@@ -161,7 +161,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
       <group ref={fref}>
         <instancedMesh
           ref={dropsRef}
-          args={[null, null, count]}
+          args={[undefined, undefined, count]}
           renderOrder={2}
         >
           <planeGeometry args={[0.5, 1]} />

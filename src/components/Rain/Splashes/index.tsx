@@ -104,7 +104,7 @@ export const Splashes = React.forwardRef<
       <group ref={fref}>
         <instancedMesh
           ref={splashRef}
-          args={[null, null, count]}
+          args={[undefined, undefined, count]}
           // @ts-ignore
           frustumCulled={false}
           renderOrder={2}

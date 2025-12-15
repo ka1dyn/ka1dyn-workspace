@@ -64,8 +64,8 @@ export function useSplashPositions(
   }, []);
 
   const _dummy = React.useMemo(() => new THREE.Object3D(), []);
-  const _dummyY = React.useMemo(() => [], []);
-  const _InitialY = React.useMemo(() => [], []);
+  const _dummyY = React.useMemo<number[]>(() => [], []);
+  const _InitialY = React.useMemo<number[]>(() => [], []);
   useFrame(({ camera }, dt) => {
     if (samplersRef.current.length === 0) return;
 
