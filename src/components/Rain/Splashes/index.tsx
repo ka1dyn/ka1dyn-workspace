@@ -109,7 +109,7 @@ export const Splashes = React.forwardRef<
           frustumCulled={false}
           renderOrder={2}
         >
-          <planeGeometry args={[0.15, 0.1]}>
+          <planeGeometry args={[0.4, 0.3]}>
             <instancedBufferAttribute
               attach={"attributes-aSplashProgress"}
               args={[new Float32Array(count), 1]}

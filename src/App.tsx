@@ -5,6 +5,7 @@ import { Suspense, useRef } from "react"
 import { Post } from "./components/Post"
 import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"
+import TestModels from "./components/TestModels.tsx"
 
 function App() {return (
     <div id="canvas-container">
@@ -19,7 +20,8 @@ function App() {return (
             dampingFactor={0.05}
           />
 
-          <Models />
+          {/* <Models /> */}
+          <TestModels />
           <Lights />
           {/* <Post /> */}
 

@@ -2,6 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
 import CSM from "three-custom-shader-material";
+import { degToRad } from "three/src/math/MathUtils.js";
 
 interface DropsProps {
   count?: number;
@@ -18,7 +19,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
       const dropsMesh = dropsRef.current;
       for (let i = 0; i < count; i++) {
 
-        const initX = THREE.MathUtils.randFloatSpread(5)
+        const initX = THREE.MathUtils.randFloatSpread(8)
         const initZ = THREE.MathUtils.randFloatSpread(5)
 
         let initY = THREE.MathUtils.randFloat(-0.1, 5);
@@ -78,7 +79,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           angles[i] = THREE.MathUtils.randFloatSpread(
             THREE.MathUtils.degToRad(20)
           );
-          _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.1, 0.5));
+          _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.5, 1.5));
         }
 
         _dummy.updateMatrix();

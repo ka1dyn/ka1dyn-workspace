@@ -191,14 +191,14 @@ export function MirrorMaterial({
           // csm_PuddleNormal = perturbNormal(csm_PuddleNormal, rippleNormals, 0.75);
 
           // Add wind noise
-          gln_tFBMOpts noiseNormalNoiseOpts = gln_tFBMOpts(1.0, 0.5, 2.0, 0.5, 1.0, 1, false, false);
-          vec3 noiseNormalPosition = vPosition * 40.0;
-          noiseNormalPosition.y += uTime * 5.0;
-          float windNoiseX = gln_sfbm(noiseNormalPosition, noiseNormalNoiseOpts);
-          float windNoiseY = gln_sfbm(noiseNormalPosition + 0.5, noiseNormalNoiseOpts);
-          float windNoiseZ = gln_sfbm(noiseNormalPosition + 1.0, noiseNormalNoiseOpts);
-          vec3 windNormal = vec3(windNoiseX, windNoiseY, windNoiseZ);
-          csm_PuddleNormal = perturbNormal(csm_PuddleNormal, windNormal, 0.05);
+          // gln_tFBMOpts noiseNormalNoiseOpts = gln_tFBMOpts(1.0, 0.5, 2.0, 0.5, 1.0, 1, false, false);
+          // vec3 noiseNormalPosition = vPosition * 40.0;
+          // noiseNormalPosition.y += uTime * 5.0;
+          // float windNoiseX = gln_sfbm(noiseNormalPosition, noiseNormalNoiseOpts);
+          // float windNoiseY = gln_sfbm(noiseNormalPosition + 0.5, noiseNormalNoiseOpts);
+          // float windNoiseZ = gln_sfbm(noiseNormalPosition + 1.0, noiseNormalNoiseOpts);
+          // vec3 windNormal = vec3(windNoiseX, windNoiseY, windNoiseZ);
+          // csm_PuddleNormal = perturbNormal(csm_PuddleNormal, windNormal, 0.05);
 
           // Color
           // Darken puddles

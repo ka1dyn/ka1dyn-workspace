@@ -4,7 +4,6 @@ import { Drops } from "./Rain/Drops";
 import { Splashes } from "./Rain/Splashes";
 import { Ground } from "./Ground";
 import Test from "../glb_components/Test";
-import TestGround from "./Ground/TestGround";
 
 export default function Models() {
     
@@ -43,9 +42,7 @@ export default function Models() {
 
 
 
-        {/* Test */}
-        {/* <Test glb_path="/models/rest/rest.glb"/> */}
-        {/* <TestGround /> */}
+        
 
         
     </>
