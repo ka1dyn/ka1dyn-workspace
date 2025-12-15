@@ -11,7 +11,7 @@ interface SplashesProps {
 export const Splashes = React.forwardRef<
   THREE.Group,
   React.PropsWithChildren<SplashesProps>
->(({ count = 200, children }, fref) => {
+>(({ count = 150, children }, fref) => {
   const splashFlipBook = useTexture("/Splash.png");
 
   const childrenGroupRef = React.useRef<THREE.Group>(null!);

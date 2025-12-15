@@ -10,12 +10,13 @@ import { MirrorTexture } from "./MirrorTexture";
 import * as THREE from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 
-// interface GroundProps {
-//   dropsRef?: React.MutableRefObject<THREE.Group>;
-//   splashRef?: React.MutableRefObject<THREE.Group>;
-// }
+interface GroundProps {
+  dropsRef?: React.MutableRefObject<THREE.Group>;
+  splashRef?: React.MutableRefObject<THREE.Group>;
+  exceptRef?: React.MutableRefObject<THREE.Group>;
+}
 
-export function Ground() {
+export function Ground({dropsRef, splashRef, exceptRef}: GroundProps) {
   const [colorMap, roughnessMap, normalMap, dispMap] = useTexture([
     'textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg',
     'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png', 
@@ -33,9 +34,15 @@ export function Ground() {
   const mirrorRef = useRef<THREE.Mesh>(null!);
 
   useFrame(({ gl, scene, camera }) => {
+    if (dropsRef && dropsRef.current) dropsRef.current.visible = false;
+    if (splashRef && splashRef.current) splashRef.current.visible = false;
+    if (exceptRef && exceptRef.current) exceptRef.current.visible = false;
     mirrorRef.current.visible = false;
     mirrorTexture.render(gl, scene, camera);
     mirrorRef.current.visible = true;
+    if (dropsRef && dropsRef.current) dropsRef.current.visible = true;
+    if (splashRef && splashRef.current) splashRef.current.visible = true;
+    if (exceptRef && exceptRef.current) exceptRef.current.visible = true;
   });
 
   const rockMaterial = useMemo(() => {
@@ -44,8 +51,8 @@ export function Ground() {
     roughnessMap,
     normalMap,
     displacementMap: dispMap,
-    displacementScale: 0.3,
-    displacementBias: -0.05,
+    displacementScale: 0.2,
+    displacementBias: -0.06,
     metalness: 0,
     roughness: 0.2,
   })
@@ -60,7 +67,7 @@ export function Ground() {
         renderOrder={1}
         rotation={[degToRad(-90), 0, 0]}
       >
-        <planeGeometry args={[7, 7, 32, 32]} />
+        <planeGeometry args={[7, 7, 64, 64]} />
         <MirrorMaterial
           baseMaterial={rockMaterial}
           renderTexture={mirrorTexture}
