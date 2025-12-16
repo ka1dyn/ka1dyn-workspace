@@ -92,9 +92,9 @@ export default function Lights() {
 
   return (
     <>
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.3} />
       <hemisphereLight
-        intensity={0.5}
+        intensity={0.3}
         args={[0xffffff, 0xffffff, 1.0]}
         // color={"#57bcff"}
         color={"#2798f5"}
@@ -105,9 +105,9 @@ export default function Lights() {
       <rectAreaLight
         width={2.8}       // Width of the light
         height={2.8}      // Height of the light
-        intensity={3}   // Brightness
+        intensity={2.5}   // Brightness
         // color="white"   // Light color
-        color="#f0d5a6"
+        color="#c8b087"
         position={[0, 2.5, 0]} 
         rotation={[-Math.PI / 2, 0, 0]} // Face downward
       />
