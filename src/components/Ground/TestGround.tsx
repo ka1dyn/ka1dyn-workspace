@@ -10,7 +10,8 @@ export function GroundBase(props:any) {
         'textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg',
         'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png', 
         'textures/aerial_rocks_01_1k/aerial_rocks_01_nor_gl_1k.png',
-        'textures/aerial_rocks_01_1k/aerial_rocks_01_disp_1k.png'])
+        'textures/aerial_rocks_01_1k/aerial_rocks_01_disp_1k.png',
+        'textures/aerial_rocks_01_1k/aerial_rocks_01_ao_1k.png'])
 
     const [alphaMap] = useTexture([
         'textures/alpha.jpg'])
@@ -29,14 +30,15 @@ export function GroundBase(props:any) {
       return new THREE.MeshStandardMaterial({
         transparent: true,
         map: maps[0],
-        alphaMap: alphaMap,
+        metalness: 0.5,
+        roughness: 0.2,
         roughnessMap: maps[1],
+        aoMap: maps[4],
         normalMap: maps[2],
+        alphaMap: alphaMap,
         displacementMap: maps[3],
         displacementScale: 0.35,
         displacementBias: -0.12,
-        metalness: 0.5,
-        roughness: 0.2,
       })
     }, [maps, alphaMap])
 
