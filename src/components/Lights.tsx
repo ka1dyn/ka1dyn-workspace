@@ -106,8 +106,8 @@ export default function Lights() {
         width={2.8}       // Width of the light
         height={2.8}      // Height of the light
         intensity={3}   // Brightness
-        // color="#ffdb97"   // Light color
-        color="#f3c87d"
+        // color="white"   // Light color
+        color="#f0d5a6"
         position={[0, 2.5, 0]} 
         rotation={[-Math.PI / 2, 0, 0]} // Face downward
       />

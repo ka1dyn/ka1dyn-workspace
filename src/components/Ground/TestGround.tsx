@@ -33,8 +33,8 @@ export function GroundBase(props:any) {
         roughnessMap: maps[1],
         normalMap: maps[2],
         displacementMap: maps[3],
-        displacementScale: 0.4,
-        displacementBias: -0.13,
+        displacementScale: 0.35,
+        displacementBias: -0.12,
         metalness: 0.5,
         roughness: 0.2,
       })
