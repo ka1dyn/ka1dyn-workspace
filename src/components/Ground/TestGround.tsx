@@ -2,8 +2,10 @@ import { MeshReflectorMaterial, useTexture } from "@react-three/drei"
 import { useMemo } from "react"
 import * as THREE from "three"
 import { degToRad } from "three/src/math/MathUtils.js"
+import { Drops } from "../Rain/Drops"
+import { Splashes } from "../Rain/Splashes"
 
-export function GroundBasic(props:any) {
+export function GroundBase(props:any) {
     const [colorMap, roughnessMap, normalMap, dispMap] = useTexture([
         'textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg',
         'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png', 
@@ -60,6 +62,19 @@ export function RainGround({props}:any) {
                 // distortionMap={distortionTexture} // The red channel of this texture is used as the distortion map. Default is null
                 reflectorOffset={0.2} // Offsets the virtual camera that projects the reflection. Useful when the reflective surface is some distance from the object's origin (default = 0)
             />
+
+            <Drops rotation={[degToRad(90), 0, 0]}/>
+
+            <Splashes count={300} rotation={[degToRad(90), 0, 0]}>
+                <mesh position={[0, 0, 0.01]}>
+                    <planeGeometry args={[10,10,1,1]}/>
+                    <meshBasicMaterial 
+                        color="white"
+                        transparent={true}
+                        opacity={0}
+                    />
+                </mesh>
+            </Splashes>
         </mesh>
     </group>
    )

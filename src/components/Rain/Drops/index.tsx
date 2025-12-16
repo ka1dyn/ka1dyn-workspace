@@ -2,14 +2,17 @@ import { useFrame } from "@react-three/fiber";
 import * as React from "react";
 import * as THREE from "three";
 import CSM from "three-custom-shader-material";
-import { degToRad } from "three/src/math/MathUtils.js";
 
-interface DropsProps {
+// interface DropsProps extends JSX.IntrinsicElements['group']{
+//   count?: number;
+// }
+
+type DropsProps = React.JSX.IntrinsicElements['group'] & {
   count?: number;
 }
 
 export const Drops = React.forwardRef<THREE.Group, DropsProps>(
-  ({ count = 400 }, fref) => {
+  ({ count = 300, ...props }, fref) => {
     const dropsRef = React.useRef<THREE.InstancedMesh>(null!);
     const _dummy = React.useMemo(() => new THREE.Object3D(), []);
     const initialY = React.useMemo(() => new Float32Array(count).fill(0), []);
@@ -19,8 +22,8 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
       const dropsMesh = dropsRef.current;
       for (let i = 0; i < count; i++) {
 
-        const initX = THREE.MathUtils.randFloatSpread(8)
-        const initZ = THREE.MathUtils.randFloatSpread(5)
+        const initX = THREE.MathUtils.randFloatSpread(9)
+        const initZ = THREE.MathUtils.randFloatSpread(9)
 
         let initY = THREE.MathUtils.randFloat(-0.1, 5);
         if (initX < 2.3 || initX > -2.3) {
@@ -59,9 +62,9 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         _dummy.rotation.x = angles[i];
         _dummy.position.y -= dt * 5;
 
-        if (_dummy.position.y <= 0 || (_dummy.position.z > -2.3 && _dummy.position.z < 2.3 && _dummy.position.x > -2.3 && _dummy.position.x < 2.3 && _dummy.position.y < 2.7)) {
-          const initX = THREE.MathUtils.randFloatSpread(5)
-          const initZ = THREE.MathUtils.randFloatSpread(5)
+        if (_dummy.position.y <= 0 ) {
+          const initX = THREE.MathUtils.randFloatSpread(9)
+          const initZ = THREE.MathUtils.randFloatSpread(9)
 
           let initY = THREE.MathUtils.randFloat(-0.1, 5);
           if (initX < 2.3 || initX > -2.3) {
@@ -79,7 +82,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           angles[i] = THREE.MathUtils.randFloatSpread(
             THREE.MathUtils.degToRad(20)
           );
-          _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.5, 1.5));
+          _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.3, 1.2));
         }
 
         _dummy.updateMatrix();
@@ -143,7 +146,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           float dropletDistance = blur(5.0);
           float rainProgress = smoothstep(0.0, 0.5, uRainProgress);
           rainProgress = clamp(rainProgress, 0.0, 1.0);
-          float circle = 1.0 - sdCircle(vInstancePosition.xz, 1.5);
+          float circle = 5.0 - sdCircle(vInstancePosition.xz, 1.5);
           csm_DiffuseColor.a = dropletDistance * 0.1 * rainProgress * circle;
           
         }
@@ -159,7 +162,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
     );
 
     return (
-      <group ref={fref}>
+      <group ref={fref} {...props}>
         <instancedMesh
           ref={dropsRef}
           args={[undefined, undefined, count]}

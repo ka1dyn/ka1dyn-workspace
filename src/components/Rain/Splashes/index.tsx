@@ -4,14 +4,18 @@ import * as THREE from "three";
 import CSM from "three-custom-shader-material";
 import { useSplashPositions } from "./useSplashPositions";
 
-interface SplashesProps {
+// interface SplashesProps {
+//   count?: number;
+// }
+
+type SplashesProps = React.JSX.IntrinsicElements['group'] & {
   count?: number;
 }
 
 export const Splashes = React.forwardRef<
   THREE.Group,
   React.PropsWithChildren<SplashesProps>
->(({ count = 150, children }, fref) => {
+>(({ count = 150, children, ...props }, fref) => {
   const splashFlipBook = useTexture("/Splash.png");
 
   const childrenGroupRef = React.useRef<THREE.Group>(null!);
@@ -101,7 +105,7 @@ export const Splashes = React.forwardRef<
 
   return (
     <>
-      <group ref={fref}>
+      <group ref={fref} {...props}>
         <instancedMesh
           ref={splashRef}
           args={[undefined, undefined, count]}

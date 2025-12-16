@@ -1,27 +1,17 @@
-import { useRef } from "react";
-import * as THREE from "three";
 import { Splashes } from "./Rain/Splashes";
 import Test from "../glb_components/Test";
-import { GroundBasic, RainGround } from "./Ground/TestGround";
-import { Drops } from "./Rain/Drops";
-
+import { GroundBase, RainGround } from "./Ground/TestGround";
 export default function TestModels() {
-    
-    // Rain
 
     return <>
-
         {/* Rain */}
         <group name="rain">
-            <Drops/>
-            <Splashes count={300}>
-                <RainGround />
-            </Splashes>
+            <RainGround />
             <Splashes>
                 <Test glb_path="/models/rest/rest.glb"/>
             </Splashes>
         </group>
-        <GroundBasic position={[0, -0.03, 0]}/>
+        <GroundBase position={[0, -0.03, 0]}/>
         
         {/* Except ground reflection */}
         <group>
