@@ -1,12 +1,12 @@
 import { MeshReflectorMaterial, useTexture } from "@react-three/drei"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import * as THREE from "three"
 import { degToRad } from "three/src/math/MathUtils.js"
 import { Drops } from "../Rain/Drops"
 import { Splashes } from "../Rain/Splashes"
 
 export function GroundBase(props:any) {
-    const [colorMap, roughnessMap, normalMap, dispMap] = useTexture([
+    const maps = useTexture([
         'textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg',
         'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png', 
         'textures/aerial_rocks_01_1k/aerial_rocks_01_nor_gl_1k.png',
@@ -15,20 +15,30 @@ export function GroundBase(props:any) {
     const [alphaMap] = useTexture([
         'textures/alpha.jpg'])
 
+    useEffect(() => {
+        maps[0].colorSpace = THREE.SRGBColorSpace;
+
+        [...maps].forEach((texture) => {
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+            texture.repeat.set(2, 2)
+            texture.needsUpdate = true
+        })
+    }, [maps, alphaMap])
+
     const rockMaterial = useMemo(() => {
       return new THREE.MeshStandardMaterial({
         transparent: true,
-        map: colorMap,
+        map: maps[0],
         alphaMap: alphaMap,
-        roughnessMap,
-        normalMap,
-        displacementMap: dispMap,
+        roughnessMap: maps[1],
+        normalMap: maps[2],
+        displacementMap: maps[3],
         displacementScale: 0.4,
-        displacementBias: -0.15,
+        displacementBias: -0.13,
         metalness: 0.5,
         roughness: 0.2,
       })
-    }, [colorMap, roughnessMap, normalMap, dispMap])
+    }, [maps, alphaMap])
 
     return (
         <group {...props}>
@@ -40,12 +50,18 @@ export function GroundBase(props:any) {
 }
 
 export function RainGround({props}:any) {
-    const [roughnessMap] = useTexture([
+     const [roughnessMap] = useTexture([
         'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png'])
-    
-        const [alphaMap] = useTexture([
+
+    const [alphaMap] = useTexture([
         'textures/alpha.jpg'])
 
+    useEffect(() => {
+        roughnessMap.wrapS = roughnessMap.wrapT = THREE.RepeatWrapping
+        roughnessMap.repeat.set(2, 2)
+        roughnessMap.needsUpdate = true
+    }, [roughnessMap])
+    
    return (
     <group {...props}>
         <mesh rotation={[degToRad(-90), 0, 0]}>
