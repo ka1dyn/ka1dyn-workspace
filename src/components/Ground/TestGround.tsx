@@ -16,7 +16,7 @@ export function GroundBase(props:any) {
         'textures/alpha.jpg'])
 
     useEffect(() => {
-        maps[0].colorSpace = THREE.SRGBColorSpace;
+        // maps[0].colorSpace = THREE.SRGBColorSpace;
 
         [...maps].forEach((texture) => {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping
