@@ -6,12 +6,13 @@ import { Suspense, useRef } from "react"
 import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"
 import { degToRad } from "three/src/math/MathUtils.js"
+import { Clouds } from "./components/Cloud.tsx"
 
 function App() {return (
     <div id="canvas-container">
       <Canvas dpr={1}>
           <Suspense>
-          <color attach="background" args={["#111111"]} />
+          <color attach="background" args={["#0f0f0f"]} />
           
           <OrbitControls
             makeDefault
@@ -24,6 +25,7 @@ function App() {return (
           {/* <Models /> */}
           <Models />
           <Lights />
+          <Clouds />
           {/* <Post /> */}
 
         </Suspense>

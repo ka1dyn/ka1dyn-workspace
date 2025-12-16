@@ -36,6 +36,7 @@ export function GroundBase(props:any) {
         aoMap: maps[4],
         normalMap: maps[2],
         alphaMap: alphaMap,
+        alphaTest: 0.01,
         displacementMap: maps[3],
         displacementScale: 0.35,
         displacementBias: -0.12,
@@ -45,7 +46,7 @@ export function GroundBase(props:any) {
     return (
         <group {...props}>
             <mesh rotation={[degToRad(-90), 0, 0]} material={rockMaterial}>
-            <planeGeometry args={[13,13,64,64]}/>
+            <planeGeometry args={[15,15,64,64]}/>
         </mesh>
         </group>
     )
@@ -67,7 +68,7 @@ export function RainGround({props}:any) {
    return (
     <group {...props}>
         <mesh rotation={[degToRad(-90), 0, 0]}>
-            <planeGeometry args={[13,13,1,1]}/>
+            <planeGeometry args={[17,17,1,1]}/>
             <MeshReflectorMaterial
                 roughnessMap={roughnessMap}
                 // normalMap={normalMap}
@@ -75,6 +76,7 @@ export function RainGround({props}:any) {
                 opacity={0.3}
                 transparent={true}
                 alphaMap={alphaMap}
+                alphaTest={0.01}
                 blur={[256, 256]} // Blur ground reflections (width, height), 0 skips blur
                 mixBlur={1.1} // How much blur mixes with surface roughness (default = 1)
                 mixStrength={10} // Strength of the reflections
@@ -94,7 +96,7 @@ export function RainGround({props}:any) {
 
             <Splashes count={300} rotation={[degToRad(90), 0, 0]}>
                 <mesh position={[0, 0, 0.01]}>
-                    <planeGeometry args={[13,13,1,1]}/>
+                    <planeGeometry args={[12,12,1,1]}/>
                     <meshBasicMaterial 
                         color="white"
                         transparent={true}
