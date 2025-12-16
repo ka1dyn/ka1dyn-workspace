@@ -105,7 +105,7 @@ export default function Lights() {
       <rectAreaLight
         width={2.8}       // Width of the light
         height={2.8}      // Height of the light
-        intensity={5}   // Brightness
+        intensity={3}   // Brightness
         // color="#ffdb97"   // Light color
         color="#f3c87d"
         position={[0, 2.5, 0]} 
@@ -163,7 +163,7 @@ export default function Lights() {
           rotation-y={Math.PI / 2}
           position={[-5, 2, 1]}
           scale={[0.5, 0.25, 1]}
-          intensity={5}
+          intensity={3}
           color="#ffedb1"
         />
         <Lightformer
@@ -181,35 +181,35 @@ export default function Lights() {
           rotation-y={Math.PI / 2}
           position={[5, 5, 5]}
           scale={[0.5, 5, 1]}
-          intensity={10}
+          intensity={1}
           color="#fff"
         />
         <Lightformer
           rotation-y={Math.PI / 2}
           position={[5, 5, 3]}
           scale={[0.5, 5, 1]}
-          intensity={10}
+          intensity={1.5}
           color="#fff"
         />
         <Lightformer
           rotation-y={Math.PI / 2}
           position={[5, 5, 0]}
           scale={[0.5, 5, 1]}
-          intensity={2}
+          intensity={1}
           color="#fff"
         />
 
         {/* Sides */}
         <Lightformer
           position={[0, 5, 5]}
-          scale={[0.5, 5, 1]}
-          intensity={2}
+          scale={[0.5, 3, 1]}
+          intensity={1.5}
           color="#fff"
         />
         <Lightformer
           position={[0, 5, -5]}
-          scale={[0.5, 5, 1]}
-          intensity={2}
+          scale={[0.5, 3, 1]}
+          intensity={1.5}
           color="#fff"
         />
       </Environment>

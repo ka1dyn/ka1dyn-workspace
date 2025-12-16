@@ -62,7 +62,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         _dummy.rotation.x = angles[i];
         _dummy.position.y -= dt * 5;
 
-        if (_dummy.position.y <= 0 ) {
+        if (_dummy.position.y <= 0 || (_dummy.position.z > -2.3 && _dummy.position.z < 2.3 && _dummy.position.x > -2.3 && _dummy.position.x < 2.3 && _dummy.position.y < 2.7)) {
           const initX = THREE.MathUtils.randFloatSpread(9)
           const initZ = THREE.MathUtils.randFloatSpread(9)
 
