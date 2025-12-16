@@ -12,9 +12,14 @@ export function GroundBase(props:any) {
         'textures/aerial_rocks_01_1k/aerial_rocks_01_nor_gl_1k.png',
         'textures/aerial_rocks_01_1k/aerial_rocks_01_disp_1k.png'])
 
+    const [alphaMap] = useTexture([
+        'textures/alpha.jpg'])
+
     const rockMaterial = useMemo(() => {
       return new THREE.MeshStandardMaterial({
+        transparent: true,
         map: colorMap,
+        alphaMap: alphaMap,
         roughnessMap,
         normalMap,
         displacementMap: dispMap,
@@ -28,7 +33,7 @@ export function GroundBase(props:any) {
     return (
         <group {...props}>
             <mesh rotation={[degToRad(-90), 0, 0]} material={rockMaterial}>
-            <planeGeometry args={[10,10,64, 64]}/>
+            <planeGeometry args={[10,10,64,64]}/>
         </mesh>
         </group>
     )
@@ -37,6 +42,9 @@ export function GroundBase(props:any) {
 export function RainGround({props}:any) {
     const [roughnessMap] = useTexture([
         'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png'])
+    
+        const [alphaMap] = useTexture([
+        'textures/alpha.jpg'])
 
    return (
     <group {...props}>
@@ -48,6 +56,7 @@ export function RainGround({props}:any) {
                 color={'#ffffff'}
                 opacity={0.3}
                 transparent={true}
+                alphaMap={alphaMap}
                 blur={[256, 256]} // Blur ground reflections (width, height), 0 skips blur
                 mixBlur={1.1} // How much blur mixes with surface roughness (default = 1)
                 mixStrength={10} // Strength of the reflections

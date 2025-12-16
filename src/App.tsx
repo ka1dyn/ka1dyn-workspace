@@ -1,4 +1,4 @@
-import { OrbitControls } from "@react-three/drei"
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei"
 import { Canvas } from "@react-three/fiber"
 import { Perf } from 'r3f-perf'
 import { Suspense, useRef } from "react"
@@ -6,6 +6,7 @@ import { Post } from "./components/Post"
 import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"
 import TestModels from "./components/TestModels.tsx"
+import { degToRad } from "three/src/math/MathUtils.js"
 
 function App() {return (
     <div id="canvas-container">
@@ -16,9 +17,10 @@ function App() {return (
           <OrbitControls
             makeDefault
             target={[0, 1, 0]}
-            maxPolarAngle={Math.PI / 2}
+            maxPolarAngle={degToRad(89.5)}
             dampingFactor={0.05}
           />
+          <PerspectiveCamera near={0.01} far={1000} fov={60} position={[0, 1, 6]} makeDefault />
 
           {/* <Models /> */}
           <TestModels />
