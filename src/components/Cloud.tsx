@@ -4,10 +4,12 @@ import { useCallback, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Cloud, Clouds } from "@react-three/drei";
 import { useSound } from "./Sound";
+import { degToRad } from "three/src/math/MathUtils.js";
 // import { isDesktop } from "react-device-detect";
 
 export function RainClouds() {
   const lightRef = useRef<THREE.DirectionalLight>(null!)
+  const cloudRef = useRef<THREE.Group>(null!);
   const [flash] = useState(() => new random.FlashGen({ count: 8, minDuration: 40, maxDuration: 200, minInterval: 10000, maxInterval: 25000 }))
   
   const {soundRef, isReady} = useSound('audio/thunder.mp3')
@@ -35,6 +37,8 @@ export function RainClouds() {
 
   const prevCnt = useRef<number>(0);
   useFrame((state, delta) => {
+
+    // Lightning
     let impulse = flash.update(state.clock.elapsedTime, delta)
     if(impulse > 0) {
       impulse = Math.random() * 4 + 2.5
@@ -47,14 +51,19 @@ export function RainClouds() {
     }
 
     prevCnt.current = flash.currentCount;
+
+    // Cloud rotation
+    if (cloudRef.current) {
+      cloudRef.current.rotation.y += 0.05 * delta;
+    }
   })
 
   const {...config} = {
     seed: 1,
     segments: 30,
     volume: 6,
-    opacity: 0.3,
-    fade: 10,
+    opacity: 0.4,
+    fade: 20,
     growth: 3,
     speed: 0.5,
     color: "#717171"
@@ -69,6 +78,7 @@ export function RainClouds() {
         decay={0.3}
         position={[0, 10, 0]} />
       <Clouds 
+        ref={cloudRef}
         limit={200} 
         material={THREE.MeshLambertMaterial}>
 
@@ -83,7 +93,7 @@ export function RainClouds() {
           seed={2}
           segments={20}
           bounds={[2, 1, 2]}
-          position={[8, 3, -4]}
+          position={[8, 4, -4]}
         />
         {/* <Cloud
           {...config}

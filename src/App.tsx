@@ -1,7 +1,7 @@
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei"
 import { Canvas } from "@react-three/fiber"
 import { Perf } from 'r3f-perf'
-import { Suspense, useRef } from "react"
+import { Suspense } from "react"
 // import { Post } from "./components/Post"
 import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"

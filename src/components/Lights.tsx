@@ -105,7 +105,7 @@ export default function Lights() {
       <rectAreaLight
         width={2.8}       // Width of the light
         height={2.8}      // Height of the light
-        intensity={2.5}   // Brightness
+        intensity={3}   // Brightness
         // color="white"   // Light color
         color="#c8b087"
         position={[0, 2.5, 0]} 
