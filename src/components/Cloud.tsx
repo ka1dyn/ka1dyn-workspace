@@ -1,20 +1,17 @@
 import * as drei from "@react-three/drei";
 import * as THREE from "three";
 import { random } from "maath"
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 // import { isDesktop } from "react-device-detect";
 
 export function Clouds() {
   const lightRef = useRef<THREE.DirectionalLight>(null!)
 
-  // drei.useHelper(lightRef, THREE.DirectionalLightHelper, 0.2, 'cyan')
-
   const [flash] = useState(() => new random.FlashGen({ count: 6, minDuration: 40, maxDuration: 200, minInterval: 10000, maxInterval: 30000 }))
 
   useFrame((state, delta) => {
     let impulse = flash.update(state.clock.elapsedTime, delta)
-    console.log(impulse)
     if(impulse > 0) {
       impulse = Math.random() * 3 + 2
     }

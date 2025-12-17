@@ -7,12 +7,14 @@ import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"
 import { degToRad } from "three/src/math/MathUtils.js"
 import { Clouds } from "./components/Cloud.tsx"
+import { BackgroundBGM } from "./components/Sound.tsx"
 
 function App() {return (
     <div id="canvas-container">
       <Canvas dpr={1}>
           <Suspense>
           <color attach="background" args={["#0f0f0f"]} />
+          <BackgroundBGM />
           
           <OrbitControls
             makeDefault
