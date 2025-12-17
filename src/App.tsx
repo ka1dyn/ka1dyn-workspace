@@ -7,31 +7,32 @@ import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"
 import { degToRad } from "three/src/math/MathUtils.js"
 import { Clouds } from "./components/Cloud.tsx"
-import { BackgroundBGM } from "./components/Sound.tsx"
+import { AudioProvider, BackgroundBGM } from "./components/Sound.tsx"
 
 function App() {return (
     <div id="canvas-container">
       <Canvas dpr={1}>
+        <AudioProvider>
           <Suspense>
-          <color attach="background" args={["#0f0f0f"]} />
-          <BackgroundBGM />
-          
-          <OrbitControls
-            makeDefault
-            target={[0, 1, 0]}
-            maxPolarAngle={degToRad(89.5)}
-            dampingFactor={0.05}
-          />
-          <PerspectiveCamera near={0.01} far={1000} fov={60} position={[0, 1, 6]} makeDefault />
+            <color attach="background" args={["#0f0f0f"]} />
+            <BackgroundBGM />
+            
+            <OrbitControls
+              makeDefault
+              target={[0, 1, 0]}
+              maxPolarAngle={degToRad(89.5)}
+              dampingFactor={0.05}
+            />
+            <PerspectiveCamera near={0.01} far={1000} fov={60} position={[0, 1, 6]} makeDefault />
 
-          {/* <Models /> */}
-          <Models />
-          <Lights />
-          <Clouds />
-          {/* <Post /> */}
+            {/* <Models /> */}
+            <Models />
+            <Lights />
+            <Clouds />
+            {/* <Post /> */}
 
-        </Suspense>
-        
+          </Suspense>
+        </AudioProvider>
 
         {/* Helpers */}
         {/* <axesHelper args={[5]} /> */}

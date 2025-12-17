@@ -40,10 +40,5 @@ export default function TmpModels() {
             </mesh>
         </group>
 
-
-
-        
-
-        
     </>
 }

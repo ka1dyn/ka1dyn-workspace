@@ -1,16 +1,38 @@
 import { useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type RefObject } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
 
-export function useSound(audioPath: string) {
+export const AudioContext = createContext<RefObject<AudioListener> | null>(null);
+
+export function AudioProvider({children}: {children: React.ReactNode}) {
   const { camera } = useThree();
-  const [loaded, setLoaded] = useState(false)
-  const [isReady, setIsReady] = useState(false)
-  const soundRef = useRef<Audio>(null!);
+  const listenerRef = useRef<AudioListener>(null!);
 
   useEffect(() => {
     const listener = new AudioListener();
+    listenerRef.current = listener
+
     camera.add(listener)
+  }, [camera])
+  
+  return (
+    <AudioContext.Provider value={listenerRef}>
+      {children}
+    </AudioContext.Provider>
+  )
+}
+
+export function useSound(audioPath: string) {
+  
+  const [loaded, setLoaded] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+  const audioListener = useContext(AudioContext)
+  const soundRef = useRef<Audio>(null!);
+
+  useEffect(() => {
+    if (!audioListener) return;
+
+    const listener = audioListener.current
 
     const sound = new Audio(listener);
     soundRef.current = sound
@@ -27,7 +49,7 @@ export function useSound(audioPath: string) {
     return () => {
       sound.stop()
     }
-  }, []);
+  }, [audioListener]);
 
   useEffect(() => {
     if(!loaded) return
@@ -36,6 +58,7 @@ export function useSound(audioPath: string) {
         setIsReady(true);
     }
     
+    // For browser policy
     window.addEventListener('click', handleClick, {once: true});
 
     return () => {
