@@ -3,6 +3,7 @@ import Test from "../glb_components/Test";
 import { GroundBase, RainGround } from "./Ground/TestGround";
 import { Floor } from "./Floor";
 import { degToRad } from "three/src/math/MathUtils.js";
+import { RainClouds } from "./Cloud";
 export default function Models() {
 
     return <>
@@ -15,9 +16,8 @@ export default function Models() {
         </group>
         <GroundBase position={[0, -0.02, 0]} rotation={[0, degToRad(50), 0]}/>
         
-        {/* Except ground reflection */}
         <Floor />
-
+        <RainClouds />
         
     </>
 }

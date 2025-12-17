@@ -22,7 +22,7 @@ export function AudioProvider({children}: {children: React.ReactNode}) {
   )
 }
 
-export function useSound(audioPath: string) {
+export function useSound(audioPath: string, loop: boolean = false) {
   
   const [loaded, setLoaded] = useState(false)
   const [isReady, setIsReady] = useState(false)
@@ -40,7 +40,7 @@ export function useSound(audioPath: string) {
     const audioLoader = new AudioLoader();
     audioLoader.load(audioPath, (buffer) => {
         sound.setBuffer(buffer);
-        sound.setLoop(true);
+        sound.setLoop(loop);
         sound.setVolume(0.5);
 
         setLoaded(true);
@@ -70,7 +70,7 @@ export function useSound(audioPath: string) {
 }
 
 export function BackgroundBGM() {
-    const {soundRef, isReady} = useSound('audio/rain.mp3')
+    const {soundRef, isReady} = useSound('audio/rain.mp3', true)
 
     useEffect(() => {
         if (!isReady) return

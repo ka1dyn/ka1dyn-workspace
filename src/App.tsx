@@ -6,7 +6,6 @@ import { Suspense, useRef } from "react"
 import Lights from "./components/Lights.tsx"
 import Models from "./components/Models.tsx"
 import { degToRad } from "three/src/math/MathUtils.js"
-import { Clouds } from "./components/Cloud.tsx"
 import { AudioProvider, BackgroundBGM } from "./components/Sound.tsx"
 
 function App() {return (
@@ -28,7 +27,7 @@ function App() {return (
             {/* <Models /> */}
             <Models />
             <Lights />
-            <Clouds />
+            
             {/* <Post /> */}
 
           </Suspense>
