@@ -94,9 +94,9 @@ export function RainGround({props}:any) {
 
             <Drops rotation={[degToRad(90), 0, 0]}/>
 
-            <Splashes count={300} rotation={[degToRad(90), 0, 0]}>
+            <Splashes count={200} rotation={[degToRad(90), 0, 0]}>
                 <mesh position={[0, 0, 0.01]}>
-                    <planeGeometry args={[12,12,1,1]}/>
+                    <circleGeometry args={[5, 32]}/>
                     <meshBasicMaterial 
                         color="white"
                         transparent={true}

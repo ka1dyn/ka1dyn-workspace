@@ -22,13 +22,13 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
       const dropsMesh = dropsRef.current;
       for (let i = 0; i < count; i++) {
 
-        const initX = THREE.MathUtils.randFloatSpread(9)
-        const initZ = THREE.MathUtils.randFloatSpread(9)
+        const initX = THREE.MathUtils.randFloatSpread(10)
+        const initZ = THREE.MathUtils.randFloatSpread(10)
 
-        let initY = THREE.MathUtils.randFloat(-0.1, 5);
+        let initY = THREE.MathUtils.randFloat(-0.1, 6);
         if (initX < 2.3 || initX > -2.3) {
           if (initZ < 2.3 || initZ > -2.3) {
-            initY = THREE.MathUtils.randFloat(3, 5)
+            initY = THREE.MathUtils.randFloat(3, 6)
           }
         }
 
@@ -60,16 +60,16 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           camera.position.z - _dummy.position.z
         );
         _dummy.rotation.x = angles[i];
-        _dummy.position.y -= dt * 5;
+        _dummy.position.y -= dt * 6;
 
         if (_dummy.position.y <= 0 || (_dummy.position.z > -2.3 && _dummy.position.z < 2.3 && _dummy.position.x > -2.3 && _dummy.position.x < 2.3 && _dummy.position.y < 2.7)) {
-          const initX = THREE.MathUtils.randFloatSpread(9)
-          const initZ = THREE.MathUtils.randFloatSpread(9)
+          const initX = THREE.MathUtils.randFloatSpread(10)
+          const initZ = THREE.MathUtils.randFloatSpread(10)
 
-          let initY = THREE.MathUtils.randFloat(-0.1, 5);
+          let initY = THREE.MathUtils.randFloat(-0.1, 6);
           if (initX < 2.3 || initX > -2.3) {
             if (initZ < 2.3 || initZ > -2.3) {
-              initY = THREE.MathUtils.randFloat(3, 5)
+              initY = THREE.MathUtils.randFloat(3, 6)
             }
           }
           _dummy.position.set(
@@ -82,7 +82,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           angles[i] = THREE.MathUtils.randFloatSpread(
             THREE.MathUtils.degToRad(20)
           );
-          _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.3, 1.2));
+          _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.3, 0.6));
         }
 
         _dummy.updateMatrix();
@@ -146,7 +146,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           float dropletDistance = blur(5.0);
           float rainProgress = smoothstep(0.0, 0.5, uRainProgress);
           rainProgress = clamp(rainProgress, 0.0, 1.0);
-          float circle = 5.0 - sdCircle(vInstancePosition.xz, 1.5);
+          float circle = 7.0 - sdCircle(vInstancePosition.xz, 1.5);
           csm_DiffuseColor.a = dropletDistance * 0.1 * rainProgress * circle;
           
         }

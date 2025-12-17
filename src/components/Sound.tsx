@@ -41,7 +41,7 @@ export function useSound(audioPath: string, loop: boolean = false) {
     audioLoader.load(audioPath, (buffer) => {
         sound.setBuffer(buffer);
         sound.setLoop(loop);
-        sound.setVolume(0.5);
+        sound.setVolume(0.7);
 
         setLoaded(true);
     })
