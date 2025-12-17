@@ -37,7 +37,7 @@ export function RainClouds() {
   useFrame((state, delta) => {
     let impulse = flash.update(state.clock.elapsedTime, delta)
     if(impulse > 0) {
-      impulse = Math.random() * 3 + 2
+      impulse = Math.random() * 4 + 2.5
     }
     lightRef.current.intensity = impulse
 
@@ -48,6 +48,17 @@ export function RainClouds() {
 
     prevCnt.current = flash.currentCount;
   })
+
+  const {...config} = {
+    seed: 1,
+    segments: 30,
+    volume: 6,
+    opacity: 0.3,
+    fade: 10,
+    growth: 3,
+    speed: 0.5,
+    color: "#717171"
+  }
 
   return (
     <>
@@ -62,30 +73,31 @@ export function RainClouds() {
         material={THREE.MeshLambertMaterial}>
 
         <Cloud
-          bounds={[1, 5, 5]}
-          segments={10}
-          position={[-10, 2, 0]}
-          color="#7d7d7d"
-          opacity={0.3}
+          {...config}
+          bounds={[2, 2, 4]}
+          position={[-9, 5, 0]}
+          
         />
         <Cloud
-          bounds={[1, 5, 5]}
-          position={[10, 2, 0]}
-          color="#7d7d7d"
-          opacity={0.3}
+          {...config}
+          seed={2}
+          segments={20}
+          bounds={[2, 1, 2]}
+          position={[8, 3, -4]}
         />
-        <Cloud
-          bounds={[1, 5, 1]}
-          position={[0, 2, 10]}
-          color="#7d7d7d"
-          opacity={0.3}
-        />
-        <Cloud
+        {/* <Cloud
+          {...config}
+          seed={3}
+          segments={20}
+          bounds={[4, 2, 1]}
+          position={[4, 4, 9]}
+        /> */}
+        {/* <Cloud
           bounds={[1, 5, 1]}
           position={[0, 2, -10]}
           color="#7d7d7d"
           opacity={0.3}
-        />
+        /> */}
       </Clouds>
 
       
