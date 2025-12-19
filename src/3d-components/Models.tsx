@@ -4,7 +4,6 @@ import { GroundBase, RainGround } from "./Ground/TestGround";
 import { Floor } from "./Floor";
 import { degToRad } from "three/src/math/MathUtils.js";
 import { RainClouds } from "./Cloud";
-import { Html } from "@react-three/drei";
 import Mac from "./Mac";
 export default function Models() {
 

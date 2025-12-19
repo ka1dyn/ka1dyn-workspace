@@ -1,19 +1,18 @@
 import { OrbitControls, PerspectiveCamera, StatsGl } from "@react-three/drei"
 import { Canvas } from "@react-three/fiber"
-import { Perf } from 'r3f-perf'
+// import { Perf } from 'r3f-perf'
 import { Suspense } from "react"
 // import { Post } from "./components/Post"
 import Lights from "@/3d-components/Lights.tsx"
 import Models from "@/3d-components/Models.tsx"
 import { degToRad } from "three/src/math/MathUtils.js"
 import { AudioProvider, BackgroundBGM } from "@/3d-components/Sound.tsx"
-import Screen from "@/3d-components/Screen"
 
 export default function Scene() {
     return (
-        <div id="canvas-container">
+        <div className="w-screen h-screen">
             <Canvas dpr={1}>
-                <StatsGl trackGPU={true}/>
+                <StatsGl trackGPU={true} className="absolute top-0 left-0 z-10000000"/>
                 <AudioProvider>
                 <Suspense>
                     <color attach="background" args={["#0f0f0f"]} />
@@ -29,9 +28,6 @@ export default function Scene() {
 
                     <Models />
                     <Lights />
-
-                    {/* Computer screen */}
-                    <Screen />
                     
                     {/* <Post /> */}
 

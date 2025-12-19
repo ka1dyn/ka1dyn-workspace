@@ -1,3 +1,4 @@
+import Home from "@/screen-components/home";
 import { Html } from "@react-three/drei";
 
 type screenProps = React.JSX.IntrinsicElements['group']
@@ -6,12 +7,19 @@ export default function Screen({...props}: screenProps) {
     return (
         <group {...props}>
             <Html
-                className="screen"
+                className="screen w-7xl h-208"
                 transform
-                distanceFactor={0.6}
-                occlude={'blending'}
+                distanceFactor={0.138}
+                occlude={"blending"}
+                style={{
+                borderRadius: "128px",
+                overflow: "hidden",
+                background: "transparent"
+            }}
             >
-                <iframe src="/home" />
+                <div className="bg-transparent">
+                    <Home />
+                </div>
             </Html>
         </group>
     )
