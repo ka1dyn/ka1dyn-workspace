@@ -16,6 +16,8 @@ export default function Models() {
         </group>
         <GroundBase position={[0, -0.02, 0]} rotation={[0, degToRad(50), 0]}/>
         
+        <Test glb_path="/models/things/things.glb"/>
+
         <Floor />
         <RainClouds />
         

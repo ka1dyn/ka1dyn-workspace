@@ -71,18 +71,19 @@ export function RainGround({props}:any) {
             <planeGeometry args={[17,17,1,1]}/>
             <MeshReflectorMaterial
                 roughnessMap={roughnessMap}
+                // roughness={0.7}
                 // normalMap={normalMap}
                 color={'#ffffff'}
                 opacity={0.3}
                 transparent={true}
                 alphaMap={alphaMap}
                 alphaTest={0.01}
-                blur={[256, 256]} // Blur ground reflections (width, height), 0 skips blur
+                blur={[64, 64]} // Blur ground reflections (width, height), 0 skips blur
                 mixBlur={1.1} // How much blur mixes with surface roughness (default = 1)
                 mixStrength={10} // Strength of the reflections
                 mixContrast={1.01} // Contrast of the reflections
-                resolution={512} // Off-buffer resolution, lower=faster, higher=better quality, slower
-                mirror={1} // Mirror environment, 0 = texture colors, 1 = pick up env colors
+                resolution={360} // Off-buffer resolution, lower=faster, higher=better quality, slower
+                mirror={0.9} // Mirror environment, 0 = texture colors, 1 = pick up env colors
                 depthScale={0} // Scale the depth factor (0 = no depth, default = 0)
                 minDepthThreshold={0.9} // Lower edge for the depthTexture interpolation (default = 0)
                 maxDepthThreshold={1} // Upper edge for the depthTexture interpolation (default = 0)
