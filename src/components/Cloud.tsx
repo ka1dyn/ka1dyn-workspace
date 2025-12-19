@@ -66,7 +66,7 @@ export function RainClouds() {
     fade: 20,
     growth: 3,
     speed: 0.5,
-    color: "#717171"
+    color: "#868686"
   }
 
   return (

@@ -46,15 +46,16 @@ export function GroundBase(props:any) {
     return (
         <group {...props}>
             <mesh rotation={[degToRad(-90), 0, 0]} material={rockMaterial}>
-            <planeGeometry args={[15,15,64,64]}/>
+            <planeGeometry args={[15,15,128,128]}/>
         </mesh>
         </group>
     )
 }
 
 export function RainGround({props}:any) {
-     const [roughnessMap] = useTexture([
-        'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png'])
+     const [roughnessMap, dispMap] = useTexture([
+        'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png',
+        'textures/aerial_rocks_01_1k/aerial_rocks_01_disp_1k.png'])
 
     const [alphaMap] = useTexture([
         'textures/alpha.jpg'])
@@ -68,12 +69,12 @@ export function RainGround({props}:any) {
    return (
     <group {...props}>
         <mesh rotation={[degToRad(-90), 0, 0]}>
-            <planeGeometry args={[17,17,1,1]}/>
-            <MeshReflectorMaterial
+            <planeGeometry args={[17,17, 1, 1]}/>
+            {/* <MeshReflectorMaterial
                 roughnessMap={roughnessMap}
                 // roughness={0.7}
                 // normalMap={normalMap}
-                color={'#ffffff'}
+                color={'#544e4eff'}
                 opacity={0.3}
                 transparent={true}
                 alphaMap={alphaMap}
@@ -91,6 +92,20 @@ export function RainGround({props}:any) {
                 // distortion={0} // Amount of distortion based on the distortionMap texture
                 // distortionMap={distortionTexture} // The red channel of this texture is used as the distortion map. Default is null
                 reflectorOffset={0.2} // Offsets the virtual camera that projects the reflection. Useful when the reflective surface is some distance from the object's origin (default = 0)
+            /> */}
+
+            <meshStandardMaterial 
+                transparent={true}
+                alphaMap={alphaMap}
+                alphaTest={0.01}
+                roughnessMap={roughnessMap}
+                roughness={0.4}
+                color={"#d0d0d0"}
+                opacity={0.4}
+                metalness={0.95}
+                // displacementMap={dispMap}
+                // displacementScale={0.2}
+                // displacementBias={-0.1}
             />
 
             <Drops rotation={[degToRad(90), 0, 0]}/>
