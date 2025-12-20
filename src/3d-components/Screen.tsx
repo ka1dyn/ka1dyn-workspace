@@ -1,4 +1,4 @@
-import Home from "@/screen-components/home";
+import Home from "@/2d-components/Home";
 import { Html } from "@react-three/drei";
 
 type screenProps = React.JSX.IntrinsicElements['group']
