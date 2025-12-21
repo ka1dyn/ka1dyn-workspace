@@ -6,7 +6,8 @@ function App() {
   const start = useStart((state) => state.start)
 
   return (
-    start ? <Scene /> : <Loading />
+    // start ? <Scene /> : <Loading />
+    <Scene />
   )
 }
 

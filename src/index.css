@@ -4,3 +4,8 @@
   width: 100vw;
   height: 100vh;
 }
+
+#leva__root {
+  position: absolute;
+  z-index: 10000000;
+}

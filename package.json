@@ -16,6 +16,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@types/three": "^0.181.0",
     "gl-noise": "^1.6.1",
+    "leva": "^0.10.1",
     "r3f-perf": "^7.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
