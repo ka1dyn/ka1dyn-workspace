@@ -41,7 +41,7 @@ export default function Loading() {
     }, []);
     
     return(
-        <div className="w-screen h-screen absolute top-0 bg-[#212121] flex justify-center items-center">
+        <div className="w-screen h-screen absolute top-0 bg-[#212121] flex justify-center items-center z-1000000000">
             <div className="w-1/2 flex-col items-center">
                 <div className="text-[#fafafa]" ref={textRef}></div>
                 {ready && (

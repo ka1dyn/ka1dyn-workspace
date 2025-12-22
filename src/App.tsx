@@ -12,8 +12,11 @@ function App() {
     <div className="w-screen h-screen bg-[#010203]">
       <Route path="/test" component={Booting} />
       <Route path="/">
-          <Scene />
-        {/* {start ? <Scene /> : <Loading />} */}
+          {/* <Scene /> */}
+          <>
+            <Scene />
+            {!start && <Loading />}
+          </>
       </Route>
       </div>
     </>
