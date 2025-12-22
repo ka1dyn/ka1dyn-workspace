@@ -9,30 +9,29 @@ import Helpers from "../Helpers"
 
 export default function Scene() {
     return (
-        <div className="w-screen h-screen">
-            <Canvas 
-                dpr={[1, 2]}
-                gl={{
-                    powerPreference: 'high-performance',
-                    alpha: false,
-                    antialias: false,
-                    stencil: false,
-                    // depth: false,
-            }}>
-                <AudioProvider>
-                    <Suspense>
-                        <color attach="background" args={["#0f0f0f"]} />
-                        <BackgroundBGM />
-                        <CameraControl />
+        <Canvas 
+            dpr={[1, 2]}
+            gl={{
+                powerPreference: 'high-performance',
+                alpha: false,
+                antialias: false,
+                stencil: false,
+                // depth: false,
+        }}>
+            <AudioProvider>
+                <Suspense>
+                    <color attach="background" args={["#0f0f0f"]} />
+                    <BackgroundBGM />
+                    <CameraControl />
 
-                        <Models />
-                        <Lights />
-                        
-                        {/* <Post /> */}
-                    </Suspense>
-                </AudioProvider>
-                {/* <Helpers /> */}
-            </Canvas>
-    </div>
+                    <Models />
+                    <Lights />
+                    
+                    {/* <Post /> */}
+                </Suspense>
+            </AudioProvider>
+            {/* <Helpers /> */}
+        </Canvas>
+
     )
 }

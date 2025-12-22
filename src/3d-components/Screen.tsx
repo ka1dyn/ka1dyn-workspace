@@ -46,9 +46,9 @@ export default function Screen({...props}: screenProps) {
         <group ref={groupRef} {...props}>
             {/* <axesHelper /> */}
             <Html
-                className="w-[2560px] h-[1664px]"
+                className="w-[2560px] h-[1700px] rounded-4xl overflow-hidden"
                 transform
-                distanceFactor={0.07}
+                distanceFactor={0.069}
                 occlude="blending"
             >
                 {/* <Home /> */}

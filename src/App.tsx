@@ -9,15 +9,13 @@ function App() {
 
   return (
     <>
-      <Route path="/test">
-        <div className="w-screen h-screen">
-          <Booting />
-        </div>
-      </Route>
+    <div className="w-screen h-screen bg-[#010203]">
+      <Route path="/test" component={Booting} />
       <Route path="/">
-        <Scene />
+          <Scene />
         {/* {start ? <Scene /> : <Loading />} */}
       </Route>
+      </div>
     </>
     
   )
