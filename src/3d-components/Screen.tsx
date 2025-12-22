@@ -1,3 +1,4 @@
+import Booting from "@/2d-components/Booting";
 import Home from "@/2d-components/Home";
 import { useCameraInit } from "@/stores";
 import { Html } from "@react-three/drei";
@@ -43,21 +44,16 @@ export default function Screen({...props}: screenProps) {
     
     return (
         <group ref={groupRef} {...props}>
-            <axesHelper />
+            {/* <axesHelper /> */}
             <Html
-                className="screen w-7xl h-208"
+                className="w-[2560px] h-[1664px]"
                 transform
-                distanceFactor={0.138}
-                occlude={"blending"}
-                style={{
-                borderRadius: "128px",
-                overflow: "hidden",
-                background: "transparent"
-            }}
+                distanceFactor={0.07}
+                occlude="blending"
             >
-                <div className="bg-transparent">
-                    <Home />
-                </div>
+                {/* <Home /> */}
+                <Booting />
+                {/* <iframe src="/test" /> */}
             </Html>
         </group>
     )

@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@layer base {
+  div {
+    border-style: none;
+  }
+}
 
 #canvas-container {
   width: 100vw;
