@@ -53,7 +53,6 @@ export default function Screen({...props}: screenProps) {
             >
                 {/* <Home /> */}
                 <Booting />
-                {/* <iframe src="/test" /> */}
             </Html>
         </group>
     )

@@ -1,3 +1,4 @@
+import { useStart } from "@/stores";
 import { useThree } from "@react-three/fiber";
 import { createContext, useContext, useEffect, useRef, useState, type RefObject } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
@@ -71,12 +72,13 @@ export function useSound(audioPath: string, loop: boolean = false) {
 
 export function BackgroundBGM() {
     const {soundRef, isReady} = useSound('audio/rain.mp3', true)
+    const start = useStart((state) => state.start)
 
     useEffect(() => {
-        if (!isReady) return
+        if (!isReady || !start) return
 
         soundRef.current.play()
-    }, [isReady])
+    }, [isReady, start])
 
     return null
 }

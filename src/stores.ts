@@ -1,5 +1,5 @@
 import {create} from 'zustand'
-import type {  StartType, Wpos, CameraInitType } from './types'
+import type {  StartType, Wpos, CameraInitType } from './types/types'
 
 export const useStart = create<StartType>((set) => ({
     start: false,

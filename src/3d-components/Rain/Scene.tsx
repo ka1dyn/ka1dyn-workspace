@@ -6,6 +6,7 @@ import Models from "@/3d-components/Models.tsx"
 import { AudioProvider, BackgroundBGM } from "@/3d-components/Sound.tsx"
 import CameraControl from "../CameraControl"
 import Helpers from "../Helpers"
+import { Preload } from "@react-three/drei"
 
 export default function Scene() {
     return (
@@ -29,6 +30,8 @@ export default function Scene() {
                     
                     {/* <Post /> */}
                 </Suspense>
+
+                <Preload all />
             </AudioProvider>
             {/* <Helpers /> */}
         </Canvas>
