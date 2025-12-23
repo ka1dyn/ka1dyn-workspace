@@ -11,11 +11,15 @@ export const useStart = create<StartType>((set) => ({
 export const useReady = create<ReadyType>((set) => ({
     frameReady: false,
     textureReady: false,
+    screenReady: false,
     setFrameReady: (newState: boolean) => {
         set({frameReady: newState})
     },
     setTextureReady: (newState: boolean) => {
         set({textureReady: newState})
+    },
+    setScreenReady: (newState: boolean) => {
+        set({screenReady: newState})
     }
 }))
 

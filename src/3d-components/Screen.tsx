@@ -1,6 +1,6 @@
 import Booting from "@/2d-components/Booting";
 import Home from "@/2d-components/Home";
-import { useCameraInit } from "@/stores";
+import { useCameraInit, useReady } from "@/stores";
 import { Html } from "@react-three/drei";
 import { useEffect, useRef } from "react";
 import * as THREE from 'three'
@@ -14,6 +14,7 @@ export default function Screen({...props}: screenProps) {
         setTarget: state.setTarget,
         setCameraPos: state.setPos
     })))
+    const screenReady = useReady((state) => state.screenReady)
 
     // Get World position
     useEffect(() => {
@@ -51,8 +52,7 @@ export default function Screen({...props}: screenProps) {
                 distanceFactor={0.069}
                 occlude="blending"
             >
-                {/* <Home /> */}
-                <Booting />
+                {screenReady ? <Home /> : <Booting />}
             </Html>
         </group>
     )

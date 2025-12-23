@@ -8,8 +8,10 @@ export interface StartType {
 export interface ReadyType {
     frameReady: boolean,
     textureReady: boolean,
+    screenReady: boolean,
     setFrameReady: (newState: boolean) => void,
-    setTextureReady: (newState: boolean) => void
+    setTextureReady: (newState: boolean) => void,
+    setScreenReady: (newState:boolean) => void
 }
 
 export interface CameraInitType {

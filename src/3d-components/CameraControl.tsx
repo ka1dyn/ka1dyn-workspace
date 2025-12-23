@@ -33,7 +33,7 @@ export default function CameraControl() {
 
     const startAnimation = useCallback(() => {
         const tl = gsap.timeline({
-            delay: 2,
+            delay: 6,
             onComplete: () => {
                 setNowAnimation(false);
             }
