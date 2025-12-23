@@ -4,7 +4,6 @@ import { useCallback, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Cloud, Clouds } from "@react-three/drei";
 import { useSound } from "./Sound";
-import { degToRad } from "three/src/math/MathUtils.js";
 // import { isDesktop } from "react-device-detect";
 
 export function RainClouds() {

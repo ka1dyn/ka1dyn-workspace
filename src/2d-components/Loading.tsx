@@ -44,7 +44,7 @@ export default function Loading() {
     return(
         <div className="w-screen h-screen absolute top-0 bg-[#212121] flex justify-center items-center z-1000000000">
             <div className="w-1/2 flex flex-col items-center">
-                <div className="text-[#fafafa] text-3xl font-thin" ref={textRef}></div>
+                <div className="text-[#fafafa] text-3xl font-thin font-roboto" ref={textRef}></div>
                 {ready && (
                     frameReady ? <button onClick={btnClick}>click</button>    
                     : <div>loading...</div>

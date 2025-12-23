@@ -40,6 +40,7 @@ export default function Scene() {
                     
                     {/* Scene Ready detection */}
                     {!frameReady && <FrameDetector />}
+                    
                     {/* <Post /> */}
                 </Suspense>
 
