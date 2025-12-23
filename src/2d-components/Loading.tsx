@@ -45,10 +45,14 @@ export default function Loading() {
         <div className="w-screen h-screen absolute top-0 bg-[#212121] flex justify-center items-center z-1000000000">
             <div className="w-1/2 flex flex-col items-center">
                 <div className="text-[#fafafa] text-3xl font-thin font-roboto" ref={textRef}></div>
-                {ready && (
-                    frameReady ? <button onClick={btnClick}>click</button>    
-                    : <div>loading...</div>
-                )}
+                    <div className="h-16 text-white text-[18px] font-roboto font-medium pt-16">
+                        {/* <span>loading...</span> */}
+                        
+                        {ready && (
+                            frameReady ? <button className="hover:scale-[0.9] hover:cursor-pointer" onClick={btnClick}>start</button>    
+                            : <div>loading...</div>
+                        )}
+                    </div>
             </div>
         </div>
     )
