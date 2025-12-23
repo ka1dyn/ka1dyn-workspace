@@ -47,12 +47,16 @@ export default function Screen({...props}: screenProps) {
         <group ref={groupRef} {...props}>
             {/* <axesHelper /> */}
             <Html
+                pointerEvents="none"
                 className="w-[2560px] h-[1700px] rounded-4xl overflow-hidden"
                 transform
                 distanceFactor={0.069}
                 occlude="blending"
             >
-                {screenReady ? <Home /> : <Booting />}
+                {/* {screenReady ? <Home /> : <Booting />} */}
+                {screenReady ? 
+                    <iframe className="w-full h-full" src="https://inpa.tistory.com/" />
+                : <Booting />}
             </Html>
         </group>
     )
