@@ -5,6 +5,13 @@ export interface StartType {
     setStart: (newStart: boolean) => void;
 }
 
+export interface ReadyType {
+    frameReady: boolean,
+    textureReady: boolean,
+    setFrameReady: (newState: boolean) => void,
+    setTextureReady: (newState: boolean) => void
+}
+
 export interface CameraInitType {
     target: Wpos,
     pos: Wpos,

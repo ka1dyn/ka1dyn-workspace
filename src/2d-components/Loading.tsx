@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { TextScramble } from "../animations/textScramble";
-import { useStart } from "../stores";
+import { useReady, useStart } from "../stores";
 
 export default function Loading() {
 
     const textRef = useRef<HTMLDivElement>(null!);
     const [ready, setReady] = useState<boolean>(false);
     const setStart = useStart((state) => state.setStart)
+    const frameReady = useReady((state) => state.frameReady)
 
     const btnClick = () => {
         setStart(true)
@@ -42,10 +43,11 @@ export default function Loading() {
     
     return(
         <div className="w-screen h-screen absolute top-0 bg-[#212121] flex justify-center items-center z-1000000000">
-            <div className="w-1/2 flex-col items-center">
-                <div className="text-[#fafafa]" ref={textRef}></div>
+            <div className="w-1/2 flex flex-col items-center">
+                <div className="text-[#fafafa] text-3xl font-thin" ref={textRef}></div>
                 {ready && (
-                    <button onClick={btnClick}>click</button>    
+                    frameReady ? <button onClick={btnClick}>click</button>    
+                    : <div>loading...</div>
                 )}
             </div>
         </div>

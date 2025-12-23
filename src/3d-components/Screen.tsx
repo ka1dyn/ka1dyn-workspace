@@ -32,7 +32,7 @@ export default function Screen({...props}: screenProps) {
         // Init camera position
         const direction = new THREE.Vector3()
         groupRef.current.getWorldDirection(direction)
-        const cameraPos = worldPosition.add(direction.multiplyScalar(0.3))
+        const cameraPos = worldPosition.add(direction.multiplyScalar(0.4))
 
         setCameraPos({
             x: cameraPos.x,

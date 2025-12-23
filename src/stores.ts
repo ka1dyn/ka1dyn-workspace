@@ -1,10 +1,21 @@
 import {create} from 'zustand'
-import type {  StartType, Wpos, CameraInitType } from './types/types'
+import type {  StartType, Wpos, CameraInitType, ReadyType } from './types/types'
 
 export const useStart = create<StartType>((set) => ({
     start: false,
     setStart: (newStart: boolean) => {
         set({start: newStart})
+    }
+}))
+
+export const useReady = create<ReadyType>((set) => ({
+    frameReady: false,
+    textureReady: false,
+    setFrameReady: (newState: boolean) => {
+        set({frameReady: newState})
+    },
+    setTextureReady: (newState: boolean) => {
+        set({textureReady: newState})
     }
 }))
 

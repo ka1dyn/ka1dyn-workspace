@@ -1,14 +1,24 @@
 import { Canvas } from "@react-three/fiber"
-import { Suspense } from "react"
+import { Suspense, useEffect } from "react"
 // import { Post } from "./components/Post"
 import Lights from "@/3d-components/Lights.tsx"
 import Models from "@/3d-components/Models.tsx"
 import { AudioProvider, BackgroundBGM } from "@/3d-components/Sound.tsx"
 import CameraControl from "../CameraControl"
 import Helpers from "../Helpers"
-import { Preload } from "@react-three/drei"
+import FrameDetector from "../FrameDetector"
+import { useReady } from "@/stores"
 
 export default function Scene() {
+    const frameReady = useReady((state) => state.frameReady)
+
+    useEffect(() => {
+        if (!frameReady) return
+        
+        //  Suspense data loading finish
+        console.log("Init frame ready")
+    }, [frameReady])
+
     return (
         <Canvas 
             dpr={[1, 2]}
@@ -28,10 +38,11 @@ export default function Scene() {
                     <Models />
                     <Lights />
                     
+                    {/* Scene Ready detection */}
+                    {!frameReady && <FrameDetector />}
                     {/* <Post /> */}
                 </Suspense>
 
-                <Preload all />
             </AudioProvider>
             {/* <Helpers /> */}
         </Canvas>

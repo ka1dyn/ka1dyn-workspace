@@ -12,10 +12,9 @@ export default function Test({glb_path, ...props}: TestProps) {
   const {gl, scene, camera} = useThree()
 
   useEffect(() => {
-    useGLTF.preload(glb_path)
     gl.compile(scene, camera)
     warmupTextures(scene, gl)
-  })
+  }, [gl, scene, camera])
 
   const gltf = useGLTF(glb_path)
   return (
