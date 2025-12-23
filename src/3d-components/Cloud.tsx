@@ -4,18 +4,20 @@ import { useCallback, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Cloud, Clouds } from "@react-three/drei";
 import { useSound } from "./Sound";
+import { useStart } from "@/stores";
 // import { isDesktop } from "react-device-detect";
 
 export function RainClouds() {
   const lightRef = useRef<THREE.DirectionalLight>(null!)
   const cloudRef = useRef<THREE.Group>(null!);
   const [flash] = useState(() => new random.FlashGen({ count: 8, minDuration: 40, maxDuration: 200, minInterval: 10000, maxInterval: 25000 }))
-  
+  const start = useStart((state) => state.start)
+
   const {soundRef, isReady} = useSound('audio/thunder.mp3')
   
   const playThunder = useCallback(() => {
     const thunder = soundRef.current
-    if(!isReady) {
+    if(!isReady || !start) {
       return
     }
 
@@ -32,7 +34,7 @@ export function RainClouds() {
     
     const delay = Math.random() * 3 + 1
     thunder.play(delay)
-  }, [isReady])
+  }, [isReady, start])
 
   const prevCnt = useRef<number>(0);
   useFrame((state, delta) => {
