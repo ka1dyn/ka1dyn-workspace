@@ -1,5 +1,6 @@
 import {create} from 'zustand'
-import type {  StartType, Wpos, CameraInitType, ReadyType } from './types/types'
+import type {  StartType, Wpos, CameraInitType, ReadyType, OverlayType } from './types/types'
+import { Overlay } from './types/enums'
 
 export const useStart = create<StartType>((set) => ({
     start: false,
@@ -39,5 +40,16 @@ export const useCameraInit = create<CameraInitType>((set) => ({
     },
     setPos: (newPos: Wpos) => {
         set({pos: {...newPos}})
+    },
+}))
+
+export const useOverlay = create<OverlayType>((set) => ({
+    active: false,
+    type: Overlay.DEFAULT,
+    setActive: (newActive: boolean) => {
+       set({active: newActive})
+    },
+    setType: (newType: Overlay) => {
+        set({type: newType})
     }
 }))

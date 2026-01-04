@@ -32,7 +32,7 @@ export function RainClouds() {
     thunder.offset = playType.start
     thunder.duration = playType.end - playType.start
     
-    const delay = Math.random() * 3 + 1
+    const delay = Math.random() * 2 + 0.5
     thunder.play(delay)
   }, [isReady, start])
 

@@ -1,5 +1,7 @@
 // Store types
 
+import type { Overlay } from "./enums";
+
 export interface StartType {
     start: boolean;
     setStart: (newStart: boolean) => void;
@@ -18,9 +20,15 @@ export interface CameraInitType {
     target: Wpos,
     pos: Wpos,
     setTarget: (newTarget: Wpos) => void,
-    setPos: (newPos: Wpos) => void
+    setPos: (newPos: Wpos) => void,
 }
 
+export interface OverlayType {
+    active: boolean,
+    type: Overlay,
+    setActive: (newActive: boolean) => void
+    setType: (newType: Overlay) => void
+}
 /* General types */
 
 // world position

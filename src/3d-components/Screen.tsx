@@ -53,10 +53,10 @@ export default function Screen({...props}: screenProps) {
                 distanceFactor={0.069}
                 occlude="blending"
             >
-                {/* {screenReady ? <Home /> : <Booting />} */}
-                {screenReady ? 
+                {screenReady ? <Home /> : <Booting />}
+                {/* {screenReady ? 
                     <iframe className="w-full h-full" src="https://inpa.tistory.com/" />
-                : <Booting />}
+                : <Booting />} */}
             </Html>
         </group>
     )
