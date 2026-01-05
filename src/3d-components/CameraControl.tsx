@@ -73,12 +73,10 @@ export default function CameraControl() {
         if (type == Overlay.SCREEN) {
             console.log('trigger screen')
             setEnable(false)
-            setActive(false);
             screenAnimation()
         } else if (type == Overlay.DEFAULT) {
             console.log('trigger back')
             setEnable(false)
-            setActive(false);
             backAnimation();
         }
     }, [type])
