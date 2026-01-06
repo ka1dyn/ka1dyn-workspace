@@ -64,3 +64,13 @@ export class TextScramble {
     return this.chars[Math.floor(Math.random() * this.chars.length)];
   }
 }
+
+export function scramble(fx: TextScramble, text: string): Promise<void> {
+  return new Promise((resolve) => {
+    fx.setText(text).then(() => {
+      setTimeout(() => {
+        resolve()
+      }, 600)
+    })
+  })
+}
