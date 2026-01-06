@@ -3,6 +3,7 @@ import { useShallow } from "zustand/shallow"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei"
 import { degToRad } from "three/src/math/MathUtils.js"
+import { Overlay as OverlayTypes } from "@/types/enums"
 import * as THREE from 'three'
 import gsap from "gsap"
 import { GsapEase, Overlay } from "@/types/enums"
@@ -12,8 +13,9 @@ export default function CameraControl() {
     const cameraRef = useRef<THREE.PerspectiveCamera>(null!);
     const controlRef = useRef<OrbitControlsImpl>(null!);
     const [enable, setEnable] = useState<boolean>(true);
-    const {type, setActive} = useOverlay(useShallow((state) => ({
+    const {type, setType, setActive} = useOverlay(useShallow((state) => ({
         type: state.type,
+        setType: state.setType,
         setActive: state.setActive,
     })))
     const typeRef = useRef<Overlay | null>(null);
@@ -39,6 +41,7 @@ export default function CameraControl() {
             onComplete: () => {
                 setEnable(true)
                 setActive(true)
+                setType(OverlayTypes.DEFAULT)
             }
         })
 
@@ -64,18 +67,15 @@ export default function CameraControl() {
     }, [cameraRef, controlRef])
 
     useEffect(() => {
-        // Ignore init trigger
-        if (typeRef.current == null) {
-            typeRef.current = type;
-            return;
-        }
-
         if (type == Overlay.SCREEN) {
-            console.log('trigger screen')
             setEnable(false)
             screenAnimation()
         } else if (type == Overlay.DEFAULT) {
-            console.log('trigger back')
+            // Ignore init trigger
+            if (typeRef.current == null) {
+                typeRef.current = type;
+                return;
+            }
             setEnable(false)
             backAnimation();
         }

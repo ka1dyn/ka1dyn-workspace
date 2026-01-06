@@ -45,7 +45,7 @@ export const useCameraInit = create<CameraInitType>((set) => ({
 
 export const useOverlay = create<OverlayType>((set) => ({
     active: false,
-    type: Overlay.DEFAULT,
+    type: Overlay.NONE,
     setActive: (newActive: boolean) => {
        set({active: newActive})
     },

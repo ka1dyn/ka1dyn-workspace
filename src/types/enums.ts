@@ -41,6 +41,7 @@ export const GsapEase = {
 } as const
 
 export const Overlay = {
+  NONE: 'none',
   DEFAULT: 'default',
   SCREEN: 'screen'
 } as const
