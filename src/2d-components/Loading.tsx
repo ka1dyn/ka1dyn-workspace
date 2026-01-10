@@ -6,6 +6,7 @@ export default function Loading() {
   const textRef1 = useRef<HTMLDivElement>(null!);
   const textRef2 = useRef<HTMLDivElement>(null!);
   const textRef3 = useRef<HTMLDivElement>(null!);
+  const textRef4 = useRef<HTMLDivElement>(null!);
   const [ready, setReady] = useState<boolean>(false);
   const setStart = useStart((state) => state.setStart);
   const frameReady = useReady((state) => state.frameReady);
@@ -20,17 +21,20 @@ export default function Loading() {
     const textAnimation = async () => {
       const phrases = [
         "Hello,",
-        "welcome to Ka1dyn's devlog",
-        "please click below to start",
+        "welcome to Ka1dyn's workspace",
+        "sound recommended for the full experience.",
+        "click below to start",
       ];
 
       const fx1 = new TextScramble(textRef1.current);
       const fx2 = new TextScramble(textRef2.current);
       const fx3 = new TextScramble(textRef3.current);
+      const fx4 = new TextScramble(textRef4.current);
 
       await scramble(fx1, phrases[0]);
       await scramble(fx2, phrases[1]);
       await scramble(fx3, phrases[2]);
+      await scramble(fx4, phrases[3]);
 
       setReady(true);
     };
@@ -53,13 +57,20 @@ export default function Loading() {
           className="text-[#fafafa] text-xl font-thin font-roboto"
           ref={textRef3}
         ></div>
+        <div
+          className="text-[#fafafa] text-xl font-thin font-roboto"
+          ref={textRef4}
+        ></div>
         <div className="h-16 text-white text-[18px] font-roboto font-medium pt-16">
           {/* <span>loading...</span> */}
 
           {ready &&
             (frameReady ? (
               <button
-                className="hover:scale-[1.1] hover:cursor-pointer"
+                className="
+                relative
+                after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-transparent
+                hover:after:bg-white hover:cursor-pointer"
                 onClick={btnClick}
               >
                 start
