@@ -7,9 +7,9 @@ import CSM from "three-custom-shader-material";
 //   count?: number;
 // }
 
-type DropsProps = React.JSX.IntrinsicElements['group'] & {
+type DropsProps = React.JSX.IntrinsicElements["group"] & {
   count?: number;
-}
+};
 
 export const Drops = React.forwardRef<THREE.Group, DropsProps>(
   ({ count = 300, ...props }, fref) => {
@@ -21,22 +21,17 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
     React.useEffect(() => {
       const dropsMesh = dropsRef.current;
       for (let i = 0; i < count; i++) {
-
-        const initX = THREE.MathUtils.randFloatSpread(10)
-        const initZ = THREE.MathUtils.randFloatSpread(10)
+        const initX = THREE.MathUtils.randFloatSpread(10);
+        const initZ = THREE.MathUtils.randFloatSpread(10);
 
         let initY = THREE.MathUtils.randFloat(-0.1, 6);
         if (initX < 2.3 || initX > -2.3) {
           if (initZ < 2.3 || initZ > -2.3) {
-            initY = THREE.MathUtils.randFloat(3, 6)
+            initY = THREE.MathUtils.randFloat(3, 6);
           }
         }
 
-        _dummy.position.set(
-          initX,
-          initY,
-          initZ,
-        );
+        _dummy.position.set(initX, initY, initZ);
 
         _dummy.updateMatrix();
         dropsMesh.setMatrixAt(i, _dummy.matrix);
@@ -52,35 +47,38 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         _dummy.matrix.decompose(
           _dummy.position,
           _dummy.quaternion,
-          _dummy.scale
+          _dummy.scale,
         );
 
         _dummy.rotation.y = Math.atan2(
           camera.position.x - _dummy.position.x,
-          camera.position.z - _dummy.position.z
+          camera.position.z - _dummy.position.z,
         );
         _dummy.rotation.x = angles[i];
         _dummy.position.y -= dt * 6;
 
-        if (_dummy.position.y <= 0 || (_dummy.position.z > -2.3 && _dummy.position.z < 2.3 && _dummy.position.x > -2.3 && _dummy.position.x < 2.3 && _dummy.position.y < 2.7)) {
-          const initX = THREE.MathUtils.randFloatSpread(10)
-          const initZ = THREE.MathUtils.randFloatSpread(10)
+        if (
+          _dummy.position.y <= 0 ||
+          (_dummy.position.z > -2.3 &&
+            _dummy.position.z < 2.3 &&
+            _dummy.position.x > -2.3 &&
+            _dummy.position.x < 2.3 &&
+            _dummy.position.y < 2.7)
+        ) {
+          const initX = THREE.MathUtils.randFloatSpread(10);
+          const initZ = THREE.MathUtils.randFloatSpread(10);
 
           let initY = THREE.MathUtils.randFloat(-0.1, 6);
           if (initX < 2.3 || initX > -2.3) {
             if (initZ < 2.3 || initZ > -2.3) {
-              initY = THREE.MathUtils.randFloat(3, 6)
+              initY = THREE.MathUtils.randFloat(3, 6);
             }
           }
-          _dummy.position.set(
-            initX,
-            initY,
-            initZ
-          );
+          _dummy.position.set(initX, initY, initZ);
 
           initialY[i] = _dummy.position.y;
           angles[i] = THREE.MathUtils.randFloatSpread(
-            THREE.MathUtils.degToRad(20)
+            THREE.MathUtils.degToRad(20),
           );
           _dummy.scale.setScalar(THREE.MathUtils.randFloat(0.3, 0.6));
         }
@@ -103,7 +101,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           vUv = uv;
         }
       `,
-      []
+      [],
     );
 
     const fragmentShader = React.useMemo(
@@ -151,14 +149,14 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           
         }
       `,
-      []
+      [],
     );
 
     const uniforms = React.useMemo(
       () => ({
         uRainProgress: { value: 1 },
       }),
-      []
+      [],
     );
 
     return (
@@ -180,5 +178,5 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         </instancedMesh>
       </group>
     );
-  }
+  },
 );

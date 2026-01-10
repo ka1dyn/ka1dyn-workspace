@@ -18,7 +18,7 @@ export class MirrorTexture extends THREE.WebGLRenderTarget {
   render(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
-    camera: THREE.Camera
+    camera: THREE.Camera,
   ) {
     this.camera.position.copy(camera.position);
     this.camera.position.reflect(new THREE.Vector3(0, 1, 0));

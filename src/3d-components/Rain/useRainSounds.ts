@@ -23,7 +23,7 @@ export function useRainSounds() {
         volume: 0.5,
       }),
     }),
-    []
+    [],
   );
 
   useEffect(() => {

@@ -16,19 +16,20 @@ interface GroundProps {
   exceptRef?: React.MutableRefObject<THREE.Group>;
 }
 
-export function Ground({dropsRef, splashRef, exceptRef}: GroundProps) {
+export function Ground({ dropsRef, splashRef, exceptRef }: GroundProps) {
   const [colorMap, roughnessMap, normalMap, dispMap] = useTexture([
-    'textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg',
-    'textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png', 
-    'textures/aerial_rocks_01_1k/aerial_rocks_01_nor_gl_1k.png',
-    'textures/aerial_rocks_01_1k/aerial_rocks_01_disp_1k.png'])
+    "textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg",
+    "textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png",
+    "textures/aerial_rocks_01_1k/aerial_rocks_01_nor_gl_1k.png",
+    "textures/aerial_rocks_01_1k/aerial_rocks_01_disp_1k.png",
+  ]);
 
   const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);
 
   const mirrorTexture = useMemo(
     () => new MirrorTexture(camera, size),
-    [camera]
+    [camera],
   );
 
   const mirrorRef = useRef<THREE.Mesh>(null!);
@@ -46,17 +47,17 @@ export function Ground({dropsRef, splashRef, exceptRef}: GroundProps) {
   });
 
   const rockMaterial = useMemo(() => {
-  return new THREE.MeshStandardMaterial({
-    map: colorMap,
-    roughnessMap,
-    normalMap,
-    displacementMap: dispMap,
-    displacementScale: 0.2,
-    displacementBias: -0.06,
-    metalness: 0,
-    roughness: 0.2,
-  })
-}, [colorMap, roughnessMap, normalMap, dispMap])
+    return new THREE.MeshStandardMaterial({
+      map: colorMap,
+      roughnessMap,
+      normalMap,
+      displacementMap: dispMap,
+      displacementScale: 0.2,
+      displacementBias: -0.06,
+      metalness: 0,
+      roughness: 0.2,
+    });
+  }, [colorMap, roughnessMap, normalMap, dispMap]);
 
   return (
     <group dispose={null}>

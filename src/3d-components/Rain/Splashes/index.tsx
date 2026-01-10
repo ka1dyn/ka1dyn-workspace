@@ -8,9 +8,9 @@ import { useSplashPositions } from "./useSplashPositions";
 //   count?: number;
 // }
 
-type SplashesProps = React.JSX.IntrinsicElements['group'] & {
+type SplashesProps = React.JSX.IntrinsicElements["group"] & {
   count?: number;
-}
+};
 
 export const Splashes = React.forwardRef<
   THREE.Group,
@@ -39,7 +39,7 @@ export const Splashes = React.forwardRef<
 					csm_Position.y += 0.05;
         }
       `,
-    []
+    [],
   );
 
   const fragmentShader = React.useMemo(
@@ -92,7 +92,7 @@ export const Splashes = React.forwardRef<
           csm_DiffuseColor.a = texel.a * 0.2 * rainProgress;
         }
       `,
-    []
+    [],
   );
 
   const uniforms = React.useMemo(
@@ -100,7 +100,7 @@ export const Splashes = React.forwardRef<
       uFlipBook: { value: splashFlipBook },
       uRainProgress: { value: 1 },
     }),
-    []
+    [],
   );
 
   return (

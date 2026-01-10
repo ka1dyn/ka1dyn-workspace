@@ -14,7 +14,7 @@ export class TextScramble {
 
   constructor(el: HTMLElement) {
     this.el = el;
-    this.chars = '!<>-_\\/[]{}—=+*^?#________';
+    this.chars = "!<>-_\\/[]{}—=+*^?#________";
     this.update = this.update.bind(this);
   }
   setText(newText: string) {
@@ -23,8 +23,8 @@ export class TextScramble {
     const promise = new Promise((resolve) => (this.resolve = resolve));
     this.queue = [];
     for (let i = 0; i < length; i++) {
-      const from = oldText[i] || '';
-      const to = newText[i] || '';
+      const from = oldText[i] || "";
+      const to = newText[i] || "";
       const start = Math.floor(Math.random() * 40);
       const end = start + Math.floor(Math.random() * 40);
       this.queue.push({ from, to, start, end });
@@ -35,7 +35,7 @@ export class TextScramble {
     return promise;
   }
   update() {
-    let output = '';
+    let output = "";
     let complete = 0;
     for (let i = 0, n = this.queue.length; i < n; i++) {
       let { from, to, start, end, char } = this.queue[i];
@@ -54,7 +54,7 @@ export class TextScramble {
     }
     this.el.innerHTML = output;
     if (complete === this.queue.length) {
-      this.resolve('');
+      this.resolve("");
     } else {
       this.frameRequest = requestAnimationFrame(this.update);
       this.frame++;
@@ -69,8 +69,8 @@ export function scramble(fx: TextScramble, text: string): Promise<void> {
   return new Promise((resolve) => {
     fx.setText(text).then(() => {
       setTimeout(() => {
-        resolve()
-      }, 600)
-    })
-  })
+        resolve();
+      }, 600);
+    });
+  });
 }
