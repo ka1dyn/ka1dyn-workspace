@@ -1,15 +1,31 @@
 import { useOverlay } from "@/stores"
-import { Overlay as OverlayTypes } from "@/types/enums"
+import { NavTypes, OverlayTypes } from "@/types/enums"
 import { useShallow } from "zustand/shallow"
 import Palette from "@/icons/palette.svg?react"
+import NavButton from "./NavButton"
+import { useState } from "react"
 
 export default function Overlay() {
+    const [navOpen, setNavOpen] = useState<boolean>(false)
     const {active, type, setType, setActive} = useOverlay(useShallow(state => ({
         active: state.active,
         type: state.type,
         setType: state.setType,
         setActive: state.setActive
     })))
+
+    const navClick = (type: NavTypes) => {
+        
+        switch(type) {
+            case NavTypes.FULL:
+                setNavOpen(!navOpen)        
+                return;
+            case NavTypes.GRAPHIC:
+                return;
+            case NavTypes.AUDIO:
+                return;
+        }
+    }
 
     const screenClick = () => {
         setActive(false);
@@ -45,24 +61,29 @@ export default function Overlay() {
             `}    
             onClick={screenClick}>{"screen >"}</button>
 
-            {/* Graphic btn */}
-            <button className="
-                w-14 h-14 bg-transparent
-                text-[#c9c9c9] text-[18px]/[18px] font-medium font-roboto
-                flex justify-center items-center
-                border border-[#ffffff2c]
-                absolute left-8 top-8
+            
+            <div className="absolute left-8 top-9 flex items-center gap-5">
+                {/* Full screen btn */}
+                <NavButton onClick={() => navClick(NavTypes.FULL)}>
+                    <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white"/>
+                </NavButton>
 
-                cursor-pointer pointer-events-auto
+                {/* Graphic btn */}
+                <NavButton onClick={() => navClick(NavTypes.GRAPHIC)}>
+                    <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white"/>
+                </NavButton>
 
-                group
-            ">
-                <span className="absolute w-0 h-px left-0 top-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:w-full group-hover:bg-white"></span>
-                <span className="absolute w-px h-0 right-0 top-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:h-full group-hover:bg-white"></span>
-                <span className="absolute w-0 h-px right-0 bottom-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:w-full group-hover:bg-white"></span>
-                <span className="absolute w-px h-0 left-0 bottom-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:h-full group-hover:bg-white"></span>
-                <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white"/>
-            </button>
+                {/* Audio btn */}
+                <NavButton onClick={() => navClick(NavTypes.AUDIO)}>
+                    <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white"/>
+                </NavButton>
+
+                {navOpen && <div className="absolute w-80 h-14 bg-[#deae28b3] top-20 left-0"></div>}
+            </div>
+
+            
+            
+            
         </div>
     )
 

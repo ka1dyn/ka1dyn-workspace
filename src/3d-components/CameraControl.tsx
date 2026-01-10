@@ -3,10 +3,10 @@ import { useShallow } from "zustand/shallow"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei"
 import { degToRad } from "three/src/math/MathUtils.js"
-import { Overlay as OverlayTypes } from "@/types/enums"
+import { OverlayTypes } from "@/types/enums"
 import * as THREE from 'three'
 import gsap from "gsap"
-import { GsapEase, Overlay } from "@/types/enums"
+import { GsapEase } from "@/types/enums"
 import { type OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 export default function CameraControl() {
@@ -18,7 +18,7 @@ export default function CameraControl() {
         setType: state.setType,
         setActive: state.setActive,
     })))
-    const typeRef = useRef<Overlay | null>(null);
+    const typeRef = useRef<OverlayTypes | null>(null);
 
     // Set Camera init position
     const {target, pos} = useCameraInit(useShallow((state) => ({
@@ -67,10 +67,10 @@ export default function CameraControl() {
     }, [cameraRef, controlRef])
 
     useEffect(() => {
-        if (type == Overlay.SCREEN) {
+        if (type == OverlayTypes.SCREEN) {
             setEnable(false)
             screenAnimation()
-        } else if (type == Overlay.DEFAULT) {
+        } else if (type == OverlayTypes.DEFAULT) {
             // Ignore init trigger
             if (typeRef.current == null) {
                 typeRef.current = type;

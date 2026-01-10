@@ -40,11 +40,18 @@ export const GsapEase = {
   ELASTIC_INOUT : 'elastic.inOut',
 } as const
 
-export const Overlay = {
+export const OverlayTypes = {
   NONE: 'none',
   DEFAULT: 'default',
   SCREEN: 'screen'
 } as const
 
+export const NavTypes = {
+  FULL: 'full',
+  GRAPHIC: 'graphic',
+  AUDIO: 'audio'
+}
+
 export type GsapEase = typeof GsapEase[keyof typeof GsapEase]
-export type Overlay = typeof Overlay[keyof typeof Overlay]
+export type OverlayTypes = typeof OverlayTypes[keyof typeof OverlayTypes]
+export type NavTypes = typeof NavTypes[keyof typeof NavTypes]

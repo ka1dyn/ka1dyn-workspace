@@ -1,6 +1,6 @@
 import { useOverlay, useStart } from "@/stores";
 import { useThree } from "@react-three/fiber";
-import { Overlay as OverlayTypes } from "@/types/enums"
+import { OverlayTypes } from "@/types/enums"
 import gsap from "gsap"
 import { createContext, useContext, useEffect, useRef, useState, type RefObject } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
@@ -41,7 +41,7 @@ function fadeInAndPlay(audio:Audio, duration = 2) {
   audio.play();
 
   gsap.to(audio.gain.gain, {
-    value: 0.7,
+    value: 0.5,
     duration: duration,
     ease: "power1.inOut",
   });
@@ -66,7 +66,7 @@ export function useSound(audioPath: string, loop: boolean = false) {
     audioLoader.load(audioPath, (buffer) => {
         sound.setBuffer(buffer);
         sound.setLoop(loop);
-        sound.setVolume(0.7);
+        sound.setVolume(0.5);
 
         setLoaded(true);
     })
