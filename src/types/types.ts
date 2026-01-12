@@ -29,6 +29,12 @@ export interface OverlayType {
   setActive: (newActive: boolean) => void;
   setType: (newType: OverlayTypes) => void;
 }
+
+export interface FullsceenType {
+  fullscreen: boolean;
+  setFullscreen: (newState: boolean) => void;
+}
+
 /* General types */
 
 // world position

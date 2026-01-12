@@ -1,9 +1,11 @@
-import { useOverlay } from "@/stores";
+import { useFullscreen, useOverlay } from "@/stores";
 import { NavTypes, OverlayTypes } from "@/types/enums";
 import { useShallow } from "zustand/shallow";
-import Palette from "@/icons/palette.svg?react";
+import PaletteIcon from "@/icons/palette.svg?react";
+import FullscreenIcon from "@/icons/fullscreen.svg?react";
+import FullscreenExitIcon from "@/icons/fullscreen_exit.svg?react";
 import NavButton from "./NavButton";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface DefaultOverlayProps {
   screenClick: () => void;
@@ -11,6 +13,7 @@ interface DefaultOverlayProps {
 
 function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
   const [navClicked, setNavClicked] = useState<NavTypes>(NavTypes.NONE);
+  const fullscreen = useFullscreen((state) => state.fullscreen);
 
   const navClick = (type: NavTypes): void => {
     switch (type) {
@@ -35,6 +38,18 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
         }
         setNavClicked(NavTypes.AUDIO);
         break;
+    }
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      // 전체 화면 진입
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error: ${err.message}`);
+      });
+    } else {
+      // 전체 화면 해제
+      document.exitFullscreen();
     }
   };
 
@@ -68,14 +83,16 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
 
       <div className="absolute left-8 top-9 flex items-center gap-5">
         {/* Full screen btn */}
-        <NavButton
-          clicked={navClicked === NavTypes.FULL}
-          onClick={() => navClick(NavTypes.FULL)}
-        >
-          <Palette
-            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white
-            ${navClicked === NavTypes.FULL && "text-white"}`}
-          />
+        <NavButton clicked={false} onClick={toggleFullScreen}>
+          {fullscreen ? (
+            <FullscreenExitIcon
+              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white`}
+            />
+          ) : (
+            <FullscreenIcon
+              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white`}
+            />
+          )}
         </NavButton>
 
         {/* Graphic btn */}
@@ -83,7 +100,7 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
           clicked={navClicked === NavTypes.GRAPHIC}
           onClick={() => navClick(NavTypes.GRAPHIC)}
         >
-          <Palette
+          <PaletteIcon
             className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white 
             ${navClicked === NavTypes.GRAPHIC && "text-white"}`}
           />
@@ -100,7 +117,7 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
           clicked={navClicked === NavTypes.AUDIO}
           onClick={() => navClick(NavTypes.AUDIO)}
         >
-          <Palette
+          <PaletteIcon
             className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white
             ${navClicked === NavTypes.AUDIO && "text-white"}`}
           />

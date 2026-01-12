@@ -5,6 +5,7 @@ import type {
   CameraInitType,
   ReadyType,
   OverlayType,
+  FullsceenType,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
 
@@ -57,5 +58,12 @@ export const useOverlay = create<OverlayType>((set) => ({
   },
   setType: (newType: OverlayTypes) => {
     set({ type: newType });
+  },
+}));
+
+export const useFullscreen = create<FullsceenType>((set) => ({
+  fullscreen: false,
+  setFullscreen: (newState: boolean) => {
+    set({ fullscreen: newState });
   },
 }));
