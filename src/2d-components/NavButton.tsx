@@ -1,9 +1,11 @@
 interface NavButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   children: React.ReactNode;
+  clicked: boolean;
 }
 
 export default function NavButton({
   children,
+  clicked,
   className,
   ...props
 }: NavButtonProps) {
@@ -23,10 +25,18 @@ export default function NavButton({
                 ${className || ""}
             `}
     >
-      <span className="absolute w-0 h-px left-0 top-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:w-full group-hover:bg-white"></span>
-      <span className="absolute w-px h-0 right-0 top-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:h-full group-hover:bg-white"></span>
-      <span className="absolute w-0 h-px right-0 bottom-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:w-full group-hover:bg-white"></span>
-      <span className="absolute w-px h-0 left-0 bottom-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:h-full group-hover:bg-white"></span>
+      <span
+        className={`absolute w-0 h-px left-0 top-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:w-full group-hover:bg-white ${clicked && "w-full bg-white"}`}
+      ></span>
+      <span
+        className={`absolute h-0 w-px right-0 top-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:h-full group-hover:bg-white ${clicked && "h-full bg-white"}`}
+      ></span>
+      <span
+        className={`absolute w-0 h-px right-0 bottom-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:w-full group-hover:bg-white ${clicked && "w-full bg-white"}`}
+      ></span>
+      <span
+        className={`absolute h-0 w-px left-0 bottom-0 bg-[#ffffff50] transition-all duration-300 ease-out group-hover:h-full group-hover:bg-white ${clicked && "h-full bg-white"}`}
+      ></span>
       {children}
     </button>
   );

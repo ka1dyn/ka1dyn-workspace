@@ -3,42 +3,42 @@ import { NavTypes, OverlayTypes } from "@/types/enums";
 import { useShallow } from "zustand/shallow";
 import Palette from "@/icons/palette.svg?react";
 import NavButton from "./NavButton";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-export default function Overlay() {
-  const [navOpen, setNavOpen] = useState<boolean>(false);
-  const { active, type, setType, setActive } = useOverlay(
-    useShallow((state) => ({
-      active: state.active,
-      type: state.type,
-      setType: state.setType,
-      setActive: state.setActive,
-    })),
-  );
+interface DefaultOverlayProps {
+  screenClick: () => void;
+}
 
-  const navClick = (type: NavTypes) => {
+function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
+  const [navClicked, setNavClicked] = useState<NavTypes>(NavTypes.NONE);
+
+  const navClick = (type: NavTypes): void => {
     switch (type) {
       case NavTypes.FULL:
-        setNavOpen(!navOpen);
-        return;
+        if (navClicked === NavTypes.FULL) {
+          setNavClicked(NavTypes.NONE);
+          break;
+        }
+        setNavClicked(NavTypes.FULL);
+        break;
       case NavTypes.GRAPHIC:
-        return;
+        if (navClicked === NavTypes.GRAPHIC) {
+          setNavClicked(NavTypes.NONE);
+          break;
+        }
+        setNavClicked(NavTypes.GRAPHIC);
+        break;
       case NavTypes.AUDIO:
-        return;
+        if (navClicked === NavTypes.AUDIO) {
+          setNavClicked(NavTypes.NONE);
+          break;
+        }
+        setNavClicked(NavTypes.AUDIO);
+        break;
     }
   };
 
-  const screenClick = () => {
-    setActive(false);
-    setType(OverlayTypes.SCREEN);
-  };
-
-  const backClick = () => {
-    setActive(false);
-    setType(OverlayTypes.DEFAULT);
-  };
-
-  const DefaultOverlay = () => (
+  return (
     <div>
       {/* Screen btn */}
       <button
@@ -68,26 +68,73 @@ export default function Overlay() {
 
       <div className="absolute left-8 top-9 flex items-center gap-5">
         {/* Full screen btn */}
-        <NavButton onClick={() => navClick(NavTypes.FULL)}>
-          <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white" />
+        <NavButton
+          clicked={navClicked === NavTypes.FULL}
+          onClick={() => navClick(NavTypes.FULL)}
+        >
+          <Palette
+            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white
+            ${navClicked === NavTypes.FULL && "text-white"}`}
+          />
         </NavButton>
 
         {/* Graphic btn */}
-        <NavButton onClick={() => navClick(NavTypes.GRAPHIC)}>
-          <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white" />
+        <NavButton
+          clicked={navClicked === NavTypes.GRAPHIC}
+          onClick={() => navClick(NavTypes.GRAPHIC)}
+        >
+          <Palette
+            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white 
+            ${navClicked === NavTypes.GRAPHIC && "text-white"}`}
+          />
+          {navClicked === NavTypes.GRAPHIC && (
+            <div
+              className="absolute w-80 h-14 bg-[#deae28b3] top-20 left-0 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            ></div>
+          )}
         </NavButton>
 
         {/* Audio btn */}
-        <NavButton onClick={() => navClick(NavTypes.AUDIO)}>
-          <Palette className="w-8 h-8 transition-all duration-300 ease-out text-[#c9c9c9] group-hover:text-white" />
+        <NavButton
+          clicked={navClicked === NavTypes.AUDIO}
+          onClick={() => navClick(NavTypes.AUDIO)}
+        >
+          <Palette
+            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white
+            ${navClicked === NavTypes.AUDIO && "text-white"}`}
+          />
+          {navClicked === NavTypes.AUDIO && (
+            <div
+              className="absolute w-80 h-14 bg-[#deae28b3] top-20 left-0 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            ></div>
+          )}
         </NavButton>
-
-        {navOpen && (
-          <div className="absolute w-80 h-14 bg-[#deae28b3] top-20 left-0"></div>
-        )}
       </div>
     </div>
   );
+}
+
+export default function Overlay() {
+  const { active, type, setType, setActive } = useOverlay(
+    useShallow((state) => ({
+      active: state.active,
+      type: state.type,
+      setType: state.setType,
+      setActive: state.setActive,
+    })),
+  );
+
+  const screenClick = () => {
+    setActive(false);
+    setType(OverlayTypes.SCREEN);
+  };
+
+  const backClick = () => {
+    setActive(false);
+    setType(OverlayTypes.DEFAULT);
+  };
 
   const ScreenOverlay = () => (
     <button
@@ -103,20 +150,20 @@ export default function Overlay() {
     </button>
   );
 
-  const RenderOverlay = () => {
+  const RenderOverlay = useMemo(() => {
     switch (type) {
       case OverlayTypes.DEFAULT:
-        return <DefaultOverlay />;
+        return <DefaultOverlay screenClick={screenClick} />;
       case OverlayTypes.SCREEN:
         return <ScreenOverlay />;
       default:
         return null;
     }
-  };
+  }, [type, screenClick]);
 
   return (
     <div className="absolute w-full h-screen pointer-events-none z-10000000">
-      {active && <RenderOverlay />}
+      {active && RenderOverlay}
     </div>
   );
 }

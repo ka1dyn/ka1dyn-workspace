@@ -47,10 +47,11 @@ export const OverlayTypes = {
 } as const;
 
 export const NavTypes = {
+  NONE: "none",
   FULL: "full",
   GRAPHIC: "graphic",
   AUDIO: "audio",
-};
+} as const;
 
 export type GsapEase = (typeof GsapEase)[keyof typeof GsapEase];
 export type OverlayTypes = (typeof OverlayTypes)[keyof typeof OverlayTypes];
