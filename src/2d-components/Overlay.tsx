@@ -8,6 +8,7 @@ import NavButton from "./NavButton";
 import { useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { SketchPicker } from "react-color";
+import usePopup from "@/hooks/Popup";
 
 interface DefaultOverlayProps {
   screenClick: () => void;
@@ -16,6 +17,11 @@ interface DefaultOverlayProps {
 function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
   const [navClicked, setNavClicked] = useState<NavTypes>(NavTypes.NONE);
   const fullscreen = useFullscreen((state) => state.fullscreen);
+  const {
+    active: pickerActive,
+    setActive: setPickerActive,
+    containerRef: pickerRef,
+  } = usePopup();
   const { intensity, lightColor, setIntensity, setLightColor } = useTweaks(
     useShallow((state) => ({
       intensity: state.intensity,
@@ -91,21 +97,7 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
         {"screen >"}
       </button>
 
-      <div className="absolute left-8 top-9 flex items-center gap-5">
-        {/* Full screen btn */}
-        <NavButton clicked={false} onClick={toggleFullScreen}>
-          {fullscreen ? (
-            <FullscreenExitIcon
-              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white`}
-            />
-          ) : (
-            <FullscreenIcon
-              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white`}
-            />
-          )}
-        </NavButton>
-
-        {/* Graphic btn */}
+      <div className="absolute right-10 top-9 flex items-center gap-5">
         <NavButton
           clicked={navClicked === NavTypes.GRAPHIC}
           onClick={() => navClick(NavTypes.GRAPHIC)}
@@ -116,21 +108,36 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
           />
           {navClicked === NavTypes.GRAPHIC && (
             <div
-              className="absolute bg-[#2d2d2db3] top-20 left-0 cursor-default flex flex-col justify-center gap-4 pt-5 px-6 pb-7"
+              className="absolute bg-[#0000002d] -top-0.5 left-0 -translate-x-[calc(100%+20px)] cursor-default flex flex-col justify-center gap-4 pt-5 px-6 pb-7"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* <SketchPicker
-                className="pointer-events-auto"
-                disableAlpha={true}
-                color={lightColor}
-                onChange={(color) => setLightColor(color.hex)}
-              /> */}
-              <p className="font-roboto text-[16px] w-fit mb-4">Light</p>
-              <div className="flex font-roboto font- items-center text-[14px] text-[#a3a3a3] gap-5">
+              <p className="font-roboto text-white text-[16px] w-fit mb-4">
+                Light
+              </p>
+              <div className="flex font-roboto font- items-center text-[16px] text-[#a3a3a3] gap-5">
                 <span className="w-[80px] text-left">color</span>
-                <span className="size-4 rounded-full bg-amber-300" />
+                <div
+                  className="flex justify-center items-center w-6 h-6 cursor-pointer"
+                  onClick={() => setPickerActive(true)}
+                >
+                  <div
+                    className={`size-4 rounded-full border-[1.5px] border-[#a3a3a3]`}
+                    style={{ backgroundColor: lightColor }}
+                  >
+                    {pickerActive && (
+                      <div ref={pickerRef} className="cursor-default">
+                        <SketchPicker
+                          className="absolute pointer-events-auto z-10000001"
+                          disableAlpha={true}
+                          color={lightColor}
+                          onChange={(color) => setLightColor(color.hex)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="flex font-roboto items-center text-[14px] text-[#a3a3a3] gap-5">
+              <div className="flex font-roboto items-center text-[16px] text-[#a3a3a3] gap-5">
                 <span className="w-[80px] text-left">intensity</span>
                 <Slider
                   defaultValue={[intensity]}
@@ -144,23 +151,35 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
             </div>
           )}
         </NavButton>
+      </div>
+
+      <div className="absolute left-8 top-10 flex items-center gap-6">
+        {/* Full screen btn */}
+        <button
+          className="
+                flex justify-center items-center cursor-pointer pointer-events-auto"
+          onClick={toggleFullScreen}
+        >
+          {fullscreen ? (
+            <FullscreenExitIcon
+              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
+            />
+          ) : (
+            <FullscreenIcon
+              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
+            />
+          )}
+        </button>
 
         {/* Audio btn */}
-        <NavButton
-          clicked={navClicked === NavTypes.AUDIO}
+        <button
+          className="cursor-pointer pointer-events-auto"
           onClick={() => navClick(NavTypes.AUDIO)}
         >
           <PaletteIcon
-            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] group-hover:text-white
-            ${navClicked === NavTypes.AUDIO && "text-white"}`}
+            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
           />
-          {navClicked === NavTypes.AUDIO && (
-            <div
-              className="absolute w-80 h-14 bg-[#deae28b3] top-20 left-0 cursor-default"
-              onClick={(e) => e.stopPropagation()}
-            ></div>
-          )}
-        </NavButton>
+        </button>
       </div>
     </div>
   );

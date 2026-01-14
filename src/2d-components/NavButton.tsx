@@ -14,7 +14,6 @@ export default function NavButton({
       {...props}
       className={`
                 w-14 h-14 bg-transparent
-                text-[#c9c9c9] text-[18px]/[18px] font-medium font-roboto
                 flex justify-center items-center
                 border border-[#ffffff2c]
                 relative
