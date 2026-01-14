@@ -1,4 +1,4 @@
-import Scene from "@/3d-components/Rain/Scene";
+import Scene from "@/3d-components/Scene";
 import { useFullscreen, useStart } from "./stores";
 import Loading from "./2d-components/Loading";
 import { Route } from "wouter";

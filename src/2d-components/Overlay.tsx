@@ -6,6 +6,8 @@ import FullscreenIcon from "@/icons/fullscreen.svg?react";
 import FullscreenExitIcon from "@/icons/fullscreen_exit.svg?react";
 import NavButton from "./NavButton";
 import { useEffect, useMemo, useState } from "react";
+import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 
 interface DefaultOverlayProps {
   screenClick: () => void;
@@ -106,9 +108,16 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
           />
           {navClicked === NavTypes.GRAPHIC && (
             <div
-              className="absolute w-80 h-14 bg-[#deae28b3] top-20 left-0 cursor-default"
+              className="absolute w-80 h-14 bg-[#2d2d2db3] top-20 left-0 cursor-default flex flex-col items-center justify-center gap-4"
               onClick={(e) => e.stopPropagation()}
-            ></div>
+            >
+              <Slider
+                defaultValue={[50]}
+                max={100}
+                step={1}
+                className="w-[200px]"
+              />
+            </div>
           )}
         </NavButton>
 
