@@ -1,13 +1,13 @@
-import { useFullscreen, useOverlay } from "@/stores";
+import { useFullscreen, useOverlay, useTweaks } from "@/stores";
 import { NavTypes, OverlayTypes } from "@/types/enums";
 import { useShallow } from "zustand/shallow";
 import PaletteIcon from "@/icons/palette.svg?react";
 import FullscreenIcon from "@/icons/fullscreen.svg?react";
 import FullscreenExitIcon from "@/icons/fullscreen_exit.svg?react";
 import NavButton from "./NavButton";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
+import { SketchPicker } from "react-color";
 
 interface DefaultOverlayProps {
   screenClick: () => void;
@@ -16,6 +16,14 @@ interface DefaultOverlayProps {
 function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
   const [navClicked, setNavClicked] = useState<NavTypes>(NavTypes.NONE);
   const fullscreen = useFullscreen((state) => state.fullscreen);
+  const { intensity, lightColor, setIntensity, setLightColor } = useTweaks(
+    useShallow((state) => ({
+      intensity: state.intensity,
+      lightColor: state.lightColor,
+      setIntensity: state.setIntensity,
+      setLightColor: state.setLightColor,
+    })),
+  );
 
   const navClick = (type: NavTypes): void => {
     switch (type) {
@@ -108,15 +116,31 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
           />
           {navClicked === NavTypes.GRAPHIC && (
             <div
-              className="absolute w-80 h-14 bg-[#2d2d2db3] top-20 left-0 cursor-default flex flex-col items-center justify-center gap-4"
+              className="absolute bg-[#2d2d2db3] top-20 left-0 cursor-default flex flex-col justify-center gap-4 pt-5 px-6 pb-7"
               onClick={(e) => e.stopPropagation()}
             >
-              <Slider
-                defaultValue={[50]}
-                max={100}
-                step={1}
-                className="w-[200px]"
-              />
+              {/* <SketchPicker
+                className="pointer-events-auto"
+                disableAlpha={true}
+                color={lightColor}
+                onChange={(color) => setLightColor(color.hex)}
+              /> */}
+              <p className="font-roboto text-[16px] w-fit mb-4">Light</p>
+              <div className="flex font-roboto font- items-center text-[14px] text-[#a3a3a3] gap-5">
+                <span className="w-[80px] text-left">color</span>
+                <span className="size-4 rounded-full bg-amber-300" />
+              </div>
+              <div className="flex font-roboto items-center text-[14px] text-[#a3a3a3] gap-5">
+                <span className="w-[80px] text-left">intensity</span>
+                <Slider
+                  defaultValue={[intensity]}
+                  min={0}
+                  max={6}
+                  step={0.1}
+                  onValueChange={(value) => setIntensity(value[0])}
+                  className="w-[120px]"
+                />
+              </div>
             </div>
           )}
         </NavButton>

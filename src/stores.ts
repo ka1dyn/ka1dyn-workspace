@@ -6,6 +6,7 @@ import type {
   ReadyType,
   OverlayType,
   FullsceenType,
+  TweaksType,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
 
@@ -66,4 +67,13 @@ export const useFullscreen = create<FullsceenType>((set) => ({
   setFullscreen: (newState: boolean) => {
     set({ fullscreen: newState });
   },
+}));
+
+export const useTweaks = create<TweaksType>((set) => ({
+  intensity: 3,
+  lightColor: "#c8b087",
+  setIntensity: (newState: number) => {
+    set({ intensity: newState });
+  },
+  setLightColor: (newState: string) => set({ lightColor: newState }),
 }));

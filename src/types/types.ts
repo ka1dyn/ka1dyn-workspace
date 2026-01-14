@@ -35,6 +35,13 @@ export interface FullsceenType {
   setFullscreen: (newState: boolean) => void;
 }
 
+export interface TweaksType {
+  intensity: number;
+  lightColor: string;
+  setIntensity: (newState: number) => void;
+  setLightColor: (newState: string) => void;
+}
+
 /* General types */
 
 // world position
