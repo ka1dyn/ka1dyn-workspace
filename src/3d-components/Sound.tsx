@@ -1,7 +1,6 @@
-import { useOverlay, useStart } from "@/stores";
+import { useOverlay, useStart, useTweaks } from "@/stores";
 import { useThree } from "@react-three/fiber";
 import { OverlayTypes } from "@/types/enums";
-import gsap from "gsap";
 import {
   createContext,
   useContext,
@@ -12,6 +11,12 @@ import {
 } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
 import { useShallow } from "zustand/shallow";
+import {
+  fadeIn,
+  fadeInAndPlay,
+  fadeOut,
+  fadeOutAndPause,
+} from "@/utils/soundEffect";
 
 export const AudioContext = createContext<RefObject<AudioListener> | null>(
   null,
@@ -33,27 +38,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AudioContext.Provider>
   );
-}
-
-function fadeOutAndPause(audio: Audio, duration = 2) {
-  gsap.to(audio.gain.gain, {
-    value: 0,
-    duration: duration,
-    ease: "power1.inOut",
-    onComplete: () => {
-      audio.pause();
-    },
-  });
-}
-
-function fadeInAndPlay(audio: Audio, duration = 2) {
-  audio.play();
-
-  gsap.to(audio.gain.gain, {
-    value: 0.5,
-    duration: duration,
-    ease: "power1.inOut",
-  });
 }
 
 export function useSound(audioPath: string, loop: boolean = false) {
@@ -117,7 +101,20 @@ export function BackgroundBGM() {
       type: state.type,
     })),
   );
+
+  const audioActive = useTweaks((state) => state.audioActive);
   const start = useStart((state) => state.start);
+
+  useEffect(() => {
+    if (!rainReady || !bgReady || !start) return;
+    if (audioActive) {
+      fadeIn(bgSound.current, 1);
+      fadeIn(rainSound.current, 1);
+    } else {
+      fadeOut(bgSound.current, 1);
+      fadeOut(rainSound.current, 1);
+    }
+  }, [audioActive]);
 
   useEffect(() => {
     if (!rainReady || !start) return;

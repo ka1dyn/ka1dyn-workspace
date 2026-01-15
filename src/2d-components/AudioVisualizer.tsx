@@ -53,9 +53,9 @@ export default function AudioVisualizer({ className }: { className?: string }) {
         const stick = stickRefs.current[i] as HTMLDivElement;
         void stick.offsetWidth;
 
-        if (stick) {
+        requestAnimationFrame(() => {
           stick.style.transform = "scaleY(1)";
-        }
+        });
       });
     }
   }, [audioActive]);
@@ -71,7 +71,7 @@ export default function AudioVisualizer({ className }: { className?: string }) {
           ref={(node) => {
             stickRefs.current[i] = node;
           }}
-          className="w-[1.5px] h-1/4 origin-bottom transition-all duration-300 ease-out bg-[#a3a3a3] group-hover:bg-white"
+          className="w-[1.5px] h-1/4 origin-bottom transition-all duration-800 ease-out bg-[#a3a3a3] group-hover:bg-white"
         />
       ))}
     </div>
