@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { SketchPicker } from "react-color";
 import usePopup from "@/hooks/Popup";
+import AudioVisualizer from "./AudioVisualizer";
 
 interface DefaultOverlayProps {
   screenClick: () => void;
@@ -180,6 +181,8 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
             className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
           />
         </button>
+
+        <AudioVisualizer className="cursor-pointer pointer-events-auto" />
       </div>
     </div>
   );

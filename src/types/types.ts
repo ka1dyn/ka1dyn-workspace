@@ -38,8 +38,10 @@ export interface FullsceenType {
 export interface TweaksType {
   intensity: number;
   lightColor: string;
+  audioActive: boolean;
   setIntensity: (newState: number) => void;
   setLightColor: (newState: string) => void;
+  setAudioActive: (newState: boolean) => void;
 }
 
 /* General types */
