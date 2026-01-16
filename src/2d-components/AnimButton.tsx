@@ -3,7 +3,7 @@ interface NavButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   clicked: boolean;
 }
 
-export default function NavButton({
+export default function AnimButton({
   children,
   clicked,
   className,

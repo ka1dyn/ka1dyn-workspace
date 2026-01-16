@@ -46,13 +46,11 @@ export const OverlayTypes = {
   SCREEN: "screen",
 } as const;
 
-export const NavTypes = {
+export const RadioBtnTypes = {
   NONE: "none",
-  FULL: "full",
-  GRAPHIC: "graphic",
-  AUDIO: "audio",
+  SETTING: "setting",
 } as const;
 
 export type GsapEase = (typeof GsapEase)[keyof typeof GsapEase];
 export type OverlayTypes = (typeof OverlayTypes)[keyof typeof OverlayTypes];
-export type NavTypes = (typeof NavTypes)[keyof typeof NavTypes];
+export type RadioBtnTypes = (typeof RadioBtnTypes)[keyof typeof RadioBtnTypes];
