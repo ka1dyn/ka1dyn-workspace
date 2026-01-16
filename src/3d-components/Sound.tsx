@@ -125,7 +125,7 @@ export function BackgroundBGM() {
   useEffect(() => {
     if (!bgReady || !start) return;
 
-    if (type == OverlayTypes.DEFAULT) {
+    if (type == OverlayTypes.DEFAULT && audioActive) {
       fadeInAndPlay(bgSound.current);
     } else if (type == OverlayTypes.SCREEN) {
       fadeOutAndPause(bgSound.current);

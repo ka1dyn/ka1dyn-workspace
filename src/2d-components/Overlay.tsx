@@ -4,6 +4,7 @@ import { useShallow } from "zustand/shallow";
 import PaletteIcon from "@/icons/palette.svg?react";
 import FullscreenIcon from "@/icons/fullscreen.svg?react";
 import FullscreenExitIcon from "@/icons/fullscreen_exit.svg?react";
+import GithubIcon from "@/icons/github.svg?react";
 import NavButton from "./NavButton";
 import { useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
@@ -29,6 +30,12 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
       lightColor: state.lightColor,
       setIntensity: state.setIntensity,
       setLightColor: state.setLightColor,
+    })),
+  );
+  const { audioActive, setAudioActive } = useTweaks(
+    useShallow((state) => ({
+      audioActive: state.audioActive,
+      setAudioActive: state.setAudioActive,
     })),
   );
 
@@ -154,35 +161,51 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
         </NavButton>
       </div>
 
-      <div className="absolute left-8 top-10 flex items-center gap-6">
+      <div className="absolute h-[32px] left-8 top-10 flex items-center gap-6 pointer-events-auto [&>*]:w-8">
         {/* Full screen btn */}
-        <button
-          className="
+        <div className="">
+          <button
+            className="
                 flex justify-center items-center cursor-pointer pointer-events-auto"
-          onClick={toggleFullScreen}
+            onClick={toggleFullScreen}
+          >
+            {fullscreen ? (
+              <FullscreenExitIcon
+                className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
+              />
+            ) : (
+              <FullscreenIcon
+                className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
+              />
+            )}
+          </button>
+        </div>
+
+        {/* Github btn */}
+        <div
+          className="h-full overflow-hidden flex items-center justify-center cursor-pointer pointer-events-auto group"
+          onClick={() =>
+            window.open(
+              "https://github.com/ka1dyn",
+              "_blank",
+              "noopener,noreferrer",
+            )
+          }
         >
-          {fullscreen ? (
-            <FullscreenExitIcon
-              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
-            />
-          ) : (
-            <FullscreenIcon
-              className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
-            />
-          )}
-        </button>
+          <GithubIcon
+            className="w-[24px] h-[24px] text-[#a3a3a3] group-hover:text-white transition-all duration-300 ease-out"
+            viewBox="0 0 98 96"
+            preserveAspectRatio="xMidYMid meet"
+          />
+        </div>
 
         {/* Audio btn */}
-        <button
-          className="cursor-pointer pointer-events-auto"
-          onClick={() => navClick(NavTypes.AUDIO)}
+        <div
+          className="h-full relative cursor-pointer pointer-events-auto group"
+          onClick={() => setAudioActive(!audioActive)}
         >
-          <PaletteIcon
-            className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
-          />
-        </button>
-
-        <AudioVisualizer className="cursor-pointer pointer-events-auto" />
+          <AudioVisualizer className="absolute w-[24px] h-[16px] bottom-[4px] left-1/2 -translate-x-1/2 cursor-pointer pointer-events-auto" />
+        </div>
       </div>
     </div>
   );

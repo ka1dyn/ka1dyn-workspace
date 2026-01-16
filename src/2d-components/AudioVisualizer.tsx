@@ -1,16 +1,11 @@
 import { useTweaks } from "@/stores";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useShallow } from "zustand/shallow";
 
 export default function AudioVisualizer({ className }: { className?: string }) {
   const stickRefs = useRef<(HTMLDivElement | null)[]>([]);
   const animationRefs = useRef<Animation[]>([]);
-  const { audioActive, setAudioActive } = useTweaks(
-    useShallow((state) => ({
-      audioActive: state.audioActive,
-      setAudioActive: state.setAudioActive,
-    })),
-  );
+  const audioActive = useTweaks((state) => state.audioActive);
 
   const stickCnt = 4;
 
@@ -62,8 +57,7 @@ export default function AudioVisualizer({ className }: { className?: string }) {
 
   return (
     <div
-      className={`flex justify-between items-end w-8 h-6 pt-1.5 pb-0.5 px-1.5 pointer-events-auto group ${className}`}
-      onClick={() => setAudioActive(!audioActive)}
+      className={`flex justify-around items-end w-8 h-8 pointer-events-auto group ${className}`}
     >
       {[...Array(stickCnt)].map((_, i) => (
         <div
