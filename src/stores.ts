@@ -1,15 +1,15 @@
 import { create } from "zustand";
-import type {
-  StartType,
-  Wpos,
-  CameraInitType,
-  ReadyType,
-  OverlayType,
-  FullsceenType,
-  TweaksType,
+import {
+  type StartType,
+  type Wpos,
+  type CameraInitType,
+  type ReadyType,
+  type OverlayType,
+  type FullsceenType,
+  type TweaksType,
+  type SoundVolType,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
-import * as THREE from "three";
 
 export const useStart = create<StartType>((set) => ({
   start: false,
@@ -78,6 +78,7 @@ export const useTweaks = create<TweaksType>((set) => ({
   intensity: 3,
   lightColor: "#c8b087",
   audioActive: true,
+  audioPrev: false,
   dive: false,
   setCameraBlock: (newState: boolean) =>
     set({
@@ -88,7 +89,23 @@ export const useTweaks = create<TweaksType>((set) => ({
   },
   setLightColor: (newState: string) => set({ lightColor: newState }),
   setAudioActive: (newState: boolean) => set({ audioActive: newState }),
+  setAudioPrev: (newState: boolean) => set({ audioPrev: newState }),
   setDive: (newState: boolean) => {
     set({ dive: newState });
+  },
+}));
+
+export const useSoundVol = create<SoundVolType>((set) => ({
+  music: 0.5,
+  rain: 0.5,
+  lightning: 0.5,
+  setMusic: (newVol: number) => {
+    set({ music: newVol });
+  },
+  setRain: (newVol: number) => {
+    set({ rain: newVol });
+  },
+  setLightning: (newVol: number) => {
+    set({ lightning: newVol });
   },
 }));

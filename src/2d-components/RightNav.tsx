@@ -11,7 +11,7 @@ interface LeftNavProps {
   soundActive?: boolean;
 }
 
-export default function LeftNav({
+export default function RightNav({
   fullActive = true,
   githubActive = true,
   soundActive = true,
@@ -37,25 +37,14 @@ export default function LeftNav({
   };
 
   return (
-    <div className="absolute h-8 left-8 top-10 flex items-center gap-6 pointer-events-auto *:w-8">
-      {/* Full screen btn */}
-      {fullActive && (
-        <div className="">
-          <button
-            className="
-                 flex justify-center items-center cursor-pointer pointer-events-auto"
-            onClick={toggleFullScreen}
-          >
-            {fullscreen ? (
-              <FullscreenExitIcon
-                className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
-              />
-            ) : (
-              <FullscreenIcon
-                className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
-              />
-            )}
-          </button>
+    <div className="absolute h-8 right-8 top-10 flex items-center gap-6 pointer-events-auto *:w-8">
+      {/* Audio btn */}
+      {soundActive && (
+        <div
+          className="h-full relative cursor-pointer pointer-events-auto group"
+          onClick={() => setAudioActive(!audioActive)}
+        >
+          <AudioVisualizer className="absolute w-6 h-4 bottom-1 left-1/2 -translate-x-1/2 cursor-pointer pointer-events-auto" />
         </div>
       )}
 
@@ -79,13 +68,24 @@ export default function LeftNav({
         </div>
       )}
 
-      {/* Audio btn */}
-      {soundActive && (
-        <div
-          className="h-full relative cursor-pointer pointer-events-auto group"
-          onClick={() => setAudioActive(!audioActive)}
-        >
-          <AudioVisualizer className="absolute w-6 h-4 bottom-1 left-1/2 -translate-x-1/2 cursor-pointer pointer-events-auto" />
+      {/* Full screen btn */}
+      {fullActive && (
+        <div className="">
+          <button
+            className="
+                 flex justify-center items-center cursor-pointer pointer-events-auto"
+            onClick={toggleFullScreen}
+          >
+            {fullscreen ? (
+              <FullscreenExitIcon
+                className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
+              />
+            ) : (
+              <FullscreenIcon
+                className={`w-8 h-8 transition-all duration-300 ease-out text-[#a3a3a3] hover:text-white`}
+              />
+            )}
+          </button>
         </div>
       )}
     </div>

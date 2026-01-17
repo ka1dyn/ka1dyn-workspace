@@ -22,7 +22,7 @@ export default function RadioNav() {
   };
 
   return (
-    <div className="absolute right-10 top-9 flex flex-col items-center gap-5">
+    <div className="absolute left-10 top-9 flex flex-col items-center gap-5">
       <AnimButton
         clicked={navClicked === RadioBtnTypes.SETTING}
         onClick={() => btnClick(RadioBtnTypes.SETTING)}

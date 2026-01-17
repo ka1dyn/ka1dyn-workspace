@@ -1,4 +1,4 @@
-import { useOverlay, useStart, useTweaks } from "@/stores";
+import { useOverlay, useSoundVol, useStart, useTweaks } from "@/stores";
 import { useThree } from "@react-three/fiber";
 import { OverlayTypes } from "@/types/enums";
 import {
@@ -16,6 +16,7 @@ import {
   fadeOut,
   fadeOutAndPause,
 } from "@/utils/soundEffect";
+import { useShallow } from "zustand/shallow";
 
 export const AudioContext = createContext<RefObject<AudioListener> | null>(
   null,
@@ -39,7 +40,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useSound(audioPath: string, loop: boolean = false) {
+export function useSound(
+  audioPath: string,
+  loop: boolean = false,
+  initVol: number = 0.5,
+) {
   const [loaded, setLoaded] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const audioListener = useContext(AudioContext);
@@ -57,7 +62,7 @@ export function useSound(audioPath: string, loop: boolean = false) {
     audioLoader.load(audioPath, (buffer) => {
       sound.setBuffer(buffer);
       sound.setLoop(loop);
-      sound.setVolume(0.5);
+      sound.setVolume(initVol);
 
       setLoaded(true);
     });
@@ -86,6 +91,12 @@ export function useSound(audioPath: string, loop: boolean = false) {
 }
 
 export function BackgroundBGM() {
+  const { music, rain } = useSoundVol(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
+
   const { soundRef: rainSound, isReady: rainReady } = useSound(
     "audio/rain.mp3",
     true,
@@ -94,10 +105,19 @@ export function BackgroundBGM() {
     "audio/background.mp3",
     true,
   );
+
   const type = useOverlay((state) => state.type);
 
   const audioActive = useTweaks((state) => state.audioActive);
   const start = useStart((state) => state.start);
+
+  // // Volume changes
+  useEffect(() => {
+    if (!rainReady || !bgReady) return;
+
+    bgSound.current.gain.gain.value = music;
+    rainSound.current.gain.gain.value = rain;
+  }, [rainReady, bgReady, music, rain]);
 
   useEffect(() => {
     if (!rainReady || !bgReady || !start) return;

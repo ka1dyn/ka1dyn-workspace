@@ -1,7 +1,20 @@
-import { useTweaks } from "@/stores";
+import { useOverlay, useTweaks } from "@/stores";
+import { useShallow } from "zustand/shallow";
 
 export default function Home() {
-  const setDive = useTweaks((state) => state.setDive);
+  const { audioPrev, setDive, setAudioActive } = useTweaks(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
+
+  const setActive = useOverlay((state) => state.setActive);
+
+  const exitClick = () => {
+    setActive(true);
+    setDive(false);
+    setAudioActive(audioPrev);
+  };
 
   return (
     <div className="home w-full h-full bg-amber-100 relative">
@@ -9,7 +22,7 @@ export default function Home() {
       <button
         type="button"
         className="absolute right-10 bottom-20 cursor-pointer"
-        onClick={() => setDive(false)}
+        onClick={exitClick}
       >
         Exit
       </button>

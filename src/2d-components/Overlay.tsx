@@ -2,7 +2,7 @@ import { useOverlay, useTweaks } from "@/stores";
 import { OverlayTypes } from "@/types/enums";
 import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
-import LeftNav from "./Leftnav";
+import RightNav from "./RightNav";
 import RadioNav from "./RadioNav";
 import useCameraAnim from "@/hooks/useCameraAnim";
 
@@ -18,7 +18,7 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
   return (
     <div>
       {/* Left nav */}
-      <LeftNav />
+      <RightNav />
 
       {/* Right nav */}
       <RadioNav />
@@ -53,12 +53,24 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
 }
 
 function ScreenOverlay({ backClick }: ScreenOverlayProps) {
-  const setDive = useTweaks((state) => state.setDive);
+  const { audioActive, setDive, setAudioActive, setAudioPrev } = useTweaks(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
+  const setActive = useOverlay((state) => state.setActive);
+
+  const diveClick = () => {
+    setActive(false);
+    setDive(true);
+    setAudioPrev(audioActive);
+    setAudioActive(false);
+  };
 
   return (
     <div>
       {/* Left nav */}
-      <LeftNav />
+      <RightNav />
 
       <button
         className="
@@ -78,7 +90,7 @@ function ScreenOverlay({ backClick }: ScreenOverlayProps) {
           text-[#c9c9c9] text-[20px] font-medium font-roboto
           hover:cursor-pointer hover:text-white
       "
-        onClick={() => setDive(true)}
+        onClick={diveClick}
       >
         {"dive in"}
       </button>

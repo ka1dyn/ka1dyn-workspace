@@ -1,6 +1,6 @@
 import { useCameraInit, useOverlay, useTweaks } from "@/stores";
 import { GsapEase, OverlayTypes } from "@/types/enums";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 import gsap from "gsap";
 
@@ -33,7 +33,7 @@ export default function useCameraAnim() {
     const controls = controlRef?.current;
 
     if (!camera || !controls) {
-      console.warn("아직 카메라가 준비되지 않았습니다.");
+      console.warn("There is no camera");
       return;
     }
 
@@ -77,7 +77,7 @@ export default function useCameraAnim() {
     const controls = controlRef?.current;
 
     if (!camera || !controls) {
-      console.warn("아직 카메라가 준비되지 않았습니다.");
+      console.warn("There is no camera");
       return;
     }
 
@@ -118,7 +118,7 @@ export default function useCameraAnim() {
     const controls = controlRef?.current;
 
     if (!camera || !controls) {
-      console.warn("아직 카메라가 준비되지 않았습니다.");
+      console.warn("There is no camera");
       return;
     }
 

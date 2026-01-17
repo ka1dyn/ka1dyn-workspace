@@ -49,12 +49,23 @@ export interface TweaksType {
   intensity: number;
   lightColor: string;
   audioActive: boolean;
+  audioPrev: boolean;
   dive: boolean;
   setCameraBlock: (newState: boolean) => void;
   setIntensity: (newState: number) => void;
   setLightColor: (newState: string) => void;
   setAudioActive: (newState: boolean) => void;
+  setAudioPrev: (newState: boolean) => void;
   setDive: (newState: boolean) => void;
+}
+
+export interface SoundVolType {
+  music: number;
+  rain: number;
+  lightning: number;
+  setMusic: (newState: number) => void;
+  setRain: (newState: number) => void;
+  setLightning: (newState: number) => void;
 }
 
 /* General types */
