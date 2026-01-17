@@ -9,6 +9,7 @@ import type {
   TweaksType,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
+import * as THREE from "three";
 
 export const useStart = create<StartType>((set) => ({
   start: false,
@@ -43,12 +44,15 @@ export const useCameraInit = create<CameraInitType>((set) => ({
     y: 0,
     z: 0,
   },
+  cameraRef: null,
+  controlRef: null,
   setTarget: (newTarget: Wpos) => {
     set({ target: { ...newTarget } });
   },
   setPos: (newPos: Wpos) => {
     set({ pos: { ...newPos } });
   },
+  setRefs: (refs) => set({ ...refs }),
 }));
 
 export const useOverlay = create<OverlayType>((set) => ({
@@ -70,10 +74,15 @@ export const useFullscreen = create<FullsceenType>((set) => ({
 }));
 
 export const useTweaks = create<TweaksType>((set) => ({
+  cameraBlock: false,
   intensity: 3,
   lightColor: "#c8b087",
   audioActive: true,
   dive: false,
+  setCameraBlock: (newState: boolean) =>
+    set({
+      cameraBlock: newState,
+    }),
   setIntensity: (newState: number) => {
     set({ intensity: newState });
   },

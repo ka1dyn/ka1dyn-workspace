@@ -1,6 +1,9 @@
 // Store types
 
+import type { RefObject } from "react";
 import type { OverlayTypes } from "./enums";
+import * as THREE from "three";
+import { type OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 export interface StartType {
   start: boolean;
@@ -19,8 +22,14 @@ export interface ReadyType {
 export interface CameraInitType {
   target: Wpos;
   pos: Wpos;
+  cameraRef: RefObject<THREE.PerspectiveCamera> | null;
+  controlRef: RefObject<OrbitControlsImpl> | null;
   setTarget: (newTarget: Wpos) => void;
   setPos: (newPos: Wpos) => void;
+  setRefs: (newRefs: {
+    cameraRef: RefObject<THREE.PerspectiveCamera>;
+    controlRef: RefObject<OrbitControlsImpl>;
+  }) => void;
 }
 
 export interface OverlayType {
@@ -36,10 +45,12 @@ export interface FullsceenType {
 }
 
 export interface TweaksType {
+  cameraBlock: boolean;
   intensity: number;
   lightColor: string;
   audioActive: boolean;
   dive: boolean;
+  setCameraBlock: (newState: boolean) => void;
   setIntensity: (newState: number) => void;
   setLightColor: (newState: string) => void;
   setAudioActive: (newState: boolean) => void;

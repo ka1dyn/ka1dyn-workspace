@@ -4,6 +4,7 @@ import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
 import LeftNav from "./Leftnav";
 import RadioNav from "./RadioNav";
+import useCameraAnim from "@/hooks/useCameraAnim";
 
 interface DefaultOverlayProps {
   screenClick: () => void;
@@ -94,15 +95,18 @@ export default function Overlay() {
       setActive: state.setActive,
     })),
   );
+  const { screenAnimation, backAnimation } = useCameraAnim();
 
   const screenClick = () => {
     setActive(false);
     setType(OverlayTypes.SCREEN);
+    screenAnimation();
   };
 
   const backClick = () => {
     setActive(false);
     setType(OverlayTypes.DEFAULT);
+    backAnimation();
   };
 
   const RenderOverlay = useMemo(() => {

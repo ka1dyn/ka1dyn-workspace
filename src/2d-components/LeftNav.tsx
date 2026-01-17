@@ -37,7 +37,7 @@ export default function LeftNav({
   };
 
   return (
-    <div className="absolute h-[32px] left-8 top-10 flex items-center gap-6 pointer-events-auto [&>*]:w-8">
+    <div className="absolute h-8 left-8 top-10 flex items-center gap-6 pointer-events-auto *:w-8">
       {/* Full screen btn */}
       {fullActive && (
         <div className="">
@@ -72,7 +72,7 @@ export default function LeftNav({
           }
         >
           <GithubIcon
-            className="w-[24px] h-[24px] text-[#a3a3a3] group-hover:text-white transition-all duration-300 ease-out"
+            className="w-6 h-6 text-[#a3a3a3] group-hover:text-white transition-all duration-300 ease-out"
             viewBox="0 0 98 96"
             preserveAspectRatio="xMidYMid meet"
           />
@@ -85,7 +85,7 @@ export default function LeftNav({
           className="h-full relative cursor-pointer pointer-events-auto group"
           onClick={() => setAudioActive(!audioActive)}
         >
-          <AudioVisualizer className="absolute w-[24px] h-[16px] bottom-[4px] left-1/2 -translate-x-1/2 cursor-pointer pointer-events-auto" />
+          <AudioVisualizer className="absolute w-6 h-4 bottom-1 left-1/2 -translate-x-1/2 cursor-pointer pointer-events-auto" />
         </div>
       )}
     </div>

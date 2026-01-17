@@ -1,4 +1,4 @@
-import usePopup from "@/hooks/Popup";
+import usePopup from "@/hooks/usePopup";
 import { useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import { Slider } from "@/components/ui/slider";
@@ -25,7 +25,7 @@ export default function PopupMenu() {
     >
       <p className="font-roboto text-white text-[16px] w-fit mb-4">Light</p>
       <div className="flex font-roboto font- items-center text-[16px] text-[#a3a3a3] gap-5">
-        <span className="w-[80px] text-left">color</span>
+        <span className="w-20 text-left">color</span>
         <div
           className="flex justify-center items-center w-6 h-6 cursor-pointer"
           onClick={() => setPickerActive(true)}
@@ -48,14 +48,14 @@ export default function PopupMenu() {
         </div>
       </div>
       <div className="flex font-roboto items-center text-[16px] text-[#a3a3a3] gap-5">
-        <span className="w-[80px] text-left">intensity</span>
+        <span className="w-20 text-left">intensity</span>
         <Slider
           defaultValue={[intensity]}
           min={0}
           max={6}
           step={0.1}
           onValueChange={(value) => setIntensity(value[0])}
-          className="w-[120px]"
+          className="w-30"
         />
       </div>
     </div>

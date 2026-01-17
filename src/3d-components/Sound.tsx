@@ -10,7 +10,6 @@ import {
   type RefObject,
 } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
-import { useShallow } from "zustand/shallow";
 import {
   fadeIn,
   fadeInAndPlay,
@@ -95,12 +94,7 @@ export function BackgroundBGM() {
     "audio/background.mp3",
     true,
   );
-  const { active, type } = useOverlay(
-    useShallow((state) => ({
-      active: state.active,
-      type: state.type,
-    })),
-  );
+  const type = useOverlay((state) => state.type);
 
   const audioActive = useTweaks((state) => state.audioActive);
   const start = useStart((state) => state.start);

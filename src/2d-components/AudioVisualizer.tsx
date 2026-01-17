@@ -1,6 +1,5 @@
 import { useTweaks } from "@/stores";
 import { useEffect, useRef } from "react";
-import { useShallow } from "zustand/shallow";
 
 export default function AudioVisualizer({ className }: { className?: string }) {
   const stickRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -57,7 +56,7 @@ export default function AudioVisualizer({ className }: { className?: string }) {
 
   return (
     <div
-      className={`flex justify-around items-end w-8 h-8 pointer-events-auto group ${className}`}
+      className={`flex justify-around items-end pointer-events-auto group ${className}`}
     >
       {[...Array(stickCnt)].map((_, i) => (
         <div

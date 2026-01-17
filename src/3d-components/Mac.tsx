@@ -11,7 +11,7 @@ export default function Mac() {
         position={[0.15, 0.74, -0.4]}
       >
         <Test glb_path="/models/macbook/macbook_fix.glb" scale={0.15} />
-        <Screen rotation={[0, degToRad(-90), 0]} position={[0.162, 0.169, 0]} />
+        <Screen rotation={[0, degToRad(-90), 0]} position={[0.161, 0.169, 0]} />
       </group>
     </>
   );

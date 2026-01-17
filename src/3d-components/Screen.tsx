@@ -49,7 +49,7 @@ export default function Screen({ ...props }: screenProps) {
     <group ref={groupRef} {...props}>
       {/* <axesHelper /> */}
       <Html
-        className={`w-[2560px] h-[1700px] overflow-hidden ${!dive && "rounded-4xl"} `}
+        className={`w-640 h-425 overflow-hidden ${!dive && "rounded-4xl"} `}
         pointerEvents="none"
         {...(dive
           ? {

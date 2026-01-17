@@ -1,5 +1,4 @@
 import { useTweaks } from "@/stores";
-import type React from "react";
 
 export default function Home() {
   const setDive = useTweaks((state) => state.setDive);
