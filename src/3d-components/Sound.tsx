@@ -108,8 +108,11 @@ export function BackgroundBGM() {
   useEffect(() => {
     if (!rainReady || !bgReady || !start) return;
     if (audioActive) {
-      fadeIn(bgSound.current, 1);
       fadeIn(rainSound.current, 1);
+
+      if (type == OverlayTypes.DEFAULT) {
+        fadeIn(bgSound.current, 1);
+      }
     } else {
       fadeOut(bgSound.current, 1);
       fadeOut(rainSound.current, 1);

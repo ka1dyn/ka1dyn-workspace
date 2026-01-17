@@ -39,9 +39,11 @@ export interface TweaksType {
   intensity: number;
   lightColor: string;
   audioActive: boolean;
+  dive: boolean;
   setIntensity: (newState: number) => void;
   setLightColor: (newState: string) => void;
   setAudioActive: (newState: boolean) => void;
+  setDive: (newState: boolean) => void;
 }
 
 /* General types */

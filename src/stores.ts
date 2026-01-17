@@ -73,9 +73,13 @@ export const useTweaks = create<TweaksType>((set) => ({
   intensity: 3,
   lightColor: "#c8b087",
   audioActive: true,
+  dive: false,
   setIntensity: (newState: number) => {
     set({ intensity: newState });
   },
   setLightColor: (newState: string) => set({ lightColor: newState }),
   setAudioActive: (newState: boolean) => set({ audioActive: newState }),
+  setDive: (newState: boolean) => {
+    set({ dive: newState });
+  },
 }));

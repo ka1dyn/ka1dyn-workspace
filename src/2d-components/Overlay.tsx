@@ -1,4 +1,4 @@
-import { useOverlay } from "@/stores";
+import { useOverlay, useTweaks } from "@/stores";
 import { OverlayTypes } from "@/types/enums";
 import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
@@ -52,18 +52,36 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
 }
 
 function ScreenOverlay({ backClick }: ScreenOverlayProps) {
+  const setDive = useTweaks((state) => state.setDive);
+
   return (
-    <button
-      className="
+    <div>
+      {/* Left nav */}
+      <LeftNav />
+
+      <button
+        className="
             animate-slide-up
-            absolute left-35 bottom-32 pointer-events-auto
+            absolute left-20 bottom-50 pointer-events-auto
             text-[#c9c9c9] text-[20px] font-medium font-roboto  
             hover:cursor-pointer hover:text-white
         "
-      onClick={backClick}
-    >
-      {"< back"}
-    </button>
+        onClick={backClick}
+      >
+        {"back"}
+      </button>
+
+      <button
+        className="animate-slide-up
+          absolute left-20 bottom-68 pointer-events-auto
+          text-[#c9c9c9] text-[20px] font-medium font-roboto
+          hover:cursor-pointer hover:text-white
+      "
+        onClick={() => setDive(true)}
+      >
+        {"dive in"}
+      </button>
+    </div>
   );
 }
 

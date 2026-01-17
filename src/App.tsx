@@ -5,6 +5,7 @@ import { Route } from "wouter";
 import Booting from "./2d-components/Booting";
 import Overlay from "./2d-components/Overlay";
 import { useEffect } from "react";
+import Home from "./2d-components/Home";
 
 function App() {
   const start = useStart((state) => state.start);
@@ -25,8 +26,9 @@ function App() {
 
   return (
     <>
+      {/* Set bg color For occlude blending option on screen */}
       <div className="w-screen h-screen bg-[#010203]">
-        <Route path="/test" component={Booting} />
+        <Route path="/test" component={Home} />
         <Route path="/">
           {/* <Scene /> */}
           <>

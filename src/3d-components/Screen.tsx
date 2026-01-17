@@ -1,6 +1,6 @@
 import Booting from "@/2d-components/Booting";
 import Home from "@/2d-components/Home";
-import { useCameraInit, useReady } from "@/stores";
+import { useCameraInit, useReady, useTweaks } from "@/stores";
 import { Html } from "@react-three/drei";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
@@ -17,6 +17,7 @@ export default function Screen({ ...props }: screenProps) {
     })),
   );
   const screenReady = useReady((state) => state.screenReady);
+  const dive = useTweaks((state) => state.dive);
 
   // Get World position
   useEffect(() => {
@@ -48,11 +49,17 @@ export default function Screen({ ...props }: screenProps) {
     <group ref={groupRef} {...props}>
       {/* <axesHelper /> */}
       <Html
+        className={`w-[2560px] h-[1700px] overflow-hidden ${!dive && "rounded-4xl"} `}
         pointerEvents="none"
-        className="w-[2560px] h-[1700px] rounded-4xl overflow-hidden"
-        transform
-        distanceFactor={0.069}
-        occlude="blending"
+        {...(dive
+          ? {
+              fullscreen: true,
+            }
+          : {
+              transform: true,
+              distanceFactor: 0.069,
+              occlude: "blending",
+            })}
       >
         {screenReady ? <Home /> : <Booting />}
         {/* {screenReady ? 
