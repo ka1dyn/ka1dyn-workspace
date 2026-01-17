@@ -55,9 +55,7 @@ export default function AudioVisualizer({ className }: { className?: string }) {
   }, [audioActive]);
 
   return (
-    <div
-      className={`flex justify-around items-end pointer-events-auto group ${className}`}
-    >
+    <div className={`flex justify-around items-end group ${className}`}>
       {[...Array(stickCnt)].map((_, i) => (
         <div
           key={i}

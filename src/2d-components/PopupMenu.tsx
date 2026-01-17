@@ -22,12 +22,11 @@ export default function PopupMenu() {
       setLightColor: state.setLightColor,
     })),
   );
-  const { music, rain, lightning, setMusic, setRain, setLightning } =
-    useSoundVol(
-      useShallow((state) => ({
-        ...state,
-      })),
-    );
+  const { music, rain, setMusic, setRain } = useSoundVol(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
 
   return (
     <div
@@ -97,17 +96,6 @@ export default function PopupMenu() {
               max={1}
               step={0.01}
               onValueChange={(value) => setRain(value[0])}
-              className="w-30"
-            />
-          </div>
-          <div className={tweak}>
-            <span className={tweak_name}>lightning</span>
-            <Slider
-              defaultValue={[lightning]}
-              min={0}
-              max={1}
-              step={0.01}
-              onValueChange={(value) => setLightning(value[0])}
               className="w-30"
             />
           </div>

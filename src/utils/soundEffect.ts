@@ -2,8 +2,6 @@ import { Audio } from "three";
 import gsap from "gsap";
 
 export function fadeIn(audio: Audio, duration = 2, volume = 0.5) {
-  audio.play();
-
   gsap.to(audio.gain.gain, {
     value: volume,
     duration: duration,
@@ -20,6 +18,8 @@ export function fadeOut(audio: Audio, duration = 2) {
 }
 
 export function fadeOutAndPause(audio: Audio, duration = 2) {
+  gsap.killTweensOf(audio.gain.gain);
+
   gsap.to(audio.gain.gain, {
     value: 0,
     duration: duration,
@@ -30,11 +30,13 @@ export function fadeOutAndPause(audio: Audio, duration = 2) {
   });
 }
 
-export function fadeInAndPlay(audio: Audio, duration = 2) {
+export function fadeInAndPlay(audio: Audio, duration = 2, volume = 0.5) {
+  gsap.killTweensOf(audio.gain.gain);
+
   audio.play();
 
   gsap.to(audio.gain.gain, {
-    value: 0.5,
+    value: volume,
     duration: duration,
     ease: "power1.inOut",
   });

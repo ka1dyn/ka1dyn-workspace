@@ -36,15 +36,19 @@ export default function RightNav({
     }
   };
 
+  const audioClick = () => {
+    setAudioActive(!audioActive);
+  };
+
   return (
-    <div className="absolute h-8 right-8 top-10 flex items-center gap-6 pointer-events-auto *:w-8">
+    <div className="absolute h-8 right-8 top-10 flex items-center gap-6 *:w-8">
       {/* Audio btn */}
       {soundActive && (
         <div
-          className="h-full relative cursor-pointer pointer-events-auto group"
-          onClick={() => setAudioActive(!audioActive)}
+          className={`h-full relative group cursor-pointer pointer-events-auto`}
+          onClick={audioClick}
         >
-          <AudioVisualizer className="absolute w-6 h-4 bottom-1 left-1/2 -translate-x-1/2 cursor-pointer pointer-events-auto" />
+          <AudioVisualizer className="absolute w-6 h-4 bottom-1 left-1/2 -translate-x-1/2" />
         </div>
       )}
 

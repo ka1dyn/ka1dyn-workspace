@@ -10,12 +10,7 @@ import {
   type RefObject,
 } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
-import {
-  fadeIn,
-  fadeInAndPlay,
-  fadeOut,
-  fadeOutAndPause,
-} from "@/utils/soundEffect";
+import { fadeInAndPlay, fadeOutAndPause } from "@/utils/soundEffect";
 import { useShallow } from "zustand/shallow";
 
 export const AudioContext = createContext<RefObject<AudioListener> | null>(
@@ -122,14 +117,14 @@ export function BackgroundBGM() {
   useEffect(() => {
     if (!rainReady || !bgReady || !start) return;
     if (audioActive) {
-      fadeIn(rainSound.current, 1);
+      fadeInAndPlay(rainSound.current, 1, rain);
 
       if (type == OverlayTypes.DEFAULT) {
-        fadeIn(bgSound.current, 1);
+        fadeInAndPlay(bgSound.current, 1, music);
       }
     } else {
-      fadeOut(bgSound.current, 1);
-      fadeOut(rainSound.current, 1);
+      fadeOutAndPause(bgSound.current, 1);
+      fadeOutAndPause(rainSound.current, 1);
     }
   }, [audioActive]);
 
@@ -143,7 +138,7 @@ export function BackgroundBGM() {
     if (!bgReady || !start) return;
 
     if (type == OverlayTypes.DEFAULT && audioActive) {
-      fadeInAndPlay(bgSound.current);
+      fadeInAndPlay(bgSound.current, 1, music);
     } else if (type == OverlayTypes.SCREEN) {
       fadeOutAndPause(bgSound.current);
     }

@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Cloud, Clouds } from "@react-three/drei";
 import { useSound } from "./Sound";
-import { useStart, useTweaks } from "@/stores";
-import { fadeIn, fadeOut } from "@/utils/soundEffect";
+import { useSoundVol, useStart, useTweaks } from "@/stores";
+import { fadeInAndPlay, fadeOutAndPause } from "@/utils/soundEffect";
+import { useShallow } from "zustand/shallow";
 // import { isDesktop } from "react-device-detect";
 
 export function RainClouds() {
@@ -23,16 +24,29 @@ export function RainClouds() {
       }),
   );
   const start = useStart((state) => state.start);
+  const { rain } = useSoundVol(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
 
   const { soundRef, isReady } = useSound("audio/thunder.mp3");
+
+  useEffect(() => {
+    if (!isReady || !start) {
+      return;
+    }
+
+    soundRef.current.gain.gain.value = rain;
+  }, [isReady, start, rain]);
 
   useEffect(() => {
     if (!isReady || !start) return;
 
     if (audioActive) {
-      fadeIn(soundRef.current, 1);
+      fadeInAndPlay(soundRef.current, rain);
     } else {
-      fadeOut(soundRef.current, 1);
+      fadeOutAndPause(soundRef.current, rain);
     }
   }, [audioActive]);
 
