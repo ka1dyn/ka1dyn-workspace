@@ -3,8 +3,10 @@ import { useSoundVol, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import { Slider } from "@/components/ui/slider";
 import { SketchPicker } from "react-color";
+import VolumeupIcon from "@/icons/volumeup.svg?react";
+import VolumeoffIcon from "@/icons/volumeoff.svg?react";
+import RefreshIcon from "@/icons/refresh.svg?react";
 
-const menu_title = "font-roboto text-white text-[12px] w-fit mb-4";
 const tweak = "flex font-roboto items-center text-[14px] text-[#a3a3a3] gap-5";
 const tweak_name = "w-20 text-left";
 
@@ -28,13 +30,24 @@ export default function PopupMenu() {
     })),
   );
 
+  const { audioActive, setAudioActive } = useTweaks(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
+
+  const soundRefreshClick = () => {
+    setMusic(0.5);
+    setRain(0.5);
+  };
+
   return (
     <div
-      className="absolute bg-[#0000002d] bottom-0 left-0 translate-y-[calc(100%+20px)] cursor-default flex flex-col justify-center gap-4 pt-5 px-6 pb-7"
+      className="absolute bg-[#0000002d] bottom-0 left-0 translate-y-[calc(100%+20px)] cursor-default flex flex-col justify-center gap-6 pt-5 px-6 pb-7"
       onClick={(e) => e.stopPropagation()}
     >
       <div>
-        <p className={menu_title}>Light</p>
+        <p className="font-roboto text-white text-[12px] w-fit mb-4">Light</p>
         <div className="flex flex-col gap-2">
           <div className={tweak}>
             <span className={tweak_name}>color</span>
@@ -63,6 +76,7 @@ export default function PopupMenu() {
             <span className={tweak_name}>intensity</span>
             <Slider
               defaultValue={[intensity]}
+              value={[intensity]}
               min={0}
               max={6}
               step={0.1}
@@ -74,13 +88,49 @@ export default function PopupMenu() {
       </div>
 
       <div>
-        <p className={menu_title}>Sound</p>
+        <div className="flex items-center mb-4 gap-5">
+          <p className="font-roboto text-white text-[12px] w-20 text-left">
+            Sound
+          </p>
+          <div className="flex gap-2">
+            <div
+              className="h-full cursor-pointer pointer-events-auto group/volumeup"
+              onClick={() => setAudioActive(!audioActive)}
+            >
+              {audioActive ? (
+                <VolumeupIcon
+                  width="18px"
+                  height="18px"
+                  className="text-[#a3a3a3] group-hover/volumeup:text-white"
+                />
+              ) : (
+                <VolumeoffIcon
+                  width="18px"
+                  height="18px"
+                  className="text-[#a3a3a3] group-hover/volumeup:text-white"
+                />
+              )}
+            </div>
+            <div
+              className="h-full cursor-pointer pointer-events-auto group/refresh"
+              onClick={soundRefreshClick}
+            >
+              <RefreshIcon
+                width="18px"
+                height="18px"
+                className="text-[#a3a3a3] group-hover/refresh:text-white"
+              />
+            </div>
+          </div>
+        </div>
 
         <div className="flex flex-col gap-2">
           <div className={tweak}>
             <span className={tweak_name}>music</span>
             <Slider
               defaultValue={[music]}
+              value={[music]}
+              disabled={!audioActive}
               min={0}
               max={1}
               step={0.01}
@@ -92,6 +142,8 @@ export default function PopupMenu() {
             <span className={tweak_name}>rain</span>
             <Slider
               defaultValue={[rain]}
+              value={[rain]}
+              disabled={!audioActive}
               min={0}
               max={1}
               step={0.01}
