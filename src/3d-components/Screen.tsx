@@ -2,6 +2,7 @@ import Booting from "@/2d-components/Booting";
 import Home from "@/2d-components/Home";
 import { useCameraInit, useReady, useTweaks } from "@/stores";
 import { Html } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
@@ -10,6 +11,7 @@ type screenProps = React.JSX.IntrinsicElements["group"];
 
 export default function Screen({ ...props }: screenProps) {
   const groupRef = useRef<THREE.Group>(null!);
+  const contentRef = useRef<HTMLDivElement>(null!);
   const { setTarget, setCameraPos } = useCameraInit(
     useShallow((state) => ({
       setTarget: state.setTarget,
@@ -45,6 +47,33 @@ export default function Screen({ ...props }: screenProps) {
     });
   }, [groupRef]);
 
+  useFrame((state) => {
+    if (!groupRef || !contentRef) return;
+
+    // Screen World Postiion
+    const worldPosition = new THREE.Vector3();
+
+    groupRef.current.updateWorldMatrix(true, false);
+    groupRef.current.getWorldPosition(worldPosition);
+
+    // Screen direction
+    const screenVec = new THREE.Vector3();
+    groupRef.current.getWorldDirection(screenVec);
+
+    const screenToCameraVec = state.camera.position
+      .clone()
+      .sub(worldPosition)
+      .normalize();
+
+    // console.log(screenToCameraVec);
+
+    const dot = Math.max(0, screenVec.dot(screenToCameraVec));
+
+    const opacity = dot;
+    contentRef.current.style.filter = `brightness(${dot})`;
+    contentRef.current.style.opacity = opacity.toString();
+  });
+
   return (
     <group ref={groupRef} {...props}>
       {/* <axesHelper /> */}
@@ -61,7 +90,9 @@ export default function Screen({ ...props }: screenProps) {
               occlude: "blending",
             })}
       >
-        {screenReady ? <Home /> : <Booting />}
+        <div ref={contentRef} className="w-full h-full">
+          {screenReady ? <Home /> : <Booting />}
+        </div>
         {/* {screenReady ? 
                     <iframe className="w-full h-full" src="https://inpa.tistory.com/" />
                 : <Booting />} */}
