@@ -7,7 +7,8 @@ import VolumeupIcon from "@/icons/volumeup.svg?react";
 import VolumeoffIcon from "@/icons/volumeoff.svg?react";
 import RefreshIcon from "@/icons/refresh.svg?react";
 
-const tweak = "flex font-roboto items-center text-[14px] text-[#a3a3a3] gap-5";
+const tweak =
+  "flex font-roboto font-bold items-center text-[12px] text-[#a3a3a3] gap-5";
 const tweak_name = "w-20 text-left";
 
 export default function PopupMenu() {
@@ -41,18 +42,40 @@ export default function PopupMenu() {
     setRain(0.5);
   };
 
+  const lightRefreshClick = () => {
+    setLightColor("#c8b087");
+    setIntensity(3);
+  };
+
   return (
     <div
       className="absolute bg-[#0000002d] bottom-0 left-0 translate-y-[calc(100%+20px)] cursor-default flex flex-col justify-center gap-6 pt-5 px-6 pb-7"
       onClick={(e) => e.stopPropagation()}
     >
       <div>
-        <p className="font-roboto text-white text-[12px] w-fit mb-4">Light</p>
+        <div className="flex items-center mb-4 gap-5">
+          <p className="font-roboto text-white text-[12px] w-20 text-left -translate-y-px pl-px">
+            Light
+          </p>
+          <div className="flex gap-2">
+            <div
+              className="h-full cursor-pointer pointer-events-auto group/refresh"
+              onClick={lightRefreshClick}
+            >
+              <RefreshIcon
+                width="18px"
+                height="18px"
+                className="text-[#a3a3a3] group-hover/refresh:text-white"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2">
           <div className={tweak}>
             <span className={tweak_name}>color</span>
             <div
-              className="flex justify-center items-center w-6 h-6 cursor-pointer"
+              className="flex w-4.5 h-4.5 justify-center items-center cursor-pointer"
               onClick={() => setPickerActive(true)}
             >
               <div
@@ -65,6 +88,21 @@ export default function PopupMenu() {
                       className="absolute pointer-events-auto z-10000001"
                       disableAlpha={true}
                       color={lightColor}
+                      presetColors={[
+                        "#c8b087",
+                        "#FFFFFF",
+                        "#D0021B",
+                        "#F5A623",
+                        "#F8E71C",
+                        "#8B572A",
+                        "#7ED321",
+                        "#417505",
+                        "#BD10E0",
+                        "#9013FE",
+                        "#4A90E2",
+                        "#50E3C2",
+                        "#B8E986",
+                      ]}
                       onChange={(color) => setLightColor(color.hex)}
                     />
                   </div>
@@ -89,7 +127,7 @@ export default function PopupMenu() {
 
       <div>
         <div className="flex items-center mb-4 gap-5">
-          <p className="font-roboto text-white text-[12px] w-20 text-left">
+          <p className="font-roboto text-white text-[12px] w-20 text-left -translate-y-px">
             Sound
           </p>
           <div className="flex gap-2">
