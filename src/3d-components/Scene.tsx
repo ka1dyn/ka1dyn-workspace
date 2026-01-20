@@ -5,7 +5,7 @@ import Lights from "@/3d-components/Lights.tsx";
 import Models from "@/3d-components/Models.tsx";
 import { AudioProvider, BackgroundBGM } from "@/3d-components/Sound.tsx";
 import CameraControl from "./CameraControl";
-// import Helpers from "./Helpers";
+import Helpers from "./Helpers";
 import FrameDetector from "./FrameDetector";
 import { useReady } from "@/stores";
 import StartAnimaion from "./StartAnimaion";
@@ -47,7 +47,7 @@ export default function Scene() {
           {/* <Post /> */}
         </Suspense>
       </AudioProvider>
-      {/* <Helpers /> */}
+      <Helpers />
     </Canvas>
   );
 }

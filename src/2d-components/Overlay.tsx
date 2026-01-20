@@ -26,7 +26,7 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
       {/* Screen btn */}
       <button
         className={`
-                w-34 h-11 px-5 py-2.5 bg-transparent text-[#c9c9c9] text-[18px]/[18px] font-medium font-roboto 
+                w-34 h-11 px-5 py-2.5 bg-transparent text-[#c9c9c9] text-[18px]/[18px] font-medium font-roboto  select-none
                 border-t border-b border-[#ffffff2c]
                 absolute left-1/2 -translate-x-1/2 bottom-18
                 

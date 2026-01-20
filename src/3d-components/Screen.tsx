@@ -80,7 +80,7 @@ export default function Screen({ ...props }: screenProps) {
     <group ref={groupRef} {...props}>
       {/* <axesHelper /> */}
       <Html
-        className={`w-640 h-425 overflow-hidden ${!dive && "rounded-4xl"} `}
+        className={`w-640 h-425 overflow-hidden ${!dive && "rounded-4xl"} ${type !== OverlayTypes.SCREEN && "select-none"}`}
         pointerEvents={type === OverlayTypes.SCREEN ? "auto" : "none"}
         {...(dive
           ? {
