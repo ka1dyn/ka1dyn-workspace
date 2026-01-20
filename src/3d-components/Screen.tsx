@@ -1,6 +1,7 @@
 import Booting from "@/2d-components/Booting";
 import Home from "@/2d-components/Home";
-import { useCameraInit, useReady, useTweaks } from "@/stores";
+import { useCameraInit, useOverlay, useReady, useTweaks } from "@/stores";
+import { OverlayTypes } from "@/types/enums";
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
@@ -20,6 +21,7 @@ export default function Screen({ ...props }: screenProps) {
   );
   const screenReady = useReady((state) => state.screenReady);
   const dive = useTweaks((state) => state.dive);
+  const type = useOverlay((state) => state.type);
 
   // Get World position
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function Screen({ ...props }: screenProps) {
       {/* <axesHelper /> */}
       <Html
         className={`w-640 h-425 overflow-hidden ${!dive && "rounded-4xl"} `}
-        pointerEvents="none"
+        pointerEvents={type === OverlayTypes.SCREEN ? "auto" : "none"}
         {...(dive
           ? {
               fullscreen: true,
@@ -90,7 +92,7 @@ export default function Screen({ ...props }: screenProps) {
               occlude: "blending",
             })}
       >
-        <div ref={contentRef} className="w-full h-full">
+        <div ref={contentRef} className="w-full h-full @container-[size]">
           {screenReady ? <Home /> : <Booting />}
         </div>
         {/* {screenReady ? 

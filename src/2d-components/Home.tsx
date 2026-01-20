@@ -1,5 +1,6 @@
 import { useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
+import Dock from "./Dock";
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -24,24 +25,34 @@ export default function Home() {
         className="absolute w-full h-full object-cover object-[50%] opacity-60"
       />
       <div
-        className="w-full h-16 relative overflow-hidden
-                bg-gray-300/30 backdrop-blur-xl
+        className="flex pl-4 items-center w-full h-16 relative overflow-hidden
+                bg-gray-500/50 backdrop-blur-xl
                 border-b border-black/20
                 shadow-md"
-      ></div>
-      <div className="flex flex-col gap-10 w-24 min-h-50 absolute right-15 top-20">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-full h-24 bg-amber-500 text-center"></div>
-          <div className="w-full break-all text-center text-[16px]/[1]">
-            about me
+      >
+        <img src="/images/ka1dyn_logo.png" className="h-full" />
+      </div>
+      <div className="flex flex-col w-40 gap-10 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.2)] origin-top-right">
+        <div className={`flex flex-col items-center gap-2`}>
+          <div className="flex flex-col gap-2 items-center">
+            <img src="/images/folder.png" className="w-20 h-auto"></img>
+            <div className="w-full break-all text-center lg:text-[18px] leading-none text-white">
+              about_me
+            </div>
           </div>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <div className="w-full h-24 bg-amber-500 text-center"></div>
-          <div className="w-full break-all text-center text-[16px]/[1]">
-            projects
+          <div className="flex flex-col gap-2 items-center">
+            <img src="/images/folder.png" className="w-20 h-auto"></img>
+            <div className="w-full break-all text-center lg:text-[18px] leading-none text-white">
+              projects
+            </div>
           </div>
         </div>
+      </div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.3)] origin-bottom">
+        <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/4 w-10 h-20 bg-gray-300/50 backdrop-blur-2xl rounded-t-full"></div>
+        <Dock />
       </div>
     </div>
   );
