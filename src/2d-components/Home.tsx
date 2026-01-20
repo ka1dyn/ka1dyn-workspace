@@ -50,9 +50,15 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.3)] origin-bottom">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.6)] origin-bottom">
         <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/4 w-10 h-20 bg-gray-300/50 backdrop-blur-2xl rounded-t-full"></div>
         <Dock />
+      </div>
+      <div className="@container-[size]">
+        <div className="80cqh">
+          <div className="w-5"></div>
+          <div className="w-10"></div>
+        </div>
       </div>
     </div>
   );
