@@ -51,6 +51,14 @@ export const RadioBtnTypes = {
   SETTING: "setting",
 } as const;
 
+export const BackgroundTypes = {
+  DOG: 0,
+  BIKE: 1,
+  CITY: 2,
+};
+
 export type GsapEase = (typeof GsapEase)[keyof typeof GsapEase];
 export type OverlayTypes = (typeof OverlayTypes)[keyof typeof OverlayTypes];
 export type RadioBtnTypes = (typeof RadioBtnTypes)[keyof typeof RadioBtnTypes];
+export type BackgroundTypes =
+  (typeof BackgroundTypes)[keyof typeof BackgroundTypes];
