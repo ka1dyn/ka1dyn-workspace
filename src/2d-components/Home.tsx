@@ -11,6 +11,7 @@ export default function Home() {
       ...state,
     })),
   );
+  const [imgSrc, setImgSrc] = useState<string>("/images/happy_dog.webp");
 
   const [dockActive, setDockActive] = useState<boolean>(true);
 
@@ -26,8 +27,8 @@ export default function Home() {
     // <div className="w-full h-full relative bg-[url(/images/man_rain_crop.jpg)] bg-position-[50%_80%] bg-no-repeat bg-cover opacity-50">
     <div className="w-full h-full relative overflow-hidden bg-black">
       <img
-        src="/images/happy_dog.jpg"
-        className="absolute w-full h-full object-cover object-[50%_40%] opacity-60"
+        src={imgSrc}
+        className="happy absolute w-full h-full object-cover object-[50%_50%] opacity-60"
       />
       <div
         className="flex pl-4 items-center w-full h-16 relative overflow-hidden
@@ -72,13 +73,7 @@ export default function Home() {
             )}
           />
         </div>
-        <Dock />
-      </div>
-      <div className="@container-[size]">
-        <div className="80cqh">
-          <div className="w-5"></div>
-          <div className="w-10"></div>
-        </div>
+        <Dock setImgSrc={(path: string) => setImgSrc(path)} />
       </div>
     </div>
   );

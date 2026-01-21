@@ -50,7 +50,7 @@ export default function Screen({ ...props }: screenProps) {
   }, [groupRef]);
 
   useFrame((state) => {
-    if (!groupRef || !contentRef) return;
+    if (!groupRef.current || !contentRef.current) return;
 
     // Screen World Postiion
     const worldPosition = new THREE.Vector3();
