@@ -38,23 +38,42 @@ export default function Home() {
       >
         <img src="/images/ka1dyn_logo.png" className="h-full" />
       </div>
-      <div className="flex flex-col w-40 gap-10 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right">
-        <div className={`flex flex-col items-center gap-2`}>
-          <div className="flex flex-col gap-2 items-center">
-            <img src="/images/folder.png" className="w-20 h-auto"></img>
-            <div className="w-full break-all text-center lg:text-[18px] leading-none text-white">
-              about_me
+      <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right">
+        <button className={`flex flex-col items-center group cursor-pointer`}>
+          <div className="flex flex-col gap-1 items-center">
+            <div
+              className="flex justify-center items-center w-25 h-23 border-gray-400/70
+            group-focus:bg-black/20 group-focus:border-2"
+            >
+              <img src="/images/folder.png" className="w-20 h-auto"></img>
+            </div>
+
+            {/* Div for background wrap */}
+            <div>
+              <span className="break-all text-center lg:text-[18px] leading-none text-white group-focus:bg-blue-600">
+                about_me
+              </span>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex flex-col gap-2 items-center">
-            <img src="/images/folder.png" className="w-20 h-auto"></img>
-            <div className="w-full break-all text-center lg:text-[18px] leading-none text-white">
-              projects
+        </button>
+
+        <button className={`flex flex-col items-center group cursor-pointer`}>
+          <div className="flex flex-col gap-1 items-center">
+            <div
+              className="flex justify-center items-center w-25 h-25 border-gray-400/70
+            group-focus:bg-black/20 group-focus:border-2"
+            >
+              <img src="/images/folder.png" className="w-20 h-auto"></img>
+            </div>
+
+            {/* Div for background wrap */}
+            <div>
+              <span className="break-all text-center lg:text-[18px] leading-none text-white group-focus:bg-blue-600">
+                projects
+              </span>
             </div>
           </div>
-        </div>
+        </button>
       </div>
       <div
         className={cn(
@@ -68,7 +87,7 @@ export default function Home() {
         >
           <ArrowDown
             className={cn(
-              "w-7 h-7 text-white -translate-y-0.5 transition-all duration-300 ease-out",
+              "w-7 h-7 text-white -translate-y-2 transition-all duration-300 ease-out",
               !dockActive && "rotate-180",
             )}
           />
