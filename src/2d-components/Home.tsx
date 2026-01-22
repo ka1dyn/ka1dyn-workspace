@@ -37,7 +37,6 @@ export default function Home() {
       >
         <img src="/images/ka1dyn_logo.png" className="h-full" />
       </div>
-      <InfoModal />
       <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right">
         <button className={`flex flex-col items-center group cursor-pointer`}>
           <div className="flex flex-col gap-1 items-center">
@@ -84,7 +83,7 @@ export default function Home() {
 
       <div
         className={cn(
-          "absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.6)] origin-bottom transition-all ease-out duration-300",
+          "absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.6)] origin-bottom transition-all ease-out duration-300 z-10",
           !dockActive && "translate-y-[calc(100%*calc(100cqh/1080px)-15px)]",
         )}
       >
@@ -99,8 +98,9 @@ export default function Home() {
             )}
           />
         </div>
-        <Dock setImgSrc={(path: string) => setImgSrc(path)} />
+        <Dock className="z-10" setImgSrc={(path: string) => setImgSrc(path)} />
       </div>
+      <InfoModal className="z-5" />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useRef } from "react";
+import ResizeIcon from "@/icons/resize.svg?react";
 
 type ViewPos = {
   x: number;
@@ -65,15 +66,44 @@ export default function InfoModal({ className = "" }: { className?: string }) {
     });
   }, []);
 
+  const resizeHandler = (e: React.MouseEvent) => {
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = modalRef.current.offsetWidth;
+    const startHeight = modalRef.current.offsetHeight;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const newWidth = startWidth + (moveEvent.clientX - startX);
+      const newHeight = startHeight + (moveEvent.clientY - startY);
+
+      modalRef.current.style.width = `${newWidth}px`;
+      modalRef.current.style.height = `${newHeight}px`;
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+
   return (
     <div
       ref={modalRef}
       className={cn(
-        "w-260 h-150 bg-white rounded-4xl overflow-hidden absolute top-20 left-20",
+        "w-260 h-150 bg-white rounded-md overflow-hidden absolute top-20 left-20",
         className,
       )}
     >
-      <div ref={headerRef} className="h-10 bg-gray-400"></div>
+      <div ref={headerRef} className="h-10 bg-gray-400 cursor-move"></div>
+      <div
+        className="absolute bottom-0 right-0 size-5 cursor-nwse-resize bg-transparent"
+        onMouseDown={resizeHandler}
+      >
+        <ResizeIcon className="w-full h-full text-gray-400" />
+      </div>
     </div>
   );
 }
