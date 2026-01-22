@@ -2,8 +2,9 @@ import { useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import InfoModal from "./InfoModal";
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -12,9 +13,7 @@ export default function Home() {
     })),
   );
   const [imgSrc, setImgSrc] = useState<string>("/images/happy_dog.webp");
-
   const [dockActive, setDockActive] = useState<boolean>(true);
-
   const setActive = useOverlay((state) => state.setActive);
 
   const exitClick = () => {
@@ -25,10 +24,10 @@ export default function Home() {
 
   return (
     // <div className="w-full h-full relative bg-[url(/images/man_rain_crop.jpg)] bg-position-[50%_80%] bg-no-repeat bg-cover opacity-50">
-    <div className="w-full h-full relative overflow-hidden bg-black">
+    <div className="w-full h-full flex flex-col relative overflow-hidden bg-black select-none">
       <img
         src={imgSrc}
-        className="happy absolute w-full h-full object-cover object-[50%_50%] opacity-60"
+        className="happy absolute w-full h-full object-cover object-[50%_50%] opacity-60 pointer-events-none"
       />
       <div
         className="flex pl-4 items-center w-full h-16 relative overflow-hidden
@@ -38,6 +37,7 @@ export default function Home() {
       >
         <img src="/images/ka1dyn_logo.png" className="h-full" />
       </div>
+      <InfoModal />
       <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right">
         <button className={`flex flex-col items-center group cursor-pointer`}>
           <div className="flex flex-col gap-1 items-center">
@@ -45,7 +45,10 @@ export default function Home() {
               className="flex justify-center items-center w-25 h-23 border-gray-400/70
             group-focus:bg-black/20 group-focus:border-2"
             >
-              <img src="/images/folder.png" className="w-20 h-auto"></img>
+              <img
+                src="/images/folder.png"
+                className="w-20 h-auto pointer-events-none"
+              ></img>
             </div>
 
             {/* Div for background wrap */}
@@ -63,7 +66,10 @@ export default function Home() {
               className="flex justify-center items-center w-25 h-25 border-gray-400/70
             group-focus:bg-black/20 group-focus:border-2"
             >
-              <img src="/images/folder.png" className="w-20 h-auto"></img>
+              <img
+                src="/images/folder.png"
+                className="w-20 h-auto pointer-events-none"
+              ></img>
             </div>
 
             {/* Div for background wrap */}
@@ -75,6 +81,7 @@ export default function Home() {
           </div>
         </button>
       </div>
+
       <div
         className={cn(
           "absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.6)] origin-bottom transition-all ease-out duration-300",
@@ -87,7 +94,7 @@ export default function Home() {
         >
           <ArrowDown
             className={cn(
-              "w-7 h-7 text-white -translate-y-2 transition-all duration-300 ease-out",
+              "w-7 h-7 text-white -translate-y-0.5 transition-all duration-300 ease-out",
               !dockActive && "rotate-180",
             )}
           />
