@@ -73,8 +73,11 @@ export default function InfoModal({ className = "" }: { className?: string }) {
     const startHeight = modalRef.current.offsetHeight;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const newWidth = startWidth + (moveEvent.clientX - startX);
-      const newHeight = startHeight + (moveEvent.clientY - startY);
+      let newWidth = startWidth + (moveEvent.clientX - startX);
+      let newHeight = startHeight + (moveEvent.clientY - startY);
+
+      if (newWidth < 300) newWidth = 300;
+      if (newHeight < 200) newHeight = 200;
 
       modalRef.current.style.width = `${newWidth}px`;
       modalRef.current.style.height = `${newHeight}px`;
@@ -93,7 +96,7 @@ export default function InfoModal({ className = "" }: { className?: string }) {
     <div
       ref={modalRef}
       className={cn(
-        "w-260 h-150 bg-white rounded-md overflow-hidden absolute top-20 left-20",
+        "w-260 h-150 bg-white rounded-md overflow-hidden",
         className,
       )}
     >

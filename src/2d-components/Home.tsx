@@ -2,7 +2,7 @@ import { useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import InfoModal from "./InfoModal";
 
@@ -80,6 +80,7 @@ export default function Home() {
           </div>
         </button>
       </div>
+      <InfoModal className="z-5 absolute top-40 left-30" />
 
       <div
         className={cn(
@@ -100,7 +101,6 @@ export default function Home() {
         </div>
         <Dock className="z-10" setImgSrc={(path: string) => setImgSrc(path)} />
       </div>
-      <InfoModal className="z-5" />
     </div>
   );
 }
