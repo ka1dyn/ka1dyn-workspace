@@ -20,8 +20,12 @@ export default function InfoModal({ className = "" }: { className?: string }) {
     headerDiv.addEventListener("mousedown", (e) => {
       pressed.current = true;
 
-      prevPosRef.current.x = e.clientX - modalDiv.offsetLeft;
-      prevPosRef.current.y = e.clientY - modalDiv.offsetTop;
+      const rect = modalDiv.getBoundingClientRect();
+      const offsetLeft = rect.x;
+      const offsetTop = rect.y;
+
+      prevPosRef.current.x = e.clientX - offsetLeft;
+      prevPosRef.current.y = e.clientY - offsetTop;
     });
 
     window.addEventListener("mouseup", () => {
@@ -30,7 +34,8 @@ export default function InfoModal({ className = "" }: { className?: string }) {
 
     window.addEventListener("mousemove", (e) => {
       if (!pressed.current) return;
-      console.log(window.innerWidth > e.clientX, window.innerHeight);
+
+      // Mouse outside browser
       if (
         window.innerWidth < e.clientX ||
         e.clientX < 0 ||
@@ -41,14 +46,23 @@ export default function InfoModal({ className = "" }: { className?: string }) {
       let newLeft = e.clientX - prevPosRef.current.x;
       let newTop = e.clientY - prevPosRef.current.y;
 
-      const minTop = 64;
+      const minTop = 64; // Fix hardcoding
       newTop = Math.max(minTop, newTop);
 
       modalDiv.style.left = `${newLeft}px`;
       modalDiv.style.top = `${newTop}px`;
     });
 
-    // window.addEventListener("resize", (e) => {});
+    window.addEventListener("resize", (e) => {
+      const rect = modalDiv.getBoundingClientRect();
+      const offsetLeft = rect.x;
+      const offsetTop = rect.y;
+
+      if (offsetLeft > window.innerWidth)
+        modalDiv.style.left = `${window.innerWidth - 30}px`;
+      if (offsetTop > window.innerHeight)
+        modalDiv.style.top = `${window.innerHeight - 30}px`;
+    });
   }, []);
 
   return (
