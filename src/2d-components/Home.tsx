@@ -79,7 +79,10 @@ export default function Home() {
       </div>
 
       {/* Portal div for modal */}
-      <div className="modals z-5"></div>
+      <div
+        id="modals"
+        className="absolute top-0 left-0 w-full h-full z-5"
+      ></div>
 
       <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right z-5">
         <Folder name="about_me" />

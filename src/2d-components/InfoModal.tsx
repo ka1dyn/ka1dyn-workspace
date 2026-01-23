@@ -41,12 +41,12 @@ export default function InfoModal({
 
   const panningHandler = (e: React.MouseEvent) => {
     const modalDiv = modalRef.current;
-    const rect = modalDiv.getBoundingClientRect();
-    const offsetLeft = rect.x;
-    const offsetTop = rect.y;
 
-    const prevX = e.clientX - offsetLeft;
-    const prevY = e.clientY - offsetTop;
+    const initModalX = modalDiv.offsetLeft;
+    const initModalY = modalDiv.offsetTop;
+
+    const initClientX = e.clientX;
+    const initClientY = e.clientY;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       if (
@@ -56,8 +56,14 @@ export default function InfoModal({
       ) {
         return;
       }
-      let newLeft = moveEvent.clientX - prevX;
-      let newTop = moveEvent.clientY - prevY;
+
+      const rect = modalDiv.getBoundingClientRect();
+
+      const scaleX = rect.width / modalDiv.offsetWidth;
+      const scaleY = rect.height / modalDiv.offsetHeight;
+
+      const newLeft = initModalX + (moveEvent.clientX - initClientX) / scaleX;
+      let newTop = initModalY + (moveEvent.clientY - initClientY) / scaleY;
 
       const minTop = 64; // Fix hardcoding
       newTop = Math.max(minTop, newTop);

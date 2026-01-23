@@ -52,7 +52,7 @@ export default function Folder({ name }: { name: string }) {
     }
   }, [active]);
 
-  const modalsDiv = document.querySelector(".modals");
+  const modalsDiv = document.getElementById("modals");
 
   return (
     <div className="flex justify-center items-center">
