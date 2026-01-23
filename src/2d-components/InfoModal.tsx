@@ -1,60 +1,27 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
+import { useModalStack } from "@/stores";
 
-type ViewPos = {
-  x: number;
-  y: number;
-};
-
-export default function InfoModal({ className = "" }: { className?: string }) {
-  const modalRef = useRef<HTMLDivElement>(null!);
+export default function InfoModal({
+  className = "",
+  modalRef,
+}: {
+  className?: string;
+  modalRef: RefObject<HTMLDivElement>;
+}) {
   const headerRef = useRef<HTMLDivElement>(null!);
-  const prevPosRef = useRef<ViewPos>({ x: 0, y: 0 });
-  const pressed = useRef<boolean>(false);
+  const getNextStack = useModalStack((state) => state.getNextStack);
+
+  const bringToFront = () => {
+    if (modalRef.current) {
+      modalRef.current.style.zIndex = getNextStack().toString();
+    }
+  };
 
   useEffect(() => {
-    const headerDiv = headerRef.current;
-    const modalDiv = modalRef.current;
-    if (!headerDiv || !modalDiv) return;
-
-    headerDiv.addEventListener("mousedown", (e) => {
-      pressed.current = true;
-
-      const rect = modalDiv.getBoundingClientRect();
-      const offsetLeft = rect.x;
-      const offsetTop = rect.y;
-
-      prevPosRef.current.x = e.clientX - offsetLeft;
-      prevPosRef.current.y = e.clientY - offsetTop;
-    });
-
-    window.addEventListener("mouseup", () => {
-      pressed.current = false;
-    });
-
-    window.addEventListener("mousemove", (e) => {
-      if (!pressed.current) return;
-
-      // Mouse outside browser
-      if (
-        window.innerWidth < e.clientX ||
-        e.clientX < 0 ||
-        window.innerHeight < e.clientY - 10
-      ) {
-        return;
-      }
-      let newLeft = e.clientX - prevPosRef.current.x;
-      let newTop = e.clientY - prevPosRef.current.y;
-
-      const minTop = 64; // Fix hardcoding
-      newTop = Math.max(minTop, newTop);
-
-      modalDiv.style.left = `${newLeft}px`;
-      modalDiv.style.top = `${newTop}px`;
-    });
-
-    window.addEventListener("resize", (e) => {
+    const resizeModalBoundary = () => {
+      const modalDiv = modalRef.current;
       const rect = modalDiv.getBoundingClientRect();
       const offsetLeft = rect.x;
       const offsetTop = rect.y;
@@ -63,8 +30,50 @@ export default function InfoModal({ className = "" }: { className?: string }) {
         modalDiv.style.left = `${window.innerWidth - 30}px`;
       if (offsetTop > window.innerHeight)
         modalDiv.style.top = `${window.innerHeight - 30}px`;
-    });
+    };
+
+    window.addEventListener("resize", resizeModalBoundary);
+
+    return () => {
+      window.removeEventListener("resize", resizeModalBoundary);
+    };
   }, []);
+
+  const panningHandler = (e: React.MouseEvent) => {
+    const modalDiv = modalRef.current;
+    const rect = modalDiv.getBoundingClientRect();
+    const offsetLeft = rect.x;
+    const offsetTop = rect.y;
+
+    const prevX = e.clientX - offsetLeft;
+    const prevY = e.clientY - offsetTop;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      if (
+        window.innerWidth < moveEvent.clientX ||
+        moveEvent.clientX < 0 ||
+        window.innerHeight < moveEvent.clientY - 10
+      ) {
+        return;
+      }
+      let newLeft = moveEvent.clientX - prevX;
+      let newTop = moveEvent.clientY - prevY;
+
+      const minTop = 64; // Fix hardcoding
+      newTop = Math.max(minTop, newTop);
+
+      modalDiv.style.left = `${newLeft}px`;
+      modalDiv.style.top = `${newTop}px`;
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
 
   const resizeHandler = (e: React.MouseEvent) => {
     const startX = e.clientX;
@@ -96,11 +105,16 @@ export default function InfoModal({ className = "" }: { className?: string }) {
     <div
       ref={modalRef}
       className={cn(
-        "w-260 h-150 bg-white rounded-md overflow-hidden",
+        "w-260 h-150 bg-white rounded-md overflow-hidden border border-gray-300 shadow-2xl",
         className,
       )}
+      onMouseDown={() => bringToFront()}
     >
-      <div ref={headerRef} className="h-10 bg-gray-400 cursor-move"></div>
+      <div
+        ref={headerRef}
+        className="h-10 bg-gray-400 cursor-move"
+        onMouseDown={panningHandler}
+      ></div>
       <div
         className="absolute bottom-0 right-0 size-5 cursor-nwse-resize bg-transparent"
         onMouseDown={resizeHandler}

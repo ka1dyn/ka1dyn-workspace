@@ -109,3 +109,15 @@ export const useSoundVol = create<SoundVolType>((set) => ({
     set({ lightning: newVol });
   },
 }));
+
+export const useModalStack = create<{
+  stack: number;
+  getNextStack: () => number;
+}>((set, get) => ({
+  stack: 1,
+  getNextStack: () => {
+    const nextStack = get().stack + 1;
+    set({ stack: nextStack });
+    return nextStack;
+  },
+}));

@@ -2,9 +2,10 @@ import { useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import InfoModal from "./InfoModal";
+import Folder from "./Folder";
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -15,6 +16,45 @@ export default function Home() {
   const [imgSrc, setImgSrc] = useState<string>("/images/happy_dog.webp");
   const [dockActive, setDockActive] = useState<boolean>(true);
   const setActive = useOverlay((state) => state.setActive);
+
+  const aboutFolderRef = useRef<HTMLDivElement>(null!);
+  const aboutModalRef = useRef<HTMLDivElement>(null!);
+  const [aboutActive, setAboutActive] = useState<boolean>(false);
+
+  const aboutClick = () => {
+    setAboutActive(true);
+  };
+
+  useEffect(() => {
+    if (aboutActive) {
+      const aboutModalDiv = aboutModalRef.current;
+      const aboutModalRect = aboutModalDiv.getBoundingClientRect();
+      // modal center
+      const modalCenterX = aboutModalRect.x + aboutModalRect.width / 2;
+      const modalCenterY = aboutModalRect.y + aboutModalRect.height / 2;
+
+      // Calculate transform
+
+      // Center of about me folder
+      const aboutFolderDiv = aboutFolderRef.current;
+      const aboutFolderRect = aboutFolderDiv.getBoundingClientRect();
+      const folderCenterX = aboutFolderRect.x + aboutFolderRect.width / 2;
+      const folderCenterY = aboutFolderRect.y + aboutFolderRect.height / 2;
+
+      const tranlateX = folderCenterX - modalCenterX;
+      const translateY = folderCenterY - modalCenterY;
+
+      aboutModalDiv.animate(
+        [
+          {
+            transform: `translate(${tranlateX}px, ${translateY}px) scale(0)`,
+          },
+          { transform: `translate(0, 0) scale(1) ` },
+        ],
+        { duration: 300, easing: "ease-in-out" },
+      );
+    }
+  }, [aboutActive]);
 
   const exitClick = () => {
     setActive(true);
@@ -37,50 +77,14 @@ export default function Home() {
       >
         <img src="/images/ka1dyn_logo.png" className="h-full" />
       </div>
-      <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right">
-        <button className={`flex flex-col items-center group cursor-pointer`}>
-          <div className="flex flex-col gap-1 items-center">
-            <div
-              className="flex justify-center items-center w-25 h-23 border-gray-400/70
-            group-focus:bg-black/20 group-focus:border-2"
-            >
-              <img
-                src="/images/folder.png"
-                className="w-20 h-auto pointer-events-none"
-              ></img>
-            </div>
 
-            {/* Div for background wrap */}
-            <div>
-              <span className="break-all text-center lg:text-[18px] leading-none text-white group-focus:bg-blue-600">
-                about_me
-              </span>
-            </div>
-          </div>
-        </button>
+      {/* Portal div for modal */}
+      <div className="modals z-5"></div>
 
-        <button className={`flex flex-col items-center group cursor-pointer`}>
-          <div className="flex flex-col gap-1 items-center">
-            <div
-              className="flex justify-center items-center w-25 h-25 border-gray-400/70
-            group-focus:bg-black/20 group-focus:border-2"
-            >
-              <img
-                src="/images/folder.png"
-                className="w-20 h-auto pointer-events-none"
-              ></img>
-            </div>
-
-            {/* Div for background wrap */}
-            <div>
-              <span className="break-all text-center lg:text-[18px] leading-none text-white group-focus:bg-blue-600">
-                projects
-              </span>
-            </div>
-          </div>
-        </button>
+      <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right z-5">
+        <Folder name="about_me" />
+        <Folder name="projects" />
       </div>
-      <InfoModal className="z-5 absolute top-40 left-30" />
 
       <div
         className={cn(
