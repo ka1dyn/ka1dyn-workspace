@@ -22,14 +22,18 @@ export default function InfoModal({
   useEffect(() => {
     const resizeModalBoundary = () => {
       const modalDiv = modalRef.current;
-      const rect = modalDiv.getBoundingClientRect();
-      const offsetLeft = rect.x;
-      const offsetTop = rect.y;
+      const modalContainer = document.getElementById("modals");
 
-      if (offsetLeft > window.innerWidth)
-        modalDiv.style.left = `${window.innerWidth - 30}px`;
-      if (offsetTop > window.innerHeight)
-        modalDiv.style.top = `${window.innerHeight - 30}px`;
+      const offsetLeft = modalDiv.offsetLeft;
+      const offsetTop = modalDiv.offsetTop;
+
+      const screenWidth = modalContainer?.offsetWidth as number;
+      const screenHeight = modalContainer?.offsetHeight as number;
+
+      if (offsetLeft > screenWidth)
+        modalDiv.style.left = `${screenWidth - 30}px`;
+      if (offsetTop > screenHeight)
+        modalDiv.style.top = `${screenHeight - 30}px`;
     };
 
     window.addEventListener("resize", resizeModalBoundary);
@@ -41,6 +45,7 @@ export default function InfoModal({
 
   const panningHandler = (e: React.MouseEvent) => {
     const modalDiv = modalRef.current;
+    const modalContainer = document.getElementById("modals");
 
     const initModalX = modalDiv.offsetLeft;
     const initModalY = modalDiv.offsetTop;
@@ -48,25 +53,29 @@ export default function InfoModal({
     const initClientX = e.clientX;
     const initClientY = e.clientY;
 
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      if (
-        window.innerWidth < moveEvent.clientX ||
-        moveEvent.clientX < 0 ||
-        window.innerHeight < moveEvent.clientY - 10
-      ) {
-        return;
-      }
+    const cursorOffsetX = e.nativeEvent.offsetX;
+    const cursorOffsetY = e.nativeEvent.offsetY;
 
+    const onMouseMove = (moveEvent: MouseEvent) => {
       const rect = modalDiv.getBoundingClientRect();
 
       const scaleX = rect.width / modalDiv.offsetWidth;
       const scaleY = rect.height / modalDiv.offsetHeight;
 
-      const newLeft = initModalX + (moveEvent.clientX - initClientX) / scaleX;
+      let newLeft = initModalX + (moveEvent.clientX - initClientX) / scaleX;
       let newTop = initModalY + (moveEvent.clientY - initClientY) / scaleY;
 
+      const screenWidth = modalContainer?.offsetWidth as number;
+      const screenHeight = modalContainer?.offsetHeight as number;
+
       const minTop = 64; // Fix hardcoding
+      const maxTop = screenHeight - cursorOffsetY;
+      const minLeft = -cursorOffsetX;
+      const maxLeft = screenWidth - cursorOffsetX;
       newTop = Math.max(minTop, newTop);
+      newTop = Math.min(maxTop, newTop);
+      newLeft = Math.max(minLeft, newLeft);
+      newLeft = Math.min(maxLeft, newLeft);
 
       modalDiv.style.left = `${newLeft}px`;
       modalDiv.style.top = `${newTop}px`;
