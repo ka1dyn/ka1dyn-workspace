@@ -2,22 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import InfoModal from "./InfoModal";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
-import { useModalStack } from "@/stores";
 
-export default function Folder({ name }: { name: string }) {
+export default function Folder({
+  name,
+  initModalX,
+  initModalY,
+}: {
+  name: string;
+  initModalX: number;
+  initModalY: number;
+}) {
   const folderRef = useRef<HTMLDivElement>(null!);
   const modalRef = useRef<HTMLDivElement>(null!);
   const [active, setActive] = useState<boolean>(false);
-  const getNextStack = useModalStack((state) => state.getNextStack);
-
-  const bringToFront = () => {
-    if (modalRef.current) {
-      modalRef.current.style.zIndex = getNextStack().toString();
-    }
-  };
 
   const folderClick = () => {
-    bringToFront();
     setActive(true);
   };
 
@@ -25,6 +24,11 @@ export default function Folder({ name }: { name: string }) {
     if (active) {
       const modalDiv = modalRef.current;
       const modalRect = modalDiv.getBoundingClientRect();
+
+      // Calculate screen scale
+      const scaleX = modalRect.width / modalDiv.offsetWidth;
+      const scaleY = modalRect.height / modalDiv.offsetHeight;
+
       // modal center
       const modalCenterX = modalRect.x + modalRect.width / 2;
       const modalCenterY = modalRect.y + modalRect.height / 2;
@@ -37,8 +41,8 @@ export default function Folder({ name }: { name: string }) {
       const folderCenterX = folderRect.x + folderRect.width / 2;
       const folderCenterY = folderRect.y + folderRect.height / 2;
 
-      const tranlateX = folderCenterX - modalCenterX;
-      const translateY = folderCenterY - modalCenterY;
+      const tranlateX = (folderCenterX - modalCenterX) / scaleX;
+      const translateY = (folderCenterY - modalCenterY) / scaleY;
 
       modalDiv.animate(
         [
@@ -83,8 +87,14 @@ export default function Folder({ name }: { name: string }) {
       {modalsDiv &&
         createPortal(
           <InfoModal
-            className={cn("absolute top-40 left-30", !active && "hidden")}
+            style={{
+              top: `${initModalY}px`,
+              left: `${initModalX}px`,
+            }}
+            className={cn("absolute", !active && "hidden")}
             modalRef={modalRef}
+            active={active}
+            setActive={setActive}
           />,
           modalsDiv,
         )}

@@ -2,9 +2,8 @@ import { useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import InfoModal from "./InfoModal";
 import Folder from "./Folder";
 
 export default function Home() {
@@ -16,45 +15,7 @@ export default function Home() {
   const [imgSrc, setImgSrc] = useState<string>("/images/happy_dog.webp");
   const [dockActive, setDockActive] = useState<boolean>(true);
   const setActive = useOverlay((state) => state.setActive);
-
-  const aboutFolderRef = useRef<HTMLDivElement>(null!);
-  const aboutModalRef = useRef<HTMLDivElement>(null!);
-  const [aboutActive, setAboutActive] = useState<boolean>(false);
-
-  const aboutClick = () => {
-    setAboutActive(true);
-  };
-
-  useEffect(() => {
-    if (aboutActive) {
-      const aboutModalDiv = aboutModalRef.current;
-      const aboutModalRect = aboutModalDiv.getBoundingClientRect();
-      // modal center
-      const modalCenterX = aboutModalRect.x + aboutModalRect.width / 2;
-      const modalCenterY = aboutModalRect.y + aboutModalRect.height / 2;
-
-      // Calculate transform
-
-      // Center of about me folder
-      const aboutFolderDiv = aboutFolderRef.current;
-      const aboutFolderRect = aboutFolderDiv.getBoundingClientRect();
-      const folderCenterX = aboutFolderRect.x + aboutFolderRect.width / 2;
-      const folderCenterY = aboutFolderRect.y + aboutFolderRect.height / 2;
-
-      const tranlateX = folderCenterX - modalCenterX;
-      const translateY = folderCenterY - modalCenterY;
-
-      aboutModalDiv.animate(
-        [
-          {
-            transform: `translate(${tranlateX}px, ${translateY}px) scale(0)`,
-          },
-          { transform: `translate(0, 0) scale(1) ` },
-        ],
-        { duration: 300, easing: "ease-in-out" },
-      );
-    }
-  }, [aboutActive]);
+  const dive = useTweaks((state) => state.dive);
 
   const exitClick = () => {
     setActive(true);
@@ -81,17 +42,17 @@ export default function Home() {
       {/* Portal div for modal */}
       <div
         id="modals"
-        className="absolute top-0 left-0 w-full h-full z-5"
+        className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"
       ></div>
 
       <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right z-5">
-        <Folder name="about_me" />
-        <Folder name="projects" />
+        <Folder name="about_me" initModalX={160} initModalY={120} />
+        <Folder name="projects" initModalX={200} initModalY={150} />
       </div>
 
       <div
         className={cn(
-          "absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.6)] origin-bottom transition-all ease-out duration-300 z-10",
+          "absolute bottom-0 left-1/2 -translate-x-1/2 scale-[clamp(0.7,calc(100cqh/1080px),1.6)] origin-bottom transition-all ease-out duration-300 z-15",
           !dockActive && "translate-y-[calc(100%*calc(100cqh/1080px)-15px)]",
         )}
       >
@@ -108,6 +69,14 @@ export default function Home() {
         </div>
         <Dock className="z-10" setImgSrc={(path: string) => setImgSrc(path)} />
       </div>
+      {dive && (
+        <div
+          className="pointer-events-auto absolute right-14 bottom-12 text-[28px] text-[#c9c9c9] cursor-pointer hover:text-white font-roboto z-15"
+          onClick={exitClick}
+        >
+          exit
+        </div>
+      )}
     </div>
   );
 }

@@ -5,10 +5,16 @@ import { useModalStack } from "@/stores";
 
 export default function InfoModal({
   className = "",
+  style,
   modalRef,
+  active,
+  setActive,
 }: {
   className?: string;
   modalRef: RefObject<HTMLDivElement>;
+  active: boolean;
+  style: Object;
+  setActive: any;
 }) {
   const headerRef = useRef<HTMLDivElement>(null!);
   const getNextStack = useModalStack((state) => state.getNextStack);
@@ -18,6 +24,10 @@ export default function InfoModal({
       modalRef.current.style.zIndex = getNextStack().toString();
     }
   };
+
+  useEffect(() => {
+    bringToFront();
+  }, [active]);
 
   useEffect(() => {
     const resizeModalBoundary = () => {
@@ -135,9 +145,10 @@ export default function InfoModal({
 
   return (
     <div
+      style={style}
       ref={modalRef}
       className={cn(
-        "w-260 h-150 bg-white rounded-md overflow-hidden border border-gray-300 shadow-2xl",
+        "w-260 h-150 bg-white rounded-md overflow-hidden border border-gray-300 shadow-2xl pointer-events-auto",
         className,
       )}
       onMouseDown={() => bringToFront()}
@@ -153,6 +164,12 @@ export default function InfoModal({
       >
         <ResizeIcon className="w-full h-full text-gray-400" />
       </div>
+      <button
+        className="text-2xl cursor-pointer"
+        onClick={() => setActive(false)}
+      >
+        exit
+      </button>
     </div>
   );
 }
