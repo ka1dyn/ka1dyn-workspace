@@ -69,7 +69,7 @@ export default function InfoModal({
       const screenHeight = modalContainer?.offsetHeight as number;
 
       const minTop = 64; // Fix hardcoding
-      const maxTop = screenHeight - cursorOffsetY;
+      const maxTop = screenHeight - cursorOffsetY - 20;
       const minLeft = -cursorOffsetX;
       const maxLeft = screenWidth - cursorOffsetX;
       newTop = Math.max(minTop, newTop);
@@ -91,17 +91,34 @@ export default function InfoModal({
   };
 
   const resizeHandler = (e: React.MouseEvent) => {
+    const modalDiv = modalRef.current;
+    const modalContainer = document.getElementById("modals");
     const startX = e.clientX;
     const startY = e.clientY;
-    const startWidth = modalRef.current.offsetWidth;
-    const startHeight = modalRef.current.offsetHeight;
+    const startWidth = modalDiv.offsetWidth;
+    const startHeight = modalDiv.offsetHeight;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      let newWidth = startWidth + (moveEvent.clientX - startX);
-      let newHeight = startHeight + (moveEvent.clientY - startY);
+      const rect = modalDiv.getBoundingClientRect();
 
-      if (newWidth < 300) newWidth = 300;
-      if (newHeight < 200) newHeight = 200;
+      const scaleX = rect.width / modalDiv.offsetWidth;
+      const scaleY = rect.height / modalDiv.offsetHeight;
+
+      const screenWidth = modalContainer?.offsetWidth as number;
+      const screenHeight = modalContainer?.offsetHeight as number;
+
+      let newWidth = startWidth + (moveEvent.clientX - startX) / scaleX;
+      let newHeight = startHeight + (moveEvent.clientY - startY) / scaleY;
+
+      const minWidth = 300;
+      const maxWidth = screenWidth * 0.9;
+      const minHeight = 200;
+      const maxHeight = screenHeight * 0.9;
+
+      newWidth = Math.max(minWidth, newWidth);
+      newWidth = Math.min(newWidth, maxWidth);
+      newHeight = Math.max(minHeight, newHeight);
+      newHeight = Math.min(newHeight, maxHeight);
 
       modalRef.current.style.width = `${newWidth}px`;
       modalRef.current.style.height = `${newHeight}px`;

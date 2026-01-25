@@ -47,7 +47,7 @@ export default function Scene() {
           {/* <Post /> */}
         </Suspense>
       </AudioProvider>
-      <Helpers />
+      {/* <Helpers /> */}
     </Canvas>
   );
 }
