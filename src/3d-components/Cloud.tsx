@@ -113,7 +113,12 @@ export function RainClouds() {
         decay={0.3}
         position={[0, 10, 0]}
       />
-      <Clouds ref={cloudRef} limit={200} material={THREE.MeshLambertMaterial}>
+      <Clouds
+        ref={cloudRef}
+        limit={200}
+        material={THREE.MeshLambertMaterial}
+        texture={"/images/cloud.png"}
+      >
         <Cloud {...config} bounds={[2, 2, 4]} position={[-9, 5, 0]} />
         <Cloud
           {...config}
