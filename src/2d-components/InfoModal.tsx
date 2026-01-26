@@ -83,9 +83,9 @@ export default function InfoModal({
       const screenHeight = modalContainer?.offsetHeight as number;
 
       const minTop = 64; // Fix hardcoding
-      const maxTop = screenHeight - cursorOffsetY - 20;
-      const minLeft = -cursorOffsetX;
-      const maxLeft = screenWidth - cursorOffsetX;
+      const maxTop = screenHeight - cursorOffsetY * modalScale - 20;
+      const minLeft = -cursorOffsetX * modalScale;
+      const maxLeft = screenWidth - cursorOffsetX * modalScale;
       newTop = Math.max(minTop, newTop);
       newTop = Math.min(maxTop, newTop);
       newLeft = Math.max(minLeft, newLeft);
@@ -130,9 +130,9 @@ export default function InfoModal({
         startHeight + (moveEvent.clientY - startY) / scaleY / modalScale;
 
       const minWidth = 300;
-      const maxWidth = screenWidth * 0.9;
+      const maxWidth = (screenWidth * 0.9) / modalScale;
       const minHeight = 200;
-      const maxHeight = screenHeight * 0.9;
+      const maxHeight = (screenHeight * 0.9) / modalScale;
 
       newWidth = Math.max(minWidth, newWidth);
       newWidth = Math.min(newWidth, maxWidth);
@@ -158,7 +158,7 @@ export default function InfoModal({
       ref={modalRef}
       className={cn(
         "w-260 h-150 bg-transparent rounded-md overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
-        "scale-[clamp(0.6,calc(100cqw/1710px),1.4)] origin-top-left",
+        "scale-[clamp(0.6,calc(100cqw/1710px),1.6)] origin-top-left",
         className,
       )}
       onMouseDown={() => bringToFront()}
@@ -186,7 +186,7 @@ export default function InfoModal({
 
       <div className="flex w-full h-full">
         <div className="flex flex-col w-42 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece]"></div>
-        <div className="flex flex-col w-full z-5">
+        <div className="flex flex-col flex-1 z-5">
           <div className="h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 px-5 border-b border-[#e5e5e5]">
             <span>{name}</span>
           </div>
