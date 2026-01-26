@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, type RefObject } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
 import { useModalStack } from "@/stores";
+import MDViewer from "./MDViewer";
 
 export default function InfoModal({
   className = "",
@@ -190,7 +191,9 @@ export default function InfoModal({
           <div className="h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 px-5 border-b border-[#e5e5e5]">
             <span>{name}</span>
           </div>
-          <div className="bg-white h-full"></div>
+          <div className="bg-white w-full h-full">
+            <MDViewer path={"/content/test.md"} />
+          </div>
         </div>
       </div>
     </div>
