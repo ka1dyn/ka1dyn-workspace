@@ -45,7 +45,7 @@ export default function Home() {
         className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"
       ></div>
 
-      <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1920px),1.4)] origin-top-right z-5">
+      <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqw/1710px),1.4)] origin-top-right z-5">
         <Folder name="about_me" initModalX={160} initModalY={120} />
         <Folder name="projects" initModalX={200} initModalY={150} />
       </div>

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, type RefObject } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
 import { useModalStack } from "@/stores";
 
@@ -67,12 +67,15 @@ export default function InfoModal({
     const cursorOffsetX = e.nativeEvent.offsetX;
     const cursorOffsetY = e.nativeEvent.offsetY;
 
+    const style = window.getComputedStyle(modalDiv);
+    const modalScale = Number(style.scale == "none" ? 1 : style.scale);
+
+    const rect = modalDiv.getBoundingClientRect();
+
+    const scaleX = rect.width / modalDiv.offsetWidth / modalScale;
+    const scaleY = rect.height / modalDiv.offsetHeight / modalScale;
+
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const rect = modalDiv.getBoundingClientRect();
-
-      const scaleX = rect.width / modalDiv.offsetWidth;
-      const scaleY = rect.height / modalDiv.offsetHeight;
-
       let newLeft = initModalX + (moveEvent.clientX - initClientX) / scaleX;
       let newTop = initModalY + (moveEvent.clientY - initClientY) / scaleY;
 
@@ -109,17 +112,22 @@ export default function InfoModal({
     const startWidth = modalDiv.offsetWidth;
     const startHeight = modalDiv.offsetHeight;
 
+    const style = window.getComputedStyle(modalDiv);
+    const modalScale = Number(style.scale == "none" ? 1 : style.scale);
+
+    const rect = modalDiv.getBoundingClientRect();
+
+    const scaleX = rect.width / modalDiv.offsetWidth / modalScale;
+    const scaleY = rect.height / modalDiv.offsetHeight / modalScale;
+
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const rect = modalDiv.getBoundingClientRect();
-
-      const scaleX = rect.width / modalDiv.offsetWidth;
-      const scaleY = rect.height / modalDiv.offsetHeight;
-
       const screenWidth = modalContainer?.offsetWidth as number;
       const screenHeight = modalContainer?.offsetHeight as number;
 
-      let newWidth = startWidth + (moveEvent.clientX - startX) / scaleX;
-      let newHeight = startHeight + (moveEvent.clientY - startY) / scaleY;
+      let newWidth =
+        startWidth + (moveEvent.clientX - startX) / scaleX / modalScale;
+      let newHeight =
+        startHeight + (moveEvent.clientY - startY) / scaleY / modalScale;
 
       const minWidth = 300;
       const maxWidth = screenWidth * 0.9;
@@ -150,12 +158,13 @@ export default function InfoModal({
       ref={modalRef}
       className={cn(
         "w-260 h-150 bg-transparent rounded-md overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
+        "scale-[clamp(0.6,calc(100cqw/1710px),1.4)] origin-top-left",
         className,
       )}
       onMouseDown={() => bringToFront()}
     >
       <div
-        className="absolute top-0 left-0 w-full h-13 bg-transparent z-10"
+        className="absolute top-0 left-0 w-full h-13 bg-transparent cursor-move z-10"
         onMouseDown={panningHandler}
       ></div>
 
@@ -176,22 +185,7 @@ export default function InfoModal({
       </div>
 
       <div className="flex w-full h-full">
-        <div className="flex flex-col w-42 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece]">
-          {/* <div className="h-13 flex items-center p-5 gap-2">
-            <div
-              className="size-3 cursor-pointer rounded-full bg-[rgb(255,95,87)]"
-              onClick={() => setActive(false)}
-            ></div>
-            <div
-              className="size-3 cursor-pointer rounded-full bg-[rgb(255,188,46)]"
-              onClick={() => setActive(false)}
-            ></div>
-            <div
-              className="size-3 cursor-pointer rounded-full bg-[rgb(43,200,64)]"
-              onClick={() => setActive(false)}
-            ></div>
-          </div> */}
-        </div>
+        <div className="flex flex-col w-42 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece]"></div>
         <div className="flex flex-col w-full z-5">
           <div className="h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 px-5 border-b border-[#e5e5e5]">
             <span>{name}</span>
@@ -199,26 +193,6 @@ export default function InfoModal({
           <div className="bg-white h-full"></div>
         </div>
       </div>
-
-      {/* <div
-        ref={headerRef}
-        className="h-10 bg-gray-400 cursor-move"
-        onMouseDown={panningHandler}
-      ></div>
-
-      
-      <div
-        className="absolute bottom-0 right-0 size-5 cursor-nwse-resize bg-transparent"
-        onMouseDown={resizeHandler}
-      >
-        <ResizeIcon className="w-full h-full text-gray-400" />
-      </div>
-      <button
-        className="text-2xl cursor-pointer"
-        onClick={() => setActive(false)}
-      >
-        exit
-      </button> */}
     </div>
   );
 }
