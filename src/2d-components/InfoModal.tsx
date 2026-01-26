@@ -5,18 +5,19 @@ import { useModalStack } from "@/stores";
 
 export default function InfoModal({
   className = "",
+  name,
   style,
   modalRef,
   active,
   setActive,
 }: {
   className?: string;
+  name: string;
   modalRef: RefObject<HTMLDivElement>;
   active: boolean;
   style: Object;
   setActive: any;
 }) {
-  const headerRef = useRef<HTMLDivElement>(null!);
   const getNextStack = useModalStack((state) => state.getNextStack);
 
   const bringToFront = () => {
@@ -148,16 +149,64 @@ export default function InfoModal({
       style={style}
       ref={modalRef}
       className={cn(
-        "w-260 h-150 bg-white rounded-md overflow-hidden border border-gray-300 shadow-2xl pointer-events-auto",
+        "w-260 h-150 bg-transparent rounded-md overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
         className,
       )}
       onMouseDown={() => bringToFront()}
     >
       <div
+        className="absolute top-0 left-0 w-full h-13 bg-transparent z-10"
+        onMouseDown={panningHandler}
+      ></div>
+
+      <div
+        className="absolute bottom-0 right-0 size-5 cursor-nwse-resize bg-transparent z-10"
+        onMouseDown={resizeHandler}
+      >
+        <ResizeIcon className="w-full h-full text-gray-400" />
+      </div>
+
+      <div className="absolute top-0 left-0 h-13 flex items-center p-5 gap-2 z-15">
+        <div
+          className="size-3 cursor-pointer rounded-full bg-[rgb(255,95,87)]"
+          onClick={() => setActive(false)}
+        ></div>
+        <div className="size-3 cursor-pointer rounded-full bg-[rgb(255,188,46)]"></div>
+        <div className="size-3 cursor-pointer rounded-full bg-[rgb(43,200,64)]"></div>
+      </div>
+
+      <div className="flex w-full h-full">
+        <div className="flex flex-col w-42 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece]">
+          {/* <div className="h-13 flex items-center p-5 gap-2">
+            <div
+              className="size-3 cursor-pointer rounded-full bg-[rgb(255,95,87)]"
+              onClick={() => setActive(false)}
+            ></div>
+            <div
+              className="size-3 cursor-pointer rounded-full bg-[rgb(255,188,46)]"
+              onClick={() => setActive(false)}
+            ></div>
+            <div
+              className="size-3 cursor-pointer rounded-full bg-[rgb(43,200,64)]"
+              onClick={() => setActive(false)}
+            ></div>
+          </div> */}
+        </div>
+        <div className="flex flex-col w-full z-5">
+          <div className="h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 px-5 border-b border-[#e5e5e5]">
+            <span>{name}</span>
+          </div>
+          <div className="bg-white h-full"></div>
+        </div>
+      </div>
+
+      {/* <div
         ref={headerRef}
         className="h-10 bg-gray-400 cursor-move"
         onMouseDown={panningHandler}
       ></div>
+
+      
       <div
         className="absolute bottom-0 right-0 size-5 cursor-nwse-resize bg-transparent"
         onMouseDown={resizeHandler}
@@ -169,7 +218,7 @@ export default function InfoModal({
         onClick={() => setActive(false)}
       >
         exit
-      </button>
+      </button> */}
     </div>
   );
 }

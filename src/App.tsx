@@ -2,7 +2,6 @@ import Scene from "@/3d-components/Scene";
 import { useFullscreen, useStart } from "./stores";
 import Loading from "./2d-components/Loading";
 import { Route } from "wouter";
-import Booting from "./2d-components/Booting";
 import Overlay from "./2d-components/Overlay";
 import { useEffect } from "react";
 import Home from "./2d-components/Home";

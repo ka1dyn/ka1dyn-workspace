@@ -87,6 +87,7 @@ export default function Folder({
       {modalsDiv &&
         createPortal(
           <InfoModal
+            name={name}
             style={{
               top: `${initModalY}px`,
               left: `${initModalX}px`,
