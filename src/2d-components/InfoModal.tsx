@@ -1,8 +1,22 @@
 import { cn } from "@/lib/utils";
 import { useEffect, type RefObject } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
+import CloseIcon from "@/icons/close.svg?react";
+import RemoveIcon from "@/icons/remove.svg?react";
+import ExpandIcon from "@/icons/expand.svg?react";
+import CollapseIcon from "@/icons/collapse.svg";
 import { useModalStack } from "@/stores";
 import MDViewer from "./MDViewer";
+
+interface InfoModalProps {
+  className?: string;
+  name: string;
+  modalRef: RefObject<HTMLDivElement>;
+  active: boolean;
+  style: Object;
+  setActive: any;
+  navActive: boolean;
+}
 
 export default function InfoModal({
   className = "",
@@ -11,14 +25,8 @@ export default function InfoModal({
   modalRef,
   active,
   setActive,
-}: {
-  className?: string;
-  name: string;
-  modalRef: RefObject<HTMLDivElement>;
-  active: boolean;
-  style: Object;
-  setActive: any;
-}) {
+  navActive,
+}: InfoModalProps) {
   const getNextStack = useModalStack((state) => state.getNextStack);
 
   const bringToFront = () => {
@@ -34,7 +42,10 @@ export default function InfoModal({
   useEffect(() => {
     const resizeModalBoundary = () => {
       const modalDiv = modalRef.current;
+      if (!modalDiv) return;
+
       const modalContainer = document.getElementById("modals");
+      if (!modalContainer) return;
 
       const offsetLeft = modalDiv.offsetLeft;
       const offsetTop = modalDiv.offsetTop;
@@ -58,6 +69,7 @@ export default function InfoModal({
   const panningHandler = (e: React.MouseEvent) => {
     const modalDiv = modalRef.current;
     const modalContainer = document.getElementById("modals");
+    if (!modalContainer) return;
 
     const initModalX = modalDiv.offsetLeft;
     const initModalY = modalDiv.offsetTop;
@@ -158,8 +170,9 @@ export default function InfoModal({
       style={style}
       ref={modalRef}
       className={cn(
-        "w-260 h-150 bg-transparent rounded-md overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
-        "scale-[clamp(0.6,calc(100cqw/1710px),1.6)] origin-top-left",
+        "@container w-260 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
+        // "scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-left",
+        "origin-top-left",
         className,
       )}
       onMouseDown={() => bringToFront()}
@@ -176,22 +189,40 @@ export default function InfoModal({
         <ResizeIcon className="w-full h-full text-gray-400" />
       </div>
 
-      <div className="absolute top-0 left-0 h-13 flex items-center p-5 gap-2 z-15">
-        <div
-          className="size-3 cursor-pointer rounded-full bg-[rgb(255,95,87)]"
-          onClick={() => setActive(false)}
-        ></div>
-        <div className="size-3 cursor-pointer rounded-full bg-[rgb(255,188,46)]"></div>
-        <div className="size-3 cursor-pointer rounded-full bg-[rgb(43,200,64)]"></div>
+      <div className="absolute top-0 left-0 w-24 h-13 flex items-center justify-center z-15 pointer-events-none">
+        <div className="flex gap-2 pointer-events-auto group">
+          <div
+            className="size-3 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
+            onClick={() => setActive(false)}
+          >
+            <CloseIcon className="size-2.5 hidden group-hover:block" />
+          </div>
+          <div className="size-3 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center">
+            <RemoveIcon className="size-2.5 hidden group-hover:block" />
+          </div>
+          <div className="size-3 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center">
+            <ExpandIcon className="size-2.5 hidden group-hover:block" />
+          </div>
+        </div>
       </div>
 
       <div className="flex w-full h-full">
-        <div className="flex flex-col w-42 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece]"></div>
+        <div
+          className={cn(
+            "flex flex-col w-42 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
+            navActive ? "hidden @4xl:block" : "hidden",
+          )}
+        ></div>
         <div className="flex flex-col flex-1 z-5">
-          <div className="h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 px-5 border-b border-[#e5e5e5]">
+          <div
+            className={cn(
+              "h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
+              navActive ? "px-24 @4xl:px-5" : "px-24",
+            )}
+          >
             <span>{name}</span>
           </div>
-          <div className="bg-white w-full h-full">
+          <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15">
             <MDViewer path={"/content/test.md"} />
           </div>
         </div>

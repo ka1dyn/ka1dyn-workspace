@@ -25,9 +25,6 @@ export default function Folder({
       const modalDiv = modalRef.current;
       const modalRect = modalDiv.getBoundingClientRect();
 
-      const style = window.getComputedStyle(modalDiv);
-      const modalScale = Number(style.scale);
-
       // Calculate screen scale
       const scaleX = modalRect.width / modalDiv.offsetWidth;
       const scaleY = modalRect.height / modalDiv.offsetHeight;
@@ -43,8 +40,6 @@ export default function Folder({
       const folderRect = folderDiv.getBoundingClientRect();
       const folderCenterX = folderRect.x + folderRect.width / 2;
       const folderCenterY = folderRect.y + folderRect.height / 2;
-
-      console.log(folderCenterX, folderCenterY);
 
       const tranlateX = (folderCenterX - modalLeft) / scaleX;
       const translateY = (folderCenterY - modalTop) / scaleY;
@@ -101,6 +96,7 @@ export default function Folder({
             modalRef={modalRef}
             active={active}
             setActive={setActive}
+            navActive={true}
           />,
           modalsDiv,
         )}
