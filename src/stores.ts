@@ -8,6 +8,7 @@ import {
   type FullsceenType,
   type TweaksType,
   type SoundVolType,
+  type ModalStore,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
 
@@ -120,4 +121,48 @@ export const useModalStack = create<{
     set({ stack: nextStack });
     return nextStack;
   },
+}));
+
+export const useModalStore = create<ModalStore>((set) => ({
+  modals: {},
+
+  registerModal: (name, x, y) =>
+    set((state) => ({
+      modals: {
+        ...state.modals,
+        [name]: {
+          name,
+          x,
+          y,
+          width: 800,
+          height: 600,
+          isOpen: false,
+          zIndex: 10,
+        },
+      },
+    })),
+
+  updateModal: (name, updates) =>
+    set((state) => ({
+      modals: {
+        ...state.modals,
+        [name]: { ...state.modals[name], ...updates },
+      },
+    })),
+
+  openModal: (name) =>
+    set((state) => ({
+      modals: {
+        ...state.modals,
+        [name]: { ...state.modals[name], isOpen: true },
+      },
+    })),
+
+  closeModal: (name) =>
+    set((state) => ({
+      modals: {
+        ...state.modals,
+        [name]: { ...state.modals[name], isOpen: false },
+      },
+    })),
 }));

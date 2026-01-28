@@ -1,32 +1,34 @@
 import { cn } from "@/lib/utils";
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
 import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
 import ExpandIcon from "@/icons/expand.svg?react";
 import CollapseIcon from "@/icons/collapse.svg";
-import { useModalStack } from "@/stores";
+import { useModalStack, useModalStore } from "@/stores";
 import MDViewer from "./MDViewer";
+import { useShallow } from "zustand/shallow";
 
 interface InfoModalProps {
   className?: string;
   name: string;
-  modalRef: RefObject<HTMLDivElement>;
-  active: boolean;
   style: Object;
-  setActive: any;
-  navActive: boolean;
+  navActive?: boolean;
 }
 
 export default function InfoModal({
   className = "",
   name,
   style,
-  modalRef,
-  active,
-  setActive,
-  navActive,
+  navActive = true,
 }: InfoModalProps) {
+  const { modalState, closeModal } = useModalStore(
+    useShallow((state) => ({
+      modalState: state.modals[name],
+      closeModal: state.closeModal,
+    })),
+  );
+  const modalRef = useRef<HTMLDivElement>(null!);
   const getNextStack = useModalStack((state) => state.getNextStack);
 
   const bringToFront = () => {
@@ -37,7 +39,46 @@ export default function InfoModal({
 
   useEffect(() => {
     bringToFront();
-  }, [active]);
+  }, []);
+
+  useEffect(() => {
+    if (!modalState.isOpen) return;
+
+    const modalDiv = modalRef.current;
+    const modalRect = modalDiv.getBoundingClientRect();
+
+    // Calculate screen scale
+    const scaleX = modalRect.width / modalDiv.offsetWidth;
+    const scaleY = modalRect.height / modalDiv.offsetHeight;
+
+    // Fodal center
+    const modalLeft = modalRect.x;
+    const modalTop = modalRect.y;
+
+    // Folder center
+    const folderDiv = document.getElementById(name);
+
+    if (!folderDiv) {
+      throw new Error("There is no target folder");
+    }
+
+    const folderRect = folderDiv.getBoundingClientRect();
+    const folderCenterX = folderRect.x + folderRect.width / 2;
+    const folderCenterY = folderRect.y + folderRect.height / 2;
+
+    const tranlateX = (folderCenterX - modalLeft) / scaleX;
+    const translateY = (folderCenterY - modalTop) / scaleY;
+
+    modalDiv.animate(
+      [
+        {
+          transform: `translate(${tranlateX}px, ${translateY}px) scale(0)`,
+        },
+        { transform: `translate(0, 0) scale(1) ` },
+      ],
+      { duration: 300, easing: "ease-in-out" },
+    );
+  }, [modalState.isOpen]);
 
   useEffect(() => {
     const resizeModalBoundary = () => {
@@ -69,7 +110,7 @@ export default function InfoModal({
   const panningHandler = (e: React.MouseEvent) => {
     const modalDiv = modalRef.current;
     const modalContainer = document.getElementById("modals");
-    if (!modalContainer) return;
+    if (!modalContainer || !modalDiv) return;
 
     const initModalX = modalDiv.offsetLeft;
     const initModalY = modalDiv.offsetTop;
@@ -193,7 +234,7 @@ export default function InfoModal({
         <div className="flex gap-2 pointer-events-auto group">
           <div
             className="size-3 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
-            onClick={() => setActive(false)}
+            onClick={() => closeModal(name)}
           >
             <CloseIcon className="size-2.5 hidden group-hover:block" />
           </div>

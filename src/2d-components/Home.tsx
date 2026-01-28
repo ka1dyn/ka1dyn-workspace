@@ -5,6 +5,7 @@ import Dock from "./Dock";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Folder from "./Folder";
+import ModalContainer from "./ModalContainer";
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -39,15 +40,21 @@ export default function Home() {
         <img src="/images/ka1dyn_logo.png" className="h-full" />
       </div>
 
-      {/* Portal div for modal */}
-      <div
-        id="modals"
-        className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"
-      ></div>
+      <ModalContainer className="absolute top-0 left-0 w-full h-full z-10" />
 
       <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-right z-5">
-        <Folder name="about_me" initModalX={160} initModalY={120} />
-        <Folder name="projects" initModalX={200} initModalY={150} />
+        <Folder
+          id="about_me"
+          name="about_me"
+          initModalX={160}
+          initModalY={120}
+        />
+        <Folder
+          id="projects"
+          name="projects"
+          initModalX={200}
+          initModalY={150}
+        />
       </div>
 
       <div

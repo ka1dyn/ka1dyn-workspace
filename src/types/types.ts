@@ -68,6 +68,24 @@ export interface SoundVolType {
   setLightning: (newState: number) => void;
 }
 
+export interface ModalData {
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  isOpen: boolean;
+  zIndex: number;
+}
+
+export interface ModalStore {
+  modals: Record<string, ModalData>;
+  registerModal: (name: string, x: number, y: number) => void;
+  updateModal: (name: string, updates: Partial<ModalData>) => void;
+  openModal: (name: string) => void;
+  closeModal: (name: string) => void;
+}
+
 /* General types */
 
 // world position
