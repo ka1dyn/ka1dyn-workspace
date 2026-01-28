@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { useModalStore } from "@/stores";
 import { BackgroundTypes } from "@/types/enums";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import ModalDockItem from "./ModalDockItem";
 
 export default function Dock({
   className,
@@ -42,10 +43,12 @@ export default function Dock({
     }
   }, [bgType]);
 
+  const someModalOpen = Object.values(modals).some((modal) => modal.isOpen);
+
   return (
     <div
       className={cn(
-        "relative flex gap-6 items-center px-4 h-22 bg-gray-500/50 backdrop-blur-sm rounded-t-2xl w-fit",
+        "relative flex items-center px-4 h-22 bg-gray-500/50 backdrop-blur-sm rounded-t-2xl w-fit",
         className,
       )}
     >
@@ -78,34 +81,19 @@ export default function Dock({
           }}
         ></div>
       </div>
-      {Object.values(modals).some((modal) => modal.isOpen) && (
-        <>
-          <div className="w-0.5 h-1/2 rounded-full bg-[#b4b4b4] -translate-y-1"></div>
-          <div className="h-full flex gap-6 justify-center items-center -translate-y-1">
-            {Object.values(modals).map(
-              (modal) =>
-                modal.isOpen && (
-                  <div
-                    className="relative flex items-center h-full"
-                    key={modal.name}
-                  >
-                    <div className="flex justify-center items-center cursor-pointer size-16 rounded-xl bg-amber-50 hover:shadow-lg/50 shadow-white animate-dock-add">
-                      <span className="break-all text-center lg:text-[16px]">
-                        {modal.name}
-                      </span>
-                    </div>
-                    <div
-                      className={`absolute bottom-0 left-8 size-1.25 rounded-full bg-white`}
-                      style={{
-                        transform: `translateX(-50%))`,
-                      }}
-                    ></div>
-                  </div>
-                ),
+      <div className="h-full flex gap-6 justify-center items-center -translate-y-1">
+        {
+          <div
+            className={cn(
+              "w-0.5 h-1/2 ml-6 rounded-full bg-[#b4b4b4] transition-all duration-300",
+              someModalOpen ? "ml-6 opacity-100" : "ml-0 opacity-0",
             )}
-          </div>
-        </>
-      )}
+          ></div>
+        }
+        {Object.values(modals).map((modal) => (
+          <ModalDockItem name={modal.name} />
+        ))}
+      </div>
     </div>
   );
 }
