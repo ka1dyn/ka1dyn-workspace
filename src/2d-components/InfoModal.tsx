@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
 import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
@@ -22,10 +22,11 @@ export default function InfoModal({
   style,
   navActive = true,
 }: InfoModalProps) {
-  const { modalState, closeModal } = useModalStore(
+  const { modalState, closeModal, downModal } = useModalStore(
     useShallow((state) => ({
       modalState: state.modals[name],
       closeModal: state.closeModal,
+      downModal: state.downModal,
     })),
   );
   const modalRef = useRef<HTMLDivElement>(null!);
@@ -36,49 +37,6 @@ export default function InfoModal({
       modalRef.current.style.zIndex = getNextStack().toString();
     }
   };
-
-  useEffect(() => {
-    bringToFront();
-  }, []);
-
-  useEffect(() => {
-    if (!modalState.isOpen) return;
-
-    const modalDiv = modalRef.current;
-    const modalRect = modalDiv.getBoundingClientRect();
-
-    // Calculate screen scale
-    const scaleX = modalRect.width / modalDiv.offsetWidth;
-    const scaleY = modalRect.height / modalDiv.offsetHeight;
-
-    // Fodal center
-    const modalLeft = modalRect.x;
-    const modalTop = modalRect.y;
-
-    // Folder center
-    const folderDiv = document.getElementById(name);
-
-    if (!folderDiv) {
-      throw new Error("There is no target folder");
-    }
-
-    const folderRect = folderDiv.getBoundingClientRect();
-    const folderCenterX = folderRect.x + folderRect.width / 2;
-    const folderCenterY = folderRect.y + folderRect.height / 2;
-
-    const tranlateX = (folderCenterX - modalLeft) / scaleX;
-    const translateY = (folderCenterY - modalTop) / scaleY;
-
-    modalDiv.animate(
-      [
-        {
-          transform: `translate(${tranlateX}px, ${translateY}px) scale(0)`,
-        },
-        { transform: `translate(0, 0) scale(1) ` },
-      ],
-      { duration: 300, easing: "ease-in-out" },
-    );
-  }, [modalState.isOpen]);
 
   useEffect(() => {
     const resizeModalBoundary = () => {
@@ -106,6 +64,115 @@ export default function InfoModal({
       window.removeEventListener("resize", resizeModalBoundary);
     };
   }, []);
+
+  useEffect(() => {
+    if (!modalState.isOpen || !modalRef.current) return;
+
+    // Folder center
+    const folderDiv = document.getElementById(
+      `folder-${name}`,
+    ) as HTMLDivElement;
+
+    if (!folderDiv) {
+      throw new Error("There is no target folder");
+    }
+
+    moveFromTarget(folderDiv);
+  }, [modalState.isOpen]);
+
+  useEffect(() => {
+    if (!modalState.isOpen || !modalRef.current) return;
+
+    if (modalState.isDown) {
+      const modalDockDiv = document.getElementById(
+        `dock-${name}`,
+      ) as HTMLDivElement;
+
+      if (!modalDockDiv) {
+        return;
+      }
+
+      moveToTarget(modalDockDiv);
+    } else {
+      const modalDockDiv = document.getElementById(
+        `dock-${name}`,
+      ) as HTMLDivElement;
+
+      if (!modalDockDiv) {
+        return;
+      }
+
+      moveFromTarget(modalDockDiv);
+    }
+  }, [modalState.isDown]);
+
+  const moveFromTarget = (target: HTMLDivElement) => {
+    const modalDiv = modalRef.current;
+    if (!modalDiv) return;
+
+    bringToFront();
+
+    const modalRect = modalDiv.getBoundingClientRect();
+
+    // Calculate screen scale
+    const scaleX = modalRect.width / modalDiv.offsetWidth;
+    const scaleY = modalRect.height / modalDiv.offsetHeight;
+
+    // Modal center
+    const modalLeft = modalRect.x;
+    const modalTop = modalRect.y;
+
+    // Target center
+    const targetRect = target.getBoundingClientRect();
+    const targetCenterX = targetRect.x + targetRect.width / 2;
+    const targetCenterY = targetRect.y + targetRect.height / 2;
+
+    const translateX = (targetCenterX - modalLeft) / scaleX;
+    const translateY = (targetCenterY - modalTop) / scaleY;
+
+    modalDiv.animate(
+      [
+        {
+          transform: `translate(${translateX}px, ${translateY}px) scale(0)`,
+        },
+        { transform: `translate(0, 0) scale(1) ` },
+      ],
+      { duration: 300, easing: "ease-in-out", fill: "forwards" },
+    );
+  };
+
+  const moveToTarget = (target: HTMLDivElement) => {
+    const modalDiv = modalRef.current;
+    if (!modalDiv) return;
+
+    const modalRect = modalDiv.getBoundingClientRect();
+
+    // Calculate screen scale
+    const scaleX = modalRect.width / modalDiv.offsetWidth;
+    const scaleY = modalRect.height / modalDiv.offsetHeight;
+
+    // Modal center
+    const modalLeft = modalRect.x;
+    const modalTop = modalRect.y;
+
+    // Target center
+    const targetRect = target.getBoundingClientRect();
+    const targetCenterX = targetRect.x + targetRect.width / 2;
+    const targetCenterY = targetRect.y + targetRect.height / 2;
+
+    const translateX = (targetCenterX - modalLeft) / scaleX;
+    const translateY = (targetCenterY - modalTop) / scaleY;
+
+    modalDiv.animate(
+      [
+        { transform: `translate(0, 0) scale(1)` },
+        {
+          transform: `translate(${translateX}px, ${translateY}px) scale(0)`,
+        },
+      ],
+      { duration: 300, easing: "ease-in-out", fill: "forwards" },
+    );
+  };
 
   const panningHandler = (e: React.MouseEvent) => {
     const modalDiv = modalRef.current;
@@ -212,8 +279,8 @@ export default function InfoModal({
       ref={modalRef}
       className={cn(
         "@container w-260 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
-        // "scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-left",
-        "origin-top-left",
+        "scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-left",
+        // "origin-top-left",
         className,
       )}
       onMouseDown={() => bringToFront()}
@@ -238,7 +305,10 @@ export default function InfoModal({
           >
             <CloseIcon className="size-2.5 hidden group-hover:block" />
           </div>
-          <div className="size-3 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center">
+          <div
+            className="size-3 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center"
+            onClick={() => downModal(name, true)}
+          >
             <RemoveIcon className="size-2.5 hidden group-hover:block" />
           </div>
           <div className="size-3 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center">

@@ -76,6 +76,7 @@ export interface ModalData {
   height: number;
   isOpen: boolean;
   zIndex: number;
+  isDown: boolean;
 }
 
 export interface ModalStore {
@@ -84,6 +85,7 @@ export interface ModalStore {
   updateModal: (name: string, updates: Partial<ModalData>) => void;
   openModal: (name: string) => void;
   closeModal: (name: string) => void;
+  downModal: (name: string, newState: boolean) => void;
 }
 
 /* General types */

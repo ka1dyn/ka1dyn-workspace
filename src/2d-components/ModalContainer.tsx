@@ -8,7 +8,6 @@ export default function ModalContainer({
   className?: string;
 }) {
   const modals = useModalStore((state) => state.modals);
-  console.log(modals);
 
   return (
     <div id="modals" className={cn("w-50 h-50 pointer-events-none", className)}>

@@ -3,6 +3,7 @@ import { useModalStore } from "@/stores";
 import { BackgroundTypes } from "@/types/enums";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ModalDockItem from "./ModalDockItem";
+import React from "react";
 
 export default function Dock({
   className,
@@ -91,7 +92,9 @@ export default function Dock({
           ></div>
         }
         {Object.values(modals).map((modal) => (
-          <ModalDockItem name={modal.name} />
+          <React.Fragment key={modal.name}>
+            <ModalDockItem name={modal.name} />
+          </React.Fragment>
         ))}
       </div>
     </div>

@@ -126,7 +126,8 @@ export const useModalStack = create<{
 export const useModalStore = create<ModalStore>((set) => ({
   modals: {},
 
-  registerModal: (name, x, y) =>
+  registerModal: (name, x, y) => {
+    console.log("register!");
     set((state) => ({
       modals: {
         ...state.modals,
@@ -138,9 +139,11 @@ export const useModalStore = create<ModalStore>((set) => ({
           height: 600,
           isOpen: false,
           zIndex: 10,
+          isDown: false,
         },
       },
-    })),
+    }));
+  },
 
   updateModal: (name, updates) =>
     set((state) => ({
@@ -163,6 +166,14 @@ export const useModalStore = create<ModalStore>((set) => ({
       modals: {
         ...state.modals,
         [name]: { ...state.modals[name], isOpen: false },
+      },
+    })),
+
+  downModal: (name, newState) =>
+    set((state) => ({
+      modals: {
+        ...state.modals,
+        [name]: { ...state.modals[name], isDown: newState },
       },
     })),
 }));
