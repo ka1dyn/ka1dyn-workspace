@@ -1,4 +1,4 @@
-import { useOverlay, useTweaks } from "@/stores";
+import { useModalStore, useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
@@ -18,8 +18,11 @@ export default function Home() {
   const setActive = useOverlay((state) => state.setActive);
   const dive = useTweaks((state) => state.dive);
 
-  const exitClick = () => {
+  const exitClick = async () => {
     setActive(true);
+
+    await useModalStore.getState().backupAll();
+
     setDive(false);
     setAudioActive(audioPrev);
   };

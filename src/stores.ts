@@ -9,8 +9,11 @@ import {
   type TweaksType,
   type SoundVolType,
   type ModalStore,
+  type ModalData,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
+import { devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 export const useStart = create<StartType>((set) => ({
   start: false,
@@ -123,57 +126,88 @@ export const useModalStack = create<{
   },
 }));
 
-export const useModalStore = create<ModalStore>((set) => ({
-  modals: {},
+export const useModalStore = create<ModalStore>()(
+  immer(
+    devtools((set, get) => ({
+      count: 0,
+      modals: {},
+      backupFns: {},
 
-  registerModal: (name, x, y) => {
-    console.log("register!");
-    set((state) => ({
-      modals: {
-        ...state.modals,
-        [name]: {
-          name,
-          x,
-          y,
-          width: 800,
-          height: 600,
-          isOpen: false,
-          zIndex: 10,
-          isDown: false,
-        },
+      openModal: (name, x, y) => {
+        set(
+          (state) => {
+            state.modals[name] = {
+              name,
+              x,
+              y,
+              width: 800,
+              height: 600,
+              isDown: false,
+              isClosing: false,
+            };
+            state.count += 1;
+          },
+          undefined,
+          "modal/open",
+        );
       },
-    }));
-  },
 
-  updateModal: (name, updates) =>
-    set((state) => ({
-      modals: {
-        ...state.modals,
-        [name]: { ...state.modals[name], ...updates },
+      closeModalStart: (name) =>
+        set(
+          (state) => {
+            state.modals[name].isClosing = true;
+          },
+          undefined,
+          "modal/close-start",
+        ),
+
+      closeModalComplete: (name) =>
+        set(
+          (state) => {
+            state.count -= 1;
+            delete state.modals[name];
+            delete state.backupFns[name];
+          },
+          undefined,
+          "modal/close-complete",
+        ),
+
+      downupModal: (name, newState) =>
+        set(
+          (state) => {
+            state.modals[name].isDown = newState;
+          },
+          undefined,
+          "modal/down",
+        ),
+
+      // Backup state from external input
+      registerBackup: (name, backupFn) =>
+        set(
+          (state) => {
+            state.backupFns[name] = backupFn;
+          },
+          undefined,
+          "modal/register-backup",
+        ),
+
+      saveModalState: async (name, curState) =>
+        set(
+          (state) => {
+            state.modals[name] = {
+              ...state.modals[name],
+              ...curState,
+            };
+          },
+          undefined,
+          "modal/save",
+        ),
+
+      backupAll: async () => {
+        const { backupFns } = get();
+        const backupPromises = Object.values(backupFns).map((fn) => fn());
+        await Promise.all(backupPromises);
       },
     })),
-
-  openModal: (name) =>
-    set((state) => ({
-      modals: {
-        ...state.modals,
-        [name]: { ...state.modals[name], isOpen: true },
-      },
-    })),
-
-  closeModal: (name) =>
-    set((state) => ({
-      modals: {
-        ...state.modals,
-        [name]: { ...state.modals[name], isOpen: false },
-      },
-    })),
-
-  downModal: (name, newState) =>
-    set((state) => ({
-      modals: {
-        ...state.modals,
-        [name]: { ...state.modals[name], isDown: newState },
-      },
-    })),
-}));
+  ),
+);

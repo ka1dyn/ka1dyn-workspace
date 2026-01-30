@@ -22,11 +22,19 @@ export default function InfoModal({
   style,
   navActive = true,
 }: InfoModalProps) {
-  const { modalState, closeModal, downModal } = useModalStore(
+  const {
+    modalState,
+    closeModalStart,
+    downupModal,
+    saveModalState,
+    registerBackup,
+  } = useModalStore(
     useShallow((state) => ({
       modalState: state.modals[name],
-      closeModal: state.closeModal,
-      downModal: state.downModal,
+      closeModalStart: state.closeModalStart,
+      downupModal: state.downupModal,
+      saveModalState: state.saveModalState,
+      registerBackup: state.registerBackup,
     })),
   );
   const modalRef = useRef<HTMLDivElement>(null!);
@@ -39,10 +47,22 @@ export default function InfoModal({
   };
 
   useEffect(() => {
-    const resizeModalBoundary = () => {
-      const modalDiv = modalRef.current;
-      if (!modalDiv) return;
+    const modalDiv = modalRef.current;
+    if (!modalDiv || !modalState) return;
 
+    const backupModal = async () => {
+      await saveModalState(name, {
+        ...useModalStore.getState().modals[name],
+        x: parseFloat(modalDiv.style.left) || modalDiv.offsetLeft,
+        y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
+        width: modalDiv.offsetWidth,
+        height: modalDiv.offsetHeight,
+      });
+    };
+
+    registerBackup(name, backupModal);
+
+    const resizeModalBoundary = () => {
       const modalContainer = document.getElementById("modals");
       if (!modalContainer) return;
 
@@ -60,13 +80,11 @@ export default function InfoModal({
 
     window.addEventListener("resize", resizeModalBoundary);
 
-    return () => {
-      window.removeEventListener("resize", resizeModalBoundary);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!modalState.isOpen || !modalRef.current) return;
+    // Init state, if isDown is false -> animating
+    if (modalState.isDown) {
+      modalDiv.style.transform = `scale(0)`;
+      return;
+    }
 
     // Folder center
     const folderDiv = document.getElementById(
@@ -78,10 +96,14 @@ export default function InfoModal({
     }
 
     moveFromTarget(folderDiv);
-  }, [modalState.isOpen]);
+
+    return () => {
+      window.removeEventListener("resize", resizeModalBoundary);
+    };
+  }, []);
 
   useEffect(() => {
-    if (!modalState.isOpen || !modalRef.current) return;
+    if (!modalRef.current || !modalState) return;
 
     if (modalState.isDown) {
       const modalDockDiv = document.getElementById(
@@ -104,11 +126,32 @@ export default function InfoModal({
 
       moveFromTarget(modalDockDiv);
     }
-  }, [modalState.isDown]);
+  }, [modalState?.isDown]);
+
+  useEffect(() => {
+    if (!modalState) return;
+
+    if (modalState.isClosing) {
+      // Folder center
+      const folderDiv = document.getElementById(
+        `folder-${name}`,
+      ) as HTMLDivElement;
+
+      if (!folderDiv) {
+        throw new Error("There is no target folder");
+      }
+
+      moveToTarget(folderDiv);
+    }
+  }, [modalState?.isClosing]);
 
   const moveFromTarget = (target: HTMLDivElement) => {
     const modalDiv = modalRef.current;
     if (!modalDiv) return;
+
+    // Initialize style
+    modalDiv.style.transform = "none";
+    void modalDiv.offsetHeight;
 
     bringToFront();
 
@@ -118,7 +161,10 @@ export default function InfoModal({
     const scaleX = modalRect.width / modalDiv.offsetWidth;
     const scaleY = modalRect.height / modalDiv.offsetHeight;
 
+    console.log(scaleX, scaleY);
+
     // Modal center
+
     const modalLeft = modalRect.x;
     const modalTop = modalRect.y;
 
@@ -144,6 +190,10 @@ export default function InfoModal({
   const moveToTarget = (target: HTMLDivElement) => {
     const modalDiv = modalRef.current;
     if (!modalDiv) return;
+
+    // Initialize style
+    modalDiv.style.transform = "none";
+    void modalDiv.offsetHeight;
 
     const modalRect = modalDiv.getBoundingClientRect();
 
@@ -301,13 +351,13 @@ export default function InfoModal({
         <div className="flex gap-2 pointer-events-auto group">
           <div
             className="size-3 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
-            onClick={() => closeModal(name)}
+            onClick={() => closeModalStart(name)}
           >
             <CloseIcon className="size-2.5 hidden group-hover:block" />
           </div>
           <div
             className="size-3 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center"
-            onClick={() => downModal(name, true)}
+            onClick={() => downupModal(name, true)}
           >
             <RemoveIcon className="size-2.5 hidden group-hover:block" />
           </div>

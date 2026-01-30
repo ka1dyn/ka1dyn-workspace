@@ -95,9 +95,6 @@ export default function Screen({ ...props }: screenProps) {
         <div ref={contentRef} className="w-full h-full @container-[size]">
           {screenReady ? <Home /> : <Booting />}
         </div>
-        {/* {screenReady ? 
-                    <iframe className="w-full h-full" src="https://inpa.tistory.com/" />
-                : <Booting />} */}
       </Html>
     </group>
   );

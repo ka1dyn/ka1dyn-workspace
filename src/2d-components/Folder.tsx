@@ -14,18 +14,16 @@ export default function Folder({
   initModalY: number;
 }) {
   const folderRef = useRef<HTMLDivElement>(null!);
-  const { registerModal, openModal } = useModalStore(
+  const { modalState, openModal } = useModalStore(
     useShallow((state) => ({
       ...state,
+      modalState: state.modals[name],
     })),
   );
 
-  useEffect(() => {
-    registerModal(name, initModalX, initModalY);
-  }, []);
-
   const folderClick = () => {
-    openModal(name);
+    if (modalState?.isClosing) return;
+    openModal(name, initModalX, initModalY);
   };
 
   return (

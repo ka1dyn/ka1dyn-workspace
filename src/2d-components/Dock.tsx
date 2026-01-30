@@ -44,7 +44,7 @@ export default function Dock({
     }
   }, [bgType]);
 
-  const someModalOpen = Object.values(modals).some((modal) => modal.isOpen);
+  const someModalOpen = Object.keys(modals).length > 0;
 
   return (
     <div

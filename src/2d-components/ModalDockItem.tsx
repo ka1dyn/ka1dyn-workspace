@@ -8,34 +8,41 @@ export default function ModalDockItem({ name }: { name: string }) {
   const [render, setRender] = useState<boolean>(false);
   const [isOpening, setIsOpening] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
-  const { modalState, downModal } = useModalStore(
+  const { modalState, downupModal, closeModalComplete } = useModalStore(
     useShallow((state) => ({
       modalState: state.modals[name],
-      downModal: state.downModal,
+      downupModal: state.downupModal,
+      closeModalComplete: state.closeModalComplete,
     })),
   );
 
   useEffect(() => {
-    if (modalState.isOpen) {
-      setIsOpening(true);
-      setRender(true);
+    if (!modalState) return;
+    setIsOpening(true);
+    setRender(true);
 
-      const timer = setTimeout(() => {
-        setIsOpening(false);
-      }, 800);
-      return () => clearTimeout(timer);
-    } else {
+    const timer = setTimeout(() => {
+      setIsOpening(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [modalState?.name]);
+
+  useEffect(() => {
+    if (!modalState) return;
+
+    if (modalState.isClosing) {
       // Animation start before unmount
       setIsClosing(true);
 
       // Unmount component
       const timer = setTimeout(() => {
         setIsClosing(false);
+        closeModalComplete(name);
         setRender(false);
       }, 400);
       return () => clearTimeout(timer);
     }
-  }, [modalState.isOpen]);
+  }, [modalState?.isClosing]);
 
   if (!render) return null;
 
@@ -51,7 +58,7 @@ export default function ModalDockItem({ name }: { name: string }) {
             isOpening && "animate-dock-add",
             isClosing && "animate-dock-remove",
           )}
-          onClick={() => downModal(modalState.name, !modalState.isDown)}
+          onClick={() => downupModal(modalState.name, !modalState.isDown)}
         >
           <span className="break-all text-center lg:text-[16px]">
             {modalState.name}

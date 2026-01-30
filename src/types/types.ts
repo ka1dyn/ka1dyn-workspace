@@ -74,18 +74,24 @@ export interface ModalData {
   y: number;
   width: number;
   height: number;
-  isOpen: boolean;
-  zIndex: number;
   isDown: boolean;
+  isClosing: boolean;
 }
 
 export interface ModalStore {
+  count: number;
   modals: Record<string, ModalData>;
-  registerModal: (name: string, x: number, y: number) => void;
+  backupFns: Record<string, () => Promise<void> | void>;
+  openModal: (name: string, x: number, y: number) => void;
+  closeModalStart: (name: string) => void;
+  closeModalComplete: (name: string) => void;
   updateModal: (name: string, updates: Partial<ModalData>) => void;
-  openModal: (name: string) => void;
-  closeModal: (name: string) => void;
-  downModal: (name: string, newState: boolean) => void;
+  downupModal: (name: string, newState: boolean) => void;
+
+  // Backup
+  saveModalState: (name: string, curState: ModalData) => Promise<void>;
+  registerBackup: (name: string, backupFn: () => Promise<void> | void) => void;
+  backupAll: () => Promise<void>;
 }
 
 /* General types */
