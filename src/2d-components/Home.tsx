@@ -81,7 +81,7 @@ export default function Home() {
       </div>
       {dive && (
         <div
-          className="pointer-events-auto absolute right-14 bottom-12 text-[28px] text-[#c9c9c9] cursor-pointer hover:text-white font-roboto z-15"
+          className="pointer-events-auto absolute left-14 bottom-12 text-[28px] text-[#c9c9c9] cursor-pointer hover:text-white font-roboto z-15"
           onClick={exitClick}
         >
           exit
