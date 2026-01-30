@@ -9,7 +9,7 @@ import {
   type TweaksType,
   type SoundVolType,
   type ModalStore,
-  type ModalData,
+  type BgImageStore,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
 import { devtools } from "zustand/middleware";
@@ -215,6 +215,22 @@ export const useModalStore = create<ModalStore>()(
         const backupPromises = Object.values(backupFns).map((fn) => fn());
         await Promise.all(backupPromises);
       },
+    })),
+  ),
+);
+
+export const useBgImageStore = create<BgImageStore>()(
+  immer(
+    devtools((set, get) => ({
+      path: "/images/happy_dog.webp",
+      changeBackground: (newPath: string) =>
+        set(
+          (state) => {
+            state.path = newPath;
+          },
+          undefined,
+          "bgimage/change",
+        ),
     })),
   ),
 );

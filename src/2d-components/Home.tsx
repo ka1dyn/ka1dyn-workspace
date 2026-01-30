@@ -1,4 +1,9 @@
-import { useModalStore, useOverlay, useTweaks } from "@/stores";
+import {
+  useBgImageStore,
+  useModalStore,
+  useOverlay,
+  useTweaks,
+} from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
@@ -13,7 +18,7 @@ export default function Home() {
       ...state,
     })),
   );
-  const [imgSrc, setImgSrc] = useState<string>("/images/happy_dog.webp");
+  const path = useBgImageStore((state) => state.path);
   const [dockActive, setDockActive] = useState<boolean>(true);
   const setActive = useOverlay((state) => state.setActive);
   const dive = useTweaks((state) => state.dive);
@@ -31,8 +36,8 @@ export default function Home() {
     // <div className="w-full h-full relative bg-[url(/images/man_rain_crop.jpg)] bg-position-[50%_80%] bg-no-repeat bg-cover opacity-50">
     <div className="w-full h-full flex flex-col relative overflow-hidden bg-black select-none">
       <img
-        src={imgSrc}
-        className="happy absolute w-full h-full object-cover object-[50%_50%] opacity-60 pointer-events-none"
+        src={path}
+        className="absolute w-full h-full object-cover object-[50%_50%] opacity-60 pointer-events-none"
       />
       <div
         className="flex pl-4 items-center w-full h-16 relative overflow-hidden
@@ -77,7 +82,7 @@ export default function Home() {
             )}
           />
         </div>
-        <Dock className="z-10" setImgSrc={(path: string) => setImgSrc(path)} />
+        <Dock className="z-10" />
       </div>
       {dive && (
         <div

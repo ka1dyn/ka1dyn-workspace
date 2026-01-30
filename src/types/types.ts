@@ -97,6 +97,11 @@ export interface ModalStore {
   backupAll: () => Promise<void>;
 }
 
+export interface BgImageStore {
+  path: string;
+  changeBackground: (newPath: string) => void;
+}
+
 /* General types */
 
 // world position

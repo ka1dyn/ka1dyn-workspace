@@ -1,48 +1,40 @@
 import { cn } from "@/lib/utils";
-import { useModalStore } from "@/stores";
-import { BackgroundTypes } from "@/types/enums";
+import { useBgImageStore, useModalStore } from "@/stores";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ModalDockItem from "./ModalDockItem";
 import React from "react";
+import { useShallow } from "zustand/shallow";
 
-export default function Dock({
-  className,
-  setImgSrc,
-}: {
-  className?: string;
-  setImgSrc: (path: string) => void;
-}) {
+export default function Dock({ className }: { className?: string }) {
   const thumnailRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [bgType, setBgType] = useState<BackgroundTypes>(BackgroundTypes.DOG);
   const [indicatorOffset, setIndicatorOffset] = useState<number>(0);
+  const { path, changeBackground } = useBgImageStore(
+    useShallow((state) => ({
+      ...state,
+    })),
+  );
   const modals = useModalStore((state) => state.modals);
 
-  const clickThumnail = (type: BackgroundTypes) => {
-    setBgType(type);
-  };
-
   useLayoutEffect(() => {
-    const curThumnail = thumnailRefs.current[bgType];
+    let type = 0;
+
+    switch (path) {
+      case "/images/happy_dog.webp":
+        type = 0;
+        break;
+      case "/images/bike_rain.webp":
+        type = 1;
+        break;
+      case "/images/city_rain.webp":
+        type = 2;
+        break;
+    }
+
+    const curThumnail = thumnailRefs.current[type];
     if (!curThumnail) return;
 
     setIndicatorOffset(curThumnail.offsetLeft);
-  }, [bgType]);
-
-  useEffect(() => {
-    switch (bgType) {
-      case BackgroundTypes.DOG:
-        setImgSrc("/images/happy_dog.webp");
-        break;
-      case BackgroundTypes.BIKE:
-        setImgSrc("/images/bike_rain.webp");
-        break;
-      case BackgroundTypes.CITY:
-        setImgSrc("/images/city_rain.webp");
-        break;
-      default:
-        return;
-    }
-  }, [bgType]);
+  }, [path]);
 
   const someModalOpen = Object.keys(modals).length > 0;
 
@@ -59,21 +51,21 @@ export default function Dock({
             thumnailRefs.current[0] = node;
           }}
           className="relative cursor-pointer size-16 rounded-xl bg-[url(/images/happy_dog_thumbnail.jpg)] bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
-          onClick={() => clickThumnail(BackgroundTypes.DOG)}
+          onClick={() => changeBackground("/images/happy_dog.webp")}
         ></div>
         <div
           ref={(node) => {
             thumnailRefs.current[1] = node;
           }}
           className="relative cursor-pointer size-16 rounded-xl bg-[url(/images/bike_rain_thumbnail.jpg)] bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
-          onClick={() => clickThumnail(BackgroundTypes.BIKE)}
+          onClick={() => changeBackground("/images/bike_rain.webp")}
         ></div>
         <div
           ref={(node) => {
             thumnailRefs.current[2] = node;
           }}
           className="relative cursor-pointer size-16 rounded-xl bg-[url(/images/city_rain_thumbnail.jpg)] bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
-          onClick={() => clickThumnail(BackgroundTypes.CITY)}
+          onClick={() => changeBackground("/images/city_rain.webp")}
         ></div>
         <div
           className={`absolute bottom-0 left-8 size-1.25 rounded-full bg-white transition-all duration-400 ease-in-out`}
