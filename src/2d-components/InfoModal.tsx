@@ -149,11 +149,10 @@ export default function InfoModal({
     const modalDiv = modalRef.current;
     if (!modalDiv) return;
 
-    // Initialize style
-    modalDiv.style.transform = "none";
-    void modalDiv.offsetHeight;
-
     bringToFront();
+
+    // Initialize transform style
+    modalDiv.getAnimations().forEach((anim) => anim.cancel());
 
     const modalRect = modalDiv.getBoundingClientRect();
 
@@ -161,10 +160,7 @@ export default function InfoModal({
     const scaleX = modalRect.width / modalDiv.offsetWidth;
     const scaleY = modalRect.height / modalDiv.offsetHeight;
 
-    console.log(scaleX, scaleY);
-
     // Modal center
-
     const modalLeft = modalRect.x;
     const modalTop = modalRect.y;
 
@@ -191,9 +187,8 @@ export default function InfoModal({
     const modalDiv = modalRef.current;
     if (!modalDiv) return;
 
-    // Initialize style
-    modalDiv.style.transform = "none";
-    void modalDiv.offsetHeight;
+    // Initialize transform style
+    modalDiv.getAnimations().forEach((anim) => anim.cancel());
 
     const modalRect = modalDiv.getBoundingClientRect();
 
