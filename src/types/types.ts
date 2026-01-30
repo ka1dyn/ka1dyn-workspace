@@ -35,8 +35,10 @@ export interface CameraInitType {
 export interface OverlayType {
   active: boolean;
   type: OverlayTypes;
+  lowDpr: boolean;
   setActive: (newActive: boolean) => void;
   setType: (newType: OverlayTypes) => void;
+  setLowDpr: (newState: boolean) => void;
 }
 
 export interface FullsceenType {

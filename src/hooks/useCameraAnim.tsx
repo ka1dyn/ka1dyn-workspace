@@ -13,9 +13,10 @@ export default function useCameraAnim() {
 
   const setCameraBlock = useTweaks((state) => state.setCameraBlock);
 
-  const { setType, setActive } = useOverlay(
+  const { setLowDpr, setType, setActive } = useOverlay(
     useShallow((state) => ({
       type: state.type,
+      setLowDpr: state.setLowDpr,
       setType: state.setType,
       setActive: state.setActive,
     })),
@@ -85,6 +86,7 @@ export default function useCameraAnim() {
 
     const tl = gsap.timeline({
       onComplete: () => {
+        setLowDpr(true);
         setActive(true);
       },
     });
@@ -121,7 +123,7 @@ export default function useCameraAnim() {
       console.warn("There is no camera");
       return;
     }
-
+    setLowDpr(false);
     setCameraBlock(true);
 
     const tl = gsap.timeline({
