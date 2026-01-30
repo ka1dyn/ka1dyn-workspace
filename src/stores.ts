@@ -129,9 +129,23 @@ export const useModalStack = create<{
 export const useModalStore = create<ModalStore>()(
   immer(
     devtools((set, get) => ({
+      zStack: 10,
       count: 0,
       modals: {},
       backupFns: {},
+
+      bringToFront: (name) => {
+        set(
+          (state) => {
+            if (!state.modals[name]) return;
+
+            state.zStack += 1;
+            state.modals[name].zIndex = state.zStack;
+          },
+          undefined,
+          "modal/zfront",
+        );
+      },
 
       openModal: (name, x, y) => {
         set(
@@ -144,6 +158,7 @@ export const useModalStore = create<ModalStore>()(
               height: 600,
               isDown: false,
               isClosing: false,
+              zIndex: 10,
             };
             state.count += 1;
           },
@@ -155,6 +170,7 @@ export const useModalStore = create<ModalStore>()(
       closeModalStart: (name) =>
         set(
           (state) => {
+            if (!state.modals[name]) return;
             state.modals[name].isClosing = true;
           },
           undefined,
@@ -175,6 +191,9 @@ export const useModalStore = create<ModalStore>()(
       downupModal: (name, newState) =>
         set(
           (state) => {
+            if (!state.modals[name]) return;
+            state.zStack += 1;
+            state.modals[name].zIndex = state.zStack;
             state.modals[name].isDown = newState;
           },
           undefined,

@@ -30,6 +30,7 @@ export default function ModalContainer({
                 left: Math.min(modal.x, maxLeft),
                 width: modal.width,
                 height: modal.height,
+                zIndex: modal.zIndex,
               }}
               className={cn("absolute")}
             />

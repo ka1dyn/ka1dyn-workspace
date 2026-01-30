@@ -14,7 +14,7 @@ export default function Folder({
   initModalY: number;
 }) {
   const folderRef = useRef<HTMLDivElement>(null!);
-  const { modalState, openModal } = useModalStore(
+  const { modalState, openModal, bringToFront } = useModalStore(
     useShallow((state) => ({
       ...state,
       modalState: state.modals[name],
@@ -24,6 +24,7 @@ export default function Folder({
   const folderClick = () => {
     if (modalState?.isClosing) return;
     openModal(name, initModalX, initModalY);
+    bringToFront(name);
   };
 
   return (

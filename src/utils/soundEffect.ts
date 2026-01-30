@@ -33,7 +33,7 @@ export function fadeOutAndPause(audio: Audio, duration = 2) {
 export function fadeInAndPlay(audio: Audio, duration = 2, volume = 0.5) {
   gsap.killTweensOf(audio.gain.gain);
 
-  audio.play();
+  if (!audio.isPlaying) audio.play();
 
   gsap.to(audio.gain.gain, {
     value: volume,

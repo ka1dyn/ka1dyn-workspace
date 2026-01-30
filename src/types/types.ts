@@ -76,12 +76,15 @@ export interface ModalData {
   height: number;
   isDown: boolean;
   isClosing: boolean;
+  zIndex: number;
 }
 
 export interface ModalStore {
+  zStack: number;
   count: number;
   modals: Record<string, ModalData>;
   backupFns: Record<string, () => Promise<void> | void>;
+  bringToFront: (name: string) => void;
   openModal: (name: string, x: number, y: number) => void;
   closeModalStart: (name: string) => void;
   closeModalComplete: (name: string) => void;

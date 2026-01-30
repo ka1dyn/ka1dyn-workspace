@@ -5,7 +5,7 @@ import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
 import ExpandIcon from "@/icons/expand.svg?react";
 import CollapseIcon from "@/icons/collapse.svg";
-import { useModalStack, useModalStore } from "@/stores";
+import { useModalStore } from "@/stores";
 import MDViewer from "./MDViewer";
 import { useShallow } from "zustand/shallow";
 
@@ -23,28 +23,21 @@ export default function InfoModal({
   navActive = true,
 }: InfoModalProps) {
   const {
+    zIndex,
     modalState,
+    bringToFront,
     closeModalStart,
     downupModal,
     saveModalState,
     registerBackup,
   } = useModalStore(
     useShallow((state) => ({
+      ...state,
+      zIndex: state.modals[name].zIndex,
       modalState: state.modals[name],
-      closeModalStart: state.closeModalStart,
-      downupModal: state.downupModal,
-      saveModalState: state.saveModalState,
-      registerBackup: state.registerBackup,
     })),
   );
   const modalRef = useRef<HTMLDivElement>(null!);
-  const getNextStack = useModalStack((state) => state.getNextStack);
-
-  const bringToFront = () => {
-    if (modalRef.current) {
-      modalRef.current.style.zIndex = getNextStack().toString();
-    }
-  };
 
   useEffect(() => {
     const modalDiv = modalRef.current;
@@ -57,6 +50,7 @@ export default function InfoModal({
         y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
         width: modalDiv.offsetWidth,
         height: modalDiv.offsetHeight,
+        zIndex: parseInt(modalDiv.style.zIndex),
       });
     };
 
@@ -145,11 +139,16 @@ export default function InfoModal({
     }
   }, [modalState?.isClosing]);
 
-  const moveFromTarget = (target: HTMLDivElement) => {
+  useEffect(() => {
     const modalDiv = modalRef.current;
     if (!modalDiv) return;
 
-    bringToFront();
+    modalDiv.style.zIndex = `${zIndex}`;
+  }, [zIndex]);
+
+  const moveFromTarget = (target: HTMLDivElement) => {
+    const modalDiv = modalRef.current;
+    if (!modalDiv) return;
 
     // Initialize transform style
     modalDiv.getAnimations().forEach((anim) => anim.cancel());
@@ -328,7 +327,7 @@ export default function InfoModal({
         // "origin-top-left",
         className,
       )}
-      onMouseDown={() => bringToFront()}
+      onMouseDown={() => bringToFront(name)}
     >
       <div
         className="absolute top-0 left-0 w-full h-13 bg-transparent cursor-move z-10"
