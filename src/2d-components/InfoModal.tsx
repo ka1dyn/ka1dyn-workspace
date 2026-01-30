@@ -153,6 +153,9 @@ export default function InfoModal({
     // Initialize transform style
     modalDiv.getAnimations().forEach((anim) => anim.cancel());
 
+    modalDiv.style.transform = "none";
+    // void modalDiv.offsetHeight;
+
     const modalRect = modalDiv.getBoundingClientRect();
 
     // Calculate screen scale
