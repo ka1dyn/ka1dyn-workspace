@@ -73,7 +73,7 @@ export default function InfoModal({
       const screenHeight = modalContainer?.offsetHeight as number;
 
       if (offsetLeft > screenWidth)
-        modalDiv.style.left = `${screenWidth - 30}px`;
+        modalDiv.style.left = `${screenWidth - 50}px`;
       if (offsetTop > screenHeight)
         modalDiv.style.top = `${screenHeight - 30}px`;
     };

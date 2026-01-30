@@ -1,5 +1,5 @@
 import { useModalStore } from "@/stores";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useShallow } from "zustand/shallow";
 
 export default function Folder({

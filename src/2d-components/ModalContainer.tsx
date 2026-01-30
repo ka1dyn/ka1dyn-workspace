@@ -17,15 +17,25 @@ export default function ModalContainer({
 
   return (
     <div id="modals" className={cn("w-50 h-50 pointer-events-none", className)}>
-      {Object.values(modals).map((modal) => (
-        <React.Fragment key={modal.name}>
-          <InfoModal
-            name={modal.name}
-            style={{ top: modal.y, left: modal.x }}
-            className={cn("absolute")}
-          />
-        </React.Fragment>
-      ))}
+      {Object.values(modals).map((modal) => {
+        const maxLeft = window.innerWidth - 50;
+        const maxTop = window.innerHeight - 30;
+
+        return (
+          <React.Fragment key={modal.name}>
+            <InfoModal
+              name={modal.name}
+              style={{
+                top: Math.min(modal.y, maxTop),
+                left: Math.min(modal.x, maxLeft),
+                width: modal.width,
+                height: modal.height,
+              }}
+              className={cn("absolute")}
+            />
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }
