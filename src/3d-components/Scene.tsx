@@ -23,7 +23,7 @@ export default function Scene() {
 
   return (
     <Canvas
-      dpr={lowDpr ? 0.6 : [1, 2]}
+      dpr={lowDpr ? 0.6 : [1, 1.5]}
       gl={{
         powerPreference: "high-performance",
         alpha: false,

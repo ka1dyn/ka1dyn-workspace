@@ -23,7 +23,9 @@ export default function Folder({
 
   const folderClick = () => {
     if (modalState?.isClosing) return;
-    openModal(name, initModalX, initModalY);
+    if (!modalState) {
+      openModal(name, initModalX, initModalY);
+    }
     bringToFront(name);
   };
 

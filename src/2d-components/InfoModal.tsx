@@ -5,7 +5,7 @@ import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
 import ExpandIcon from "@/icons/expand.svg?react";
 import CollapseIcon from "@/icons/collapse.svg";
-import { useModalStore } from "@/stores";
+import { useModalStore, useTweaks } from "@/stores";
 import MDViewer from "./MDViewer";
 import { useShallow } from "zustand/shallow";
 
@@ -38,6 +38,7 @@ export default function InfoModal({
     })),
   );
   const modalRef = useRef<HTMLDivElement>(null!);
+  const dive = useTweaks((state) => state.dive);
 
   useEffect(() => {
     const modalDiv = modalRef.current;
@@ -198,8 +199,8 @@ export default function InfoModal({
     const modalRect = modalDiv.getBoundingClientRect();
 
     // Calculate screen scale
-    const scaleX = modalRect.width / modalDiv.offsetWidth;
-    const scaleY = modalRect.height / modalDiv.offsetHeight;
+    let scaleX = modalRect.width / modalDiv.offsetWidth;
+    let scaleY = modalRect.height / modalDiv.offsetHeight;
 
     // Modal center
     const modalLeft = modalRect.x;
@@ -329,8 +330,11 @@ export default function InfoModal({
       ref={modalRef}
       className={cn(
         "@container w-260 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
-        "scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-left",
         // "origin-top-left",
+        dive
+          ? "origin-top-left"
+          : "scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-left",
+
         className,
       )}
       onMouseDown={() => bringToFront(name)}
