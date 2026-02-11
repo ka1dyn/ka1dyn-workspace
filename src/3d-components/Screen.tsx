@@ -49,29 +49,40 @@ export default function Screen({ ...props }: screenProps) {
     });
   }, [groupRef]);
 
+  const worldPosition = new THREE.Vector3();
+  const screenVec = new THREE.Vector3();
+  const screenToCameraVec = new THREE.Vector3();
+
   useFrame((state) => {
     if (!groupRef.current || !contentRef.current) return;
 
     // Screen World Postiion
-    const worldPosition = new THREE.Vector3();
 
     groupRef.current.updateWorldMatrix(true, false);
     groupRef.current.getWorldPosition(worldPosition);
 
     // Screen direction
-    const screenVec = new THREE.Vector3();
     groupRef.current.getWorldDirection(screenVec);
 
-    const screenToCameraVec = state.camera.position
-      .clone()
+    screenToCameraVec
+      .copy(state.camera.position)
       .sub(worldPosition)
       .normalize();
 
-    // console.log(screenToCameraVec);
+    const distance = state.camera.position.distanceTo(worldPosition);
+
+    const maxOpacity = 1;
+    const minOpacity = 0.5;
+    const maxDistance = 10;
+    const minDistance = 0 as const; // Never change for calculate simple. 0!
+
+    const distanceFactor =
+      (-(maxOpacity - minOpacity) / (maxDistance - minDistance)) * distance +
+      maxOpacity;
 
     const dot = Math.max(0, screenVec.dot(screenToCameraVec));
 
-    const opacity = dot;
+    const opacity = dot * distanceFactor;
     contentRef.current.style.filter = `brightness(${dot})`;
     contentRef.current.style.opacity = opacity.toString();
   });

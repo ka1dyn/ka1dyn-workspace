@@ -54,7 +54,7 @@ export default function ModalDockItem({ name }: { name: string }) {
       >
         <div
           className={cn(
-            "flex justify-center items-center cursor-pointer size-16 rounded-xl bg-amber-50 hover:shadow-lg/50 shadow-white transition-all duration-300 ease-in-out",
+            "flex justify-center items-center cursor-pointer size-16 rounded-xl bg-white hover:shadow-lg/50 shadow-white transition-all duration-300 ease-in-out",
             isOpening && "animate-dock-add",
             isClosing && "animate-dock-remove",
           )}
