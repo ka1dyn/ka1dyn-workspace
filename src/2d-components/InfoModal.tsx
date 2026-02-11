@@ -359,47 +359,47 @@ export default function InfoModal({
         // "origin-top-left",
         !modalState.isFull &&
           (dive
-            ? "scale-[clamp(0.6,calc(100cqw/1920px),1)] origin-top-left"
-            : "scale-[clamp(0.6,calc(100cqh/1080px),1.4)] origin-top-left"),
+            ? "scale-[clamp(0.45,calc(100cqw/3200px),0.6)] origin-top-left"
+            : "scale-[clamp(0.6,calc(100cqh/1800px),1)] origin-top-left"),
 
         className,
       )}
       onMouseDown={() => bringToFront(name)}
     >
       <div
-        className="absolute top-0 left-0 w-full h-13 bg-transparent cursor-move z-10"
+        className="absolute top-0 left-0 w-full h-18 bg-transparent cursor-move z-10"
         onMouseDown={panningHandler}
       ></div>
 
       <div
-        className="absolute bottom-0 right-0 size-5 cursor-nwse-resize bg-transparent z-10"
+        className="absolute bottom-0 right-0 size-7 cursor-nwse-resize bg-transparent z-10"
         onMouseDown={resizeHandler}
       >
         <ResizeIcon className="w-full h-full text-gray-400" />
       </div>
 
-      <div className="absolute top-0 left-0 w-24 h-13 flex items-center justify-center z-15 pointer-events-none">
+      <div className="absolute top-0 left-0 w-30 h-18 flex items-center justify-center z-15 pointer-events-none">
         <div className="flex gap-2 pointer-events-auto group">
           <div
-            className="size-3 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
+            className="size-4.5 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
             onClick={() => closeModalStart(name)}
           >
-            <CloseIcon className="size-2.5 hidden group-hover:block" />
+            <CloseIcon className="size-3 hidden group-hover:block" />
           </div>
           <div
-            className="size-3 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center"
+            className="size-4.5 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center"
             onClick={() => downupModal(name, true)}
           >
-            <RemoveIcon className="size-2.5 hidden group-hover:block" />
+            <RemoveIcon className="size-3 hidden group-hover:block" />
           </div>
           <div
-            className="size-3 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center"
+            className="size-4.5 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center"
             onClick={expandClick}
           >
             {modalState.isFull ? (
-              <CollapseIcon className="size-2.5 hidden group-hover:block" />
+              <CollapseIcon className="size-3 hidden group-hover:block" />
             ) : (
-              <ExpandIcon className="size-2.5 hidden group-hover:block" />
+              <ExpandIcon className="size-3 hidden group-hover:block" />
             )}
           </div>
         </div>
@@ -408,7 +408,7 @@ export default function InfoModal({
       <div className="flex w-full h-full">
         <div
           className={cn(
-            "flex flex-col w-42 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
+            "flex flex-col w-60 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
             navActive ? "hidden @4xl:block" : "hidden",
           )}
         >
@@ -417,11 +417,11 @@ export default function InfoModal({
         <div className="flex flex-col flex-1 z-5">
           <div
             className={cn(
-              "h-13 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
-              navActive ? "px-24 @4xl:px-5" : "px-24",
+              "h-18 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
+              navActive ? "px-30 @4xl:px-8" : "px-30",
             )}
           >
-            <span>{name}</span>
+            <span className="text-2xl font-semibold">{name}</span>
           </div>
           <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15">
             <MDViewer path={modalState.contentPath} />

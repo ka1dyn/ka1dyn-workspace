@@ -11,7 +11,7 @@ export default function MDViewer({ path }: { path: string }) {
   }, [path]);
 
   return (
-    <div className="prose select-text">
+    <div className="prose text-[28px] leading-relaxed">
       <Markdown>{content}</Markdown>
     </div>
   );
