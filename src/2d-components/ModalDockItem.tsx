@@ -54,12 +54,13 @@ export default function ModalDockItem({ name }: { name: string }) {
       >
         <div
           className={cn(
-            "flex justify-center items-center cursor-pointer size-16 rounded-xl bg-white hover:shadow-lg/50 shadow-white transition-all duration-300 ease-in-out",
+            "relative flex justify-center items-center cursor-pointer size-16 rounded-xl bg-white hover:shadow-lg/50 shadow-white transition-all duration-300 ease-in-out overflow-hidden",
             isOpening && "animate-dock-add",
             isClosing && "animate-dock-remove",
           )}
           onClick={() => downupModal(modalState.name, !modalState.isDown)}
         >
+          <div className="absolute top-0 left-0 bg-gray-400 w-full h-2"></div>
           <span className="break-all text-center lg:text-[16px]">
             {modalState.name}
           </span>
