@@ -21,6 +21,8 @@ export default function ModalContainer({
         const maxLeft = window.innerWidth - 50;
         const maxTop = window.innerHeight - 30;
 
+        const navActive = modal.name == "projects";
+
         return (
           <React.Fragment key={modal.name}>
             <InfoModal
@@ -33,6 +35,7 @@ export default function ModalContainer({
                 zIndex: modal.zIndex,
               }}
               className={cn("absolute")}
+              navActive={navActive}
             />
           </React.Fragment>
         );

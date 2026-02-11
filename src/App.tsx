@@ -27,7 +27,6 @@ function App() {
     <>
       {/* Set bg color For occlude blending option on screen */}
       <div className="w-screen h-screen bg-[#010203]">
-        <Route path="/test" component={Home} />
         <Route path="/">
           {/* <Scene /> */}
           <>

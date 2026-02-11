@@ -329,11 +329,12 @@ export default function InfoModal({
       style={style}
       ref={modalRef}
       className={cn(
-        "@container w-260 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
+        "@container w-250 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
         // "origin-top-left",
-        dive
-          ? "origin-top-left"
-          : "scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-left",
+        "w-screen h-screen",
+        // dive
+        //   ? "scale-[clamp(0.6,calc(100cqw/1920px),1)] origin-top-left"
+        //   : "scale-[clamp(0.6,calc(100cqh/1080px),1.4)] origin-top-left",
 
         className,
       )}

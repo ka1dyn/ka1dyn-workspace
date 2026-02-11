@@ -31,6 +31,7 @@ export default function Scene() {
         stencil: false,
         // depth: false,
       }}
+      className="w-full"
     >
       <AudioProvider>
         <Suspense>
