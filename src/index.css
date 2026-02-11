@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "tailwind-scrollbar-hide/v4";
+@import "./font.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -20,58 +21,9 @@
   z-index: 10000000;
 }
 
-/* Fonts */
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Bold.ttf");
-  font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-SemiBold.ttf");
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Medium.ttf");
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Regular.ttf");
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Light.ttf");
-  font-weight: 300;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-ExtraLight.ttf");
-  font-weight: 200;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Thin.ttf");
-  font-weight: 100;
-  font-display: swap;
-}
-
 @theme {
   --font-roboto: "Roboto Mono", sans-serif;
+  --font-pretendard: "Pretendard", sans-serif;
 }
 
 @theme {

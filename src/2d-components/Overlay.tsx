@@ -79,7 +79,7 @@ function ScreenOverlay({ backClick }: ScreenOverlayProps) {
         className="
             animate-slide-up
             absolute left-20 bottom-50 pointer-events-auto
-            text-[#c9c9c9] text-[20px] font-medium font-roboto  
+            text-[#c9c9c9] text-[20px] font-medium 
             hover:cursor-pointer hover:text-white
         "
         onClick={backClick}
@@ -90,7 +90,7 @@ function ScreenOverlay({ backClick }: ScreenOverlayProps) {
       <button
         className="animate-slide-up
           absolute left-20 bottom-68 pointer-events-auto
-          text-[#c9c9c9] text-[20px] font-medium font-roboto
+          text-[#c9c9c9] text-[20px] font-medium
           hover:cursor-pointer hover:text-white
       "
         onClick={diveClick}

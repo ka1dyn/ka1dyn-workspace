@@ -11,7 +11,7 @@ function ProjectNavContent({ name }: { name: string }) {
   return (
     <div className="flex flex-col text-2xl">
       <div
-        onClick={() => setContentPath(name, "/content/home.md")}
+        onClick={() => setContentPath(name, "/home")}
         className="hover:underline"
       >
         Home

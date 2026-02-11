@@ -1,0 +1,144 @@
+/* Fonts */
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-Bold.ttf");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-SemiBold.ttf");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-Medium.ttf");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-Regular.ttf");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-Light.ttf");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-ExtraLight.ttf");
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/RobotoMono/RobotoMono-Thin.ttf");
+  font-weight: 100;
+  font-display: swap;
+}
+
+/*
+Copyright (c) 2021 Kil Hyung-jin, with Reserved Font Name Pretendard.
+https://github.com/orioncactus/pretendard
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL
+*/
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 900;
+  font-display: swap;
+  src:
+    local("Pretendard Black"),
+    url("fonts/Pretendard-subset/Pretendard-Black.subset.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 800;
+  font-display: swap;
+  src:
+    local("Pretendard ExtraBold"),
+    url("fonts/Pretendard-subset/Pretendard-ExtraBold.subset.woff2")
+      format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 700;
+  font-display: swap;
+  src:
+    local("Pretendard Bold"),
+    url("fonts/Pretendard-subset/Pretendard-Bold.subset.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 600;
+  font-display: swap;
+  src:
+    local("Pretendard SemiBold"),
+    url("fonts/Pretendard-subset/Pretendard-SemiBold.subset.woff2")
+      format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 500;
+  font-display: swap;
+  src:
+    local("Pretendard Medium"),
+    url("fonts/Pretendard-subset/Pretendard-Medium.subset.woff2")
+      format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("Pretendard Regular"),
+    url("fonts/Pretendard-subset/Pretendard-Regular.subset.woff2")
+      format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 300;
+  font-display: swap;
+  src:
+    local("Pretendard Light"),
+    url("fonts/Pretendard-subset/Pretendard-Light.subset.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 200;
+  font-display: swap;
+  src:
+    local("Pretendard ExtraLight"),
+    url("fonts/Pretendard-subset/Pretendard-ExtraLight.subset.woff2")
+      format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 100;
+  font-display: swap;
+  src:
+    local("Pretendard Thin"),
+    url("fonts/Pretendard-subset/Pretendard-Thin.subset.woff2") format("woff2");
+}

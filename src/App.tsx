@@ -26,7 +26,7 @@ function App() {
   return (
     <>
       {/* Set bg color For occlude blending option on screen */}
-      <div className="w-screen h-screen bg-[#010203]">
+      <div className="w-screen h-screen bg-[#010203] font-roboto">
         <Route path="/">
           {/* <Scene /> */}
           <>

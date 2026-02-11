@@ -103,7 +103,10 @@ export default function Screen({ ...props }: screenProps) {
               occlude: "blending",
             })}
       >
-        <div ref={contentRef} className="w-full h-full @container-[size]">
+        <div
+          ref={contentRef}
+          className="w-full h-full @container-[size] font-pretendard"
+        >
           {screenReady ? <Home /> : <Booting />}
         </div>
       </Html>

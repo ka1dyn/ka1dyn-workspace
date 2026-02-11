@@ -60,8 +60,8 @@ export default function ModalDockItem({ name }: { name: string }) {
           )}
           onClick={() => downupModal(modalState.name, !modalState.isDown)}
         >
-          <span className="break-all text-center lg:text-[16px]">
-            {modalState.name}
+          <span className="break-normal text-center lg:text-[16px]">
+            {modalState.name.replace("_", " ")}
           </span>
         </div>
         {!modalState.isDown && (

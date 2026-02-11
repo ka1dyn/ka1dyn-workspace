@@ -44,24 +44,12 @@ export default function Loading() {
 
   return (
     <div className="w-screen h-screen absolute top-0 bg-[#212121] flex justify-center items-center z-10000001">
-      <div className="w-1/2 flex flex-col">
-        <div
-          className="text-[#fafafa] text-xl font-thin font-roboto"
-          ref={textRef1}
-        ></div>
-        <div
-          className="text-[#fafafa] text-xl font-thin font-roboto"
-          ref={textRef2}
-        ></div>
-        <div
-          className="text-[#fafafa] text-xl font-thin font-roboto"
-          ref={textRef3}
-        ></div>
-        <div
-          className="text-[#fafafa] text-xl font-thin font-roboto"
-          ref={textRef4}
-        ></div>
-        <div className="h-16 text-white text-[18px] font-roboto font-medium pt-16">
+      <div className="w-1/2 flex flex-col font-roboto">
+        <div className="text-[#fafafa] text-xl font-thin" ref={textRef1}></div>
+        <div className="text-[#fafafa] text-xl font-thin" ref={textRef2}></div>
+        <div className="text-[#fafafa] text-xl font-thin" ref={textRef3}></div>
+        <div className="text-[#fafafa] text-xl font-thin" ref={textRef4}></div>
+        <div className="h-16 text-white text-[18px] font-medium pt-16">
           {/* <span>loading...</span> */}
 
           {ready &&

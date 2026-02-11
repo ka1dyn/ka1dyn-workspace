@@ -9,6 +9,7 @@ import { useModalStore, useTweaks } from "@/stores";
 import MDViewer from "./MDViewer";
 import { useShallow } from "zustand/shallow";
 import NavContent from "./NavContent";
+import ProjectContentHome from "./ProjectContentHome";
 
 interface InfoModalProps {
   className?: string;
@@ -423,8 +424,12 @@ export default function InfoModal({
           >
             <span className="text-2xl font-semibold">{name}</span>
           </div>
-          <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15">
-            <MDViewer path={modalState.contentPath} />
+          <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15 py-10">
+            {modalState.contentPath === "/home" ? (
+              <ProjectContentHome />
+            ) : (
+              <MDViewer path={modalState.contentPath} />
+            )}
           </div>
         </div>
       </div>

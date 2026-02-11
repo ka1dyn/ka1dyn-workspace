@@ -7,8 +7,7 @@ import VolumeupIcon from "@/icons/volumeup.svg?react";
 import VolumeoffIcon from "@/icons/volumeoff.svg?react";
 import RefreshIcon from "@/icons/refresh.svg?react";
 
-const tweak =
-  "flex font-roboto font-bold items-center text-[12px] text-[#a3a3a3] gap-5";
+const tweak = "flex font-bold items-center text-[12px] text-[#a3a3a3] gap-5";
 const tweak_name = "w-20 text-left";
 
 export default function PopupMenu() {
@@ -54,7 +53,7 @@ export default function PopupMenu() {
     >
       <div>
         <div className="flex items-center mb-4 gap-5">
-          <p className="font-roboto text-white text-[12px] w-20 text-left -translate-y-px pl-px">
+          <p className="text-white text-[12px] w-20 text-left -translate-y-px pl-px">
             Light
           </p>
           <div className="flex gap-2">
@@ -127,7 +126,7 @@ export default function PopupMenu() {
 
       <div>
         <div className="flex items-center mb-4 gap-5">
-          <p className="font-roboto text-white text-[12px] w-20 text-left -translate-y-px">
+          <p className="text-white text-[12px] w-20 text-left -translate-y-px">
             Sound
           </p>
           <div className="flex gap-2">
