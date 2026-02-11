@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
 import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
@@ -43,6 +43,74 @@ export default function InfoModal({
   );
   const modalRef = useRef<HTMLDivElement>(null!);
   const dive = useTweaks((state) => state.dive);
+
+  useLayoutEffect(() => {
+    const modalDiv = modalRef.current;
+    if (!modalDiv || !modalState) return;
+
+    // Outbound checking
+    const modalContainer = document.getElementById("modals");
+
+    const screenWidth = modalContainer?.offsetWidth as number;
+    const screenHeight = modalContainer?.offsetHeight as number;
+
+    if (modalState.isFull) {
+      // Fix width, height with calculated scale
+      if (!modalContainer) return;
+
+      let properScale = 0;
+      if (dive) {
+        properScale = modalContainer.offsetWidth / 3200;
+        if (properScale < 0.45) properScale = 0.45;
+        if (properScale > 0.6) properScale = 0.6;
+      } else {
+        properScale = modalContainer.offsetHeight / 1800;
+        if (properScale < 0.6) properScale = 0.6;
+      }
+
+      const newWidth = modalDiv.offsetWidth / properScale;
+      const newHeight = modalDiv.offsetHeight / properScale;
+
+      modalDiv.style.width = `${newWidth}px`;
+      modalDiv.style.height = `${newHeight}px`;
+    } else {
+      // Position setting
+      let newTop = parseInt(modalDiv.style.top);
+      let newLeft = parseInt(modalDiv.style.left);
+
+      const style = window.getComputedStyle(modalDiv);
+      const modalScale = Number(style.scale == "none" ? 1 : style.scale);
+
+      const minTop = 64; // Fix hardcoding
+      const maxTop = screenHeight - 40;
+      const minLeft = -modalDiv.offsetWidth * modalScale + 40;
+      const maxLeft = screenWidth - 40;
+      newTop = Math.max(minTop, newTop);
+      newTop = Math.min(maxTop, newTop);
+      newLeft = Math.max(minLeft, newLeft);
+      newLeft = Math.min(maxLeft, newLeft);
+
+      modalDiv.style.top = `${newTop}px`;
+      modalDiv.style.left = `${newLeft}px`;
+
+      // Size setting
+      let newWidth = modalDiv.offsetWidth;
+      let newHeight = modalDiv.offsetHeight;
+
+      const minWidth = 300;
+      const maxWidth = (screenWidth * 0.9) / modalScale;
+      const minHeight = 200;
+      const maxHeight = (screenHeight * 0.9) / modalScale;
+
+      newWidth = Math.max(minWidth, newWidth);
+      newWidth = Math.min(newWidth, maxWidth);
+      newHeight = Math.max(minHeight, newHeight);
+      newHeight = Math.min(newHeight, maxHeight);
+
+      modalRef.current.style.width = `${newWidth}px`;
+      modalRef.current.style.height = `${newHeight}px`;
+    }
+  }, [style]);
 
   useEffect(() => {
     const modalDiv = modalRef.current;
@@ -100,30 +168,6 @@ export default function InfoModal({
     }
 
     moveFromTarget(folderDiv);
-
-    // Outbound checking
-    const modalContainer = document.getElementById("modals");
-
-    const screenWidth = modalContainer?.offsetWidth as number;
-    const screenHeight = modalContainer?.offsetHeight as number;
-
-    let newTop = parseInt(modalDiv.style.top);
-    let newLeft = parseInt(modalDiv.style.left);
-
-    const style = window.getComputedStyle(modalDiv);
-    const modalScale = Number(style.scale == "none" ? 1 : style.scale);
-
-    const minTop = 64; // Fix hardcoding
-    const maxTop = screenHeight - 40;
-    const minLeft = -modalDiv.offsetWidth * modalScale + 40;
-    const maxLeft = screenWidth - 40;
-    newTop = Math.max(minTop, newTop);
-    newTop = Math.min(maxTop, newTop);
-    newLeft = Math.max(minLeft, newLeft);
-    newLeft = Math.min(maxLeft, newLeft);
-
-    modalDiv.style.top = `${newTop}px`;
-    modalDiv.style.left = `${newLeft}px`;
 
     return () => {
       window.removeEventListener("resize", resizeModalBoundary);
@@ -382,11 +426,9 @@ export default function InfoModal({
       className={cn(
         "@container w-250 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
         // "origin-top-left",
-        !modalState.isFull &&
-          (dive
-            ? "scale-[clamp(0.45,calc(100cqw/3200px),0.6)] origin-top-left"
-            : "scale-[clamp(0.6,calc(100cqh/1800px),1)] origin-top-left"),
-
+        dive
+          ? "scale-[clamp(0.45,calc(100cqw/3200px),0.6)] origin-top-left"
+          : "scale-[clamp(0.6,calc(100cqh/1800px),1)] origin-top-left",
         className,
       )}
       onMouseDown={() => bringToFront(name)}
@@ -396,12 +438,14 @@ export default function InfoModal({
         onMouseDown={panningHandler}
       ></div>
 
-      <div
-        className="absolute bottom-0 right-0 size-7 cursor-nwse-resize bg-transparent z-10"
-        onMouseDown={resizeHandler}
-      >
-        <ResizeIcon className="w-full h-full text-gray-400" />
-      </div>
+      {!modalState.isFull && (
+        <div
+          className="absolute bottom-0 right-0 size-9 cursor-nwse-resize bg-transparent z-10"
+          onMouseDown={resizeHandler}
+        >
+          <ResizeIcon className="w-full h-full text-blue-600" />
+        </div>
+      )}
 
       <div className="absolute top-0 left-0 w-40 h-22 flex items-center justify-center z-15 pointer-events-none">
         <div className="flex gap-3 pointer-events-auto group">
@@ -433,7 +477,7 @@ export default function InfoModal({
       <div className="flex w-full h-full">
         <div
           className={cn(
-            "flex flex-col w-60 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
+            "flex flex-col w-65 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
             navActive ? "hidden @4xl:block" : "hidden",
           )}
         >
@@ -448,7 +492,11 @@ export default function InfoModal({
           >
             <span className="text-[1.6rem] font-semibold">{name}</span>
           </div>
-          <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15 py-10">
+          <div
+            className={cn(
+              "bg-white w-full h-full overflow-auto flex flex-col items-center px-15 py-10",
+            )}
+          >
             {modalState.contentPath === "/home" ? (
               <ProjectContentHome />
             ) : (
