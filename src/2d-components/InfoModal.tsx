@@ -101,6 +101,30 @@ export default function InfoModal({
 
     moveFromTarget(folderDiv);
 
+    // Outbound checking
+    const modalContainer = document.getElementById("modals");
+
+    const screenWidth = modalContainer?.offsetWidth as number;
+    const screenHeight = modalContainer?.offsetHeight as number;
+
+    let newTop = parseInt(modalDiv.style.top);
+    let newLeft = parseInt(modalDiv.style.left);
+
+    const style = window.getComputedStyle(modalDiv);
+    const modalScale = Number(style.scale == "none" ? 1 : style.scale);
+
+    const minTop = 64; // Fix hardcoding
+    const maxTop = screenHeight - 40;
+    const minLeft = -modalDiv.offsetWidth * modalScale + 40;
+    const maxLeft = screenWidth - 40;
+    newTop = Math.max(minTop, newTop);
+    newTop = Math.min(maxTop, newTop);
+    newLeft = Math.max(minLeft, newLeft);
+    newLeft = Math.min(maxLeft, newLeft);
+
+    modalDiv.style.top = `${newTop}px`;
+    modalDiv.style.left = `${newLeft}px`;
+
     return () => {
       window.removeEventListener("resize", resizeModalBoundary);
     };
@@ -368,7 +392,7 @@ export default function InfoModal({
       onMouseDown={() => bringToFront(name)}
     >
       <div
-        className="absolute top-0 left-0 w-full h-18 bg-transparent cursor-move z-10"
+        className="absolute top-0 left-0 w-full h-23 bg-transparent cursor-move z-10"
         onMouseDown={panningHandler}
       ></div>
 
@@ -379,22 +403,22 @@ export default function InfoModal({
         <ResizeIcon className="w-full h-full text-gray-400" />
       </div>
 
-      <div className="absolute top-0 left-0 w-30 h-18 flex items-center justify-center z-15 pointer-events-none">
-        <div className="flex gap-2 pointer-events-auto group">
+      <div className="absolute top-0 left-0 w-40 h-22 flex items-center justify-center z-15 pointer-events-none">
+        <div className="flex gap-3 pointer-events-auto group">
           <div
-            className="size-4.5 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
+            className="size-5 rounded-full bg-[rgb(255,95,87)] flex justify-center items-center"
             onClick={() => closeModalStart(name)}
           >
             <CloseIcon className="size-3 hidden group-hover:block" />
           </div>
           <div
-            className="size-4.5 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center"
+            className="size-5 rounded-full bg-[rgb(255,188,46)] flex justify-center items-center"
             onClick={() => downupModal(name, true)}
           >
             <RemoveIcon className="size-3 hidden group-hover:block" />
           </div>
           <div
-            className="size-4.5 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center"
+            className="size-5 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center"
             onClick={expandClick}
           >
             {modalState.isFull ? (
@@ -418,11 +442,11 @@ export default function InfoModal({
         <div className="flex flex-col flex-1 z-5">
           <div
             className={cn(
-              "h-18 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
-              navActive ? "px-30 @4xl:px-8" : "px-30",
+              "h-23 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
+              navActive ? "px-38 @4xl:px-8" : "px-38",
             )}
           >
-            <span className="text-2xl font-semibold">{name}</span>
+            <span className="text-[1.6rem] font-semibold">{name}</span>
           </div>
           <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15 py-10">
             {modalState.contentPath === "/home" ? (
