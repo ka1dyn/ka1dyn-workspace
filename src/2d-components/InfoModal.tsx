@@ -4,10 +4,11 @@ import ResizeIcon from "@/icons/resize.svg?react";
 import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
 import ExpandIcon from "@/icons/expand.svg?react";
-import CollapseIcon from "@/icons/collapse.svg";
+import CollapseIcon from "@/icons/collapse.svg?react";
 import { useModalStore, useTweaks } from "@/stores";
 import MDViewer from "./MDViewer";
 import { useShallow } from "zustand/shallow";
+import NavContent from "./NavContent";
 
 interface InfoModalProps {
   className?: string;
@@ -395,7 +396,11 @@ export default function InfoModal({
             className="size-3 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center"
             onClick={expandClick}
           >
-            <ExpandIcon className="size-2.5 hidden group-hover:block" />
+            {modalState.isFull ? (
+              <CollapseIcon className="size-2.5 hidden group-hover:block" />
+            ) : (
+              <ExpandIcon className="size-2.5 hidden group-hover:block" />
+            )}
           </div>
         </div>
       </div>
@@ -406,7 +411,9 @@ export default function InfoModal({
             "flex flex-col w-42 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
             navActive ? "hidden @4xl:block" : "hidden",
           )}
-        ></div>
+        >
+          <NavContent name={name} />
+        </div>
         <div className="flex flex-col flex-1 z-5">
           <div
             className={cn(
@@ -417,7 +424,7 @@ export default function InfoModal({
             <span>{name}</span>
           </div>
           <div className="bg-white w-full h-full overflow-auto flex flex-col items-center px-15">
-            <MDViewer path={"/content/test.md"} />
+            <MDViewer path={modalState.contentPath} />
           </div>
         </div>
       </div>

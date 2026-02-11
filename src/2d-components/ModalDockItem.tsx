@@ -60,7 +60,6 @@ export default function ModalDockItem({ name }: { name: string }) {
           )}
           onClick={() => downupModal(modalState.name, !modalState.isDown)}
         >
-          <div className="absolute top-0 left-0 bg-gray-400 w-full h-2"></div>
           <span className="break-all text-center lg:text-[16px]">
             {modalState.name}
           </span>

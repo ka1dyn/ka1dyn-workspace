@@ -8,7 +8,7 @@ export default function MDViewer({ path }: { path: string }) {
     fetch(path)
       .then((res) => res.text())
       .then((text) => setContent(text));
-  }, []);
+  }, [path]);
 
   return (
     <div className="prose select-text">

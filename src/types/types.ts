@@ -76,6 +76,7 @@ export interface ModalData extends ModalPos {
   isClosing: boolean;
   zIndex: number;
   isFull: boolean;
+  contentPath: string;
 }
 
 export interface ModalPos {
@@ -98,6 +99,7 @@ export interface ModalStore {
   downupModal: (name: string, newState: boolean) => void;
   expandModal: (name: string, backupPos: ModalPos) => void;
   collapseModal: (name: string) => void;
+  setContentPath: (name: string, newPath: string) => void;
 
   // Backup
   saveModalState: (name: string, curState: ModalData) => Promise<void>;

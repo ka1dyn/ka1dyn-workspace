@@ -152,6 +152,7 @@ export const useModalStore = create<ModalStore>()(
               isClosing: false,
               zIndex: 10,
               isFull: false,
+              contentPath: "/home",
             };
             state.count += 1;
           },
@@ -194,22 +195,41 @@ export const useModalStore = create<ModalStore>()(
         ),
 
       expandModal: (name, backupPos) =>
-        set((state) => {
-          if (!state.modals[name]) return;
-          const { x, y, width, height } = backupPos;
+        set(
+          (state) => {
+            if (!state.modals[name]) return;
+            const { x, y, width, height } = backupPos;
 
-          state.modals[name].isFull = true;
-          state.modals[name].x = x;
-          state.modals[name].y = y;
-          state.modals[name].width = width;
-          state.modals[name].height = height;
-        }),
+            state.modals[name].isFull = true;
+            state.modals[name].x = x;
+            state.modals[name].y = y;
+            state.modals[name].width = width;
+            state.modals[name].height = height;
+          },
+          undefined,
+          "modal/expand",
+        ),
 
       collapseModal: (name) => {
-        set((state) => {
-          if (!state.modals[name]) return;
-          state.modals[name].isFull = false;
-        });
+        set(
+          (state) => {
+            if (!state.modals[name]) return;
+            state.modals[name].isFull = false;
+          },
+          undefined,
+          "modal/collapse",
+        );
+      },
+
+      setContentPath: (name, newPath) => {
+        set(
+          (state) => {
+            if (!state.modals[name]) return;
+            state.modals[name].contentPath = newPath;
+          },
+          undefined,
+          "modal/changePath",
+        );
       },
 
       // Backup state from external input
