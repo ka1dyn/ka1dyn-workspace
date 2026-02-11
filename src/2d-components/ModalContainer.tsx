@@ -28,10 +28,10 @@ export default function ModalContainer({
             <InfoModal
               name={modal.name}
               style={{
-                top: Math.min(modal.y, maxTop),
-                left: Math.min(modal.x, maxLeft),
-                width: modal.width,
-                height: modal.height,
+                top: modal.isFull ? "64px" : Math.min(modal.y, maxTop),
+                left: modal.isFull ? "0px" : Math.min(modal.x, maxLeft),
+                width: modal.isFull ? "100%" : modal.width,
+                height: modal.isFull ? "calc(100% - 64px)" : modal.height,
                 zIndex: modal.zIndex,
               }}
               className={cn("absolute")}

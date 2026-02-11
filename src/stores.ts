@@ -151,6 +151,7 @@ export const useModalStore = create<ModalStore>()(
               isDown: false,
               isClosing: false,
               zIndex: 10,
+              isFull: false,
             };
             state.count += 1;
           },
@@ -191,6 +192,25 @@ export const useModalStore = create<ModalStore>()(
           undefined,
           "modal/down",
         ),
+
+      expandModal: (name, backupPos) =>
+        set((state) => {
+          if (!state.modals[name]) return;
+          const { x, y, width, height } = backupPos;
+
+          state.modals[name].isFull = true;
+          state.modals[name].x = x;
+          state.modals[name].y = y;
+          state.modals[name].width = width;
+          state.modals[name].height = height;
+        }),
+
+      collapseModal: (name) => {
+        set((state) => {
+          if (!state.modals[name]) return;
+          state.modals[name].isFull = false;
+        });
+      },
 
       // Backup state from external input
       registerBackup: (name, backupFn) =>

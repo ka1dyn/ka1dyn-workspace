@@ -28,6 +28,8 @@ export default function InfoModal({
     bringToFront,
     closeModalStart,
     downupModal,
+    expandModal,
+    collapseModal,
     saveModalState,
     registerBackup,
   } = useModalStore(
@@ -45,12 +47,17 @@ export default function InfoModal({
     if (!modalDiv || !modalState) return;
 
     const backupModal = async () => {
+      const curModalState = useModalStore.getState().modals[name];
+
       await saveModalState(name, {
-        ...useModalStore.getState().modals[name],
-        x: parseFloat(modalDiv.style.left) || modalDiv.offsetLeft,
-        y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
-        width: modalDiv.offsetWidth,
-        height: modalDiv.offsetHeight,
+        ...curModalState,
+        ...(!curModalState.isFull && {
+          x: parseFloat(modalDiv.style.left) || modalDiv.offsetLeft,
+          y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
+          width: modalDiv.offsetWidth,
+          height: modalDiv.offsetHeight,
+        }),
+
         zIndex: parseInt(modalDiv.style.zIndex),
       });
     };
@@ -324,6 +331,24 @@ export default function InfoModal({
     window.addEventListener("mouseup", onMouseUp);
   };
 
+  const expandClick = () => {
+    const modalDiv = modalRef.current;
+    if (!modalDiv || !modalState) return;
+
+    const { isFull } = modalState;
+
+    if (isFull) {
+      collapseModal(name);
+    } else {
+      expandModal(name, {
+        x: parseFloat(modalDiv.style.left) || modalDiv.offsetLeft,
+        y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
+        width: modalDiv.offsetWidth,
+        height: modalDiv.offsetHeight,
+      });
+    }
+  };
+
   return (
     <div
       style={style}
@@ -331,10 +356,10 @@ export default function InfoModal({
       className={cn(
         "@container w-250 h-150 bg-transparent rounded-lg overflow-hidden border border-gray-300 shadow-2xl shadow-[#00000052] pointer-events-auto relative",
         // "origin-top-left",
-        "w-screen h-screen",
-        // dive
-        //   ? "scale-[clamp(0.6,calc(100cqw/1920px),1)] origin-top-left"
-        //   : "scale-[clamp(0.6,calc(100cqh/1080px),1.4)] origin-top-left",
+        !modalState.isFull &&
+          (dive
+            ? "scale-[clamp(0.6,calc(100cqw/1920px),1)] origin-top-left"
+            : "scale-[clamp(0.6,calc(100cqh/1080px),1.4)] origin-top-left"),
 
         className,
       )}
@@ -366,7 +391,10 @@ export default function InfoModal({
           >
             <RemoveIcon className="size-2.5 hidden group-hover:block" />
           </div>
-          <div className="size-3 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center">
+          <div
+            className="size-3 rounded-full bg-[rgb(43,200,64)] flex justify-center items-center"
+            onClick={expandClick}
+          >
             <ExpandIcon className="size-2.5 hidden group-hover:block" />
           </div>
         </div>

@@ -70,15 +70,19 @@ export interface SoundVolType {
   setLightning: (newState: number) => void;
 }
 
-export interface ModalData {
+export interface ModalData extends ModalPos {
   name: string;
+  isDown: boolean;
+  isClosing: boolean;
+  zIndex: number;
+  isFull: boolean;
+}
+
+export interface ModalPos {
   x: number;
   y: number;
   width: number;
   height: number;
-  isDown: boolean;
-  isClosing: boolean;
-  zIndex: number;
 }
 
 export interface ModalStore {
@@ -92,6 +96,8 @@ export interface ModalStore {
   closeModalComplete: (name: string) => void;
   updateModal: (name: string, updates: Partial<ModalData>) => void;
   downupModal: (name: string, newState: boolean) => void;
+  expandModal: (name: string, backupPos: ModalPos) => void;
+  collapseModal: (name: string) => void;
 
   // Backup
   saveModalState: (name: string, curState: ModalData) => Promise<void>;
