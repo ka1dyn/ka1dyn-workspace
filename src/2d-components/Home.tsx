@@ -7,10 +7,11 @@ import {
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import Folder from "./Folder";
 import ModalContainer from "./ModalContainer";
+import { LogOut } from "lucide-react";
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -32,6 +33,25 @@ export default function Home() {
     setAudioActive(audioPrev);
   };
 
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date: Date) => {
+    const dayList = ["일", "월", "화", "수", "목", "금", "토"];
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const week = dayList[date.getDay()];
+    const ampm = date.getHours() >= 12 ? "오후" : "오전";
+    const hours = date.getHours() % 12 || 12;
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${month}월 ${day}일 (${week}) ${ampm} ${hours}:${minutes}`;
+  };
+
   return (
     // <div className="w-full h-full relative bg-[url(/images/man_rain_crop.jpg)] bg-position-[50%_80%] bg-no-repeat bg-cover opacity-50">
     <div className="w-full h-full flex flex-col relative overflow-hidden bg-black select-none">
@@ -40,12 +60,25 @@ export default function Home() {
         className="absolute w-full h-full object-cover object-[50%_50%] opacity-60 pointer-events-none"
       />
       <div
-        className="flex pl-4 items-center w-full h-16 relative overflow-hidden
-                bg-gray-500/50 backdrop-blur-sm
+        className="flex pl-4 pr-4 items-center justify-between w-full h-16 relative overflow-hidden
+                bg-gray-500/60 backdrop-blur-2xl
                 border-b border-black/20
                 shadow-md"
       >
         <img src="/images/ka1dyn_logo.png" className="h-full" />
+        {dive && (
+          <div className="text-md font-roboto flex h-fit gap-5 text-white">
+            <div
+              className="flex gap-2 items-center cursor-pointer"
+              onClick={exitClick}
+            >
+              <LogOut className="size-5" />
+              <span className="-translate-y-px">exit</span>
+            </div>
+            <div className="w-px scale-60 bg-white"></div>
+            <div className="text-sm">{formatTime(time)}</div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col w-40 gap-5 absolute right-5 top-25 scale-[clamp(0.6,calc(100cqh/1080px),1.5)] origin-top-right z-5">
@@ -84,14 +117,6 @@ export default function Home() {
         </div>
         <Dock className="z-10" />
       </div>
-      {dive && (
-        <div
-          className="pointer-events-auto absolute left-14 bottom-12 text-[28px] text-[#c9c9c9] cursor-pointer hover:text-white z-15 font-roboto"
-          onClick={exitClick}
-        >
-          exit
-        </div>
-      )}
     </div>
   );
 }

@@ -75,28 +75,32 @@ function ScreenOverlay({ backClick }: ScreenOverlayProps) {
       {/* Left nav */}
       <RightNav />
 
-      <button
-        className="
+      <div className="flex flex-col absolute top-10 left-10 h-fit gap-2 text-xl sm:flex-row sm:gap-5 lg:text-2xl">
+        <button
+          className="
             animate-slide-up
-            absolute left-20 bottom-50 pointer-events-auto
-            text-[#c9c9c9] text-[20px] font-medium 
+           pointer-events-auto
+            text-[#c9c9c9] font-medium 
             hover:cursor-pointer hover:text-white
         "
-        onClick={backClick}
-      >
-        {"back"}
-      </button>
+          onClick={backClick}
+        >
+          {"< back"}
+        </button>
 
-      <button
-        className="animate-slide-up
-          absolute left-20 bottom-68 pointer-events-auto
-          text-[#c9c9c9] text-[20px] font-medium
+        <div className="w-0.5 bg-gray-400 scale-y-60"></div>
+
+        <button
+          className="animate-slide-up
+          pointer-events-auto
+          text-[#c9c9c9] font-medium
           hover:cursor-pointer hover:text-white
       "
-        onClick={diveClick}
-      >
-        {"dive in"}
-      </button>
+          onClick={diveClick}
+        >
+          {"dive in"}
+        </button>
+      </div>
     </div>
   );
 }
