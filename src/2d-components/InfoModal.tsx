@@ -477,7 +477,7 @@ export default function InfoModal({
       <div className="flex w-full h-full">
         <div
           className={cn(
-            "flex flex-col w-65 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
+            "flex flex-col w-75 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
             navActive ? "hidden @4xl:block" : "hidden",
           )}
         >

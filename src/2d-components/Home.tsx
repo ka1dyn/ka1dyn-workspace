@@ -69,7 +69,7 @@ export default function Home() {
         {dive && (
           <div className="text-md font-roboto flex h-fit gap-5 text-white">
             <div
-              className="flex gap-2 items-center cursor-pointer"
+              className="flex gap-2 items-center cursor-pointer -translate-y-0.5"
               onClick={exitClick}
             >
               <LogOut className="size-5" />

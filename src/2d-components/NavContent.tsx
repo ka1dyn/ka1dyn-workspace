@@ -1,43 +1,34 @@
-import { useModalStore } from "@/stores";
+import { Book, Home, Sprout, Umbrella } from "lucide-react";
 import { useMemo } from "react";
+import NavItem from "./NavItem";
 
 interface NavContentProps {
   name: string;
 }
 
 function ProjectNavContent({ name }: { name: string }) {
-  const setContentPath = useModalStore((state) => state.setContentPath);
-
   return (
-    <div className="flex flex-col text-2xl">
-      <div
-        onClick={() => setContentPath(name, "/home")}
-        className="hover:underline"
-      >
+    <div className="flex flex-col gap-7 text-2xl p-3">
+      <NavItem name={name} content={"/home"}>
+        <Home className="text-blue-500" />
         Home
-      </div>
+      </NavItem>
 
       <div className="flex flex-col gap-3">
-        <h2>Web projects</h2>
+        <h2 className="pl-3 text-muted-foreground">Web projects</h2>
         <div className="flex flex-col gap-2">
-          <div
-            onClick={() => setContentPath(name, "/content/test.md")}
-            className="hover:underline"
-          >
+          <NavItem name={name} content={"/content/test.md"}>
+            <Umbrella className="text-blue-500" />
             Ka1dyn-workspace
-          </div>
-          <div
-            onClick={() => setContentPath(name, "/content/test1.md")}
-            className="hover:underline"
-          >
+          </NavItem>
+          <NavItem name={name} content={"/content/test1.md"}>
+            <Book className="text-blue-500" />
             Ka1dyn-devlog
-          </div>
-          <div
-            onClick={() => setContentPath(name, "/content/test2.md")}
-            className="hover:underline"
-          >
+          </NavItem>
+          <NavItem name={name} content={"/content/test2.md"}>
+            <Sprout className="text-blue-500" />
             Ecode
-          </div>
+          </NavItem>
         </div>
       </div>
     </div>
