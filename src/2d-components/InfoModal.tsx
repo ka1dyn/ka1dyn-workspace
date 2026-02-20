@@ -378,7 +378,7 @@ export default function InfoModal({
       let newHeight =
         startHeight + (moveEvent.clientY - startY) / scaleY / modalScale;
 
-      const minWidth = 300;
+      const minWidth = 850;
       const maxWidth = (screenWidth * 0.9) / modalScale;
       const minHeight = 200;
       const maxHeight = (screenHeight * 0.9) / modalScale;
@@ -478,7 +478,8 @@ export default function InfoModal({
         <div
           className={cn(
             "flex flex-col w-75 shrink-0 bg-[#d6d6d6]/80 backdrop-blur-2xl border-r-2 border-[#cecece] transition-all duration-200 ease-out",
-            navActive ? "hidden @4xl:block" : "hidden",
+            // navActive ? "hidden @4xl:block" : "hidden",
+            navActive ? "block" : "hidden",
           )}
         >
           <NavContent name={name} />
@@ -487,7 +488,8 @@ export default function InfoModal({
           <div
             className={cn(
               "h-23 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
-              navActive ? "px-38 @4xl:px-8" : "px-38",
+              // navActive ? "px-38 @4xl:px-8" : "px-38",
+              navActive ? "px-8" : "px-38",
             )}
           >
             <span className="text-[1.6rem] font-semibold">{name}</span>
@@ -498,7 +500,7 @@ export default function InfoModal({
             )}
           >
             {modalState.contentPath === "/home" ? (
-              <ProjectContentHome />
+              <ProjectContentHome name={name} />
             ) : (
               <MDViewer path={modalState.contentPath} />
             )}

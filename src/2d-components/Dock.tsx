@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useBgImageStore, useModalStore } from "@/stores";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import ModalDockItem from "./ModalDockItem";
 import React from "react";
 import { useShallow } from "zustand/shallow";

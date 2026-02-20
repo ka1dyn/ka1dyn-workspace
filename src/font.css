@@ -1,49 +1,49 @@
 /* Fonts */
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Bold.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-Bold.ttf");
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-SemiBold.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-SemiBold.ttf");
   font-weight: 600;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Medium.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-Medium.ttf");
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Regular.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-Regular.ttf");
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Light.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-Light.ttf");
   font-weight: 300;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-ExtraLight.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-ExtraLight.ttf");
   font-weight: 200;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Roboto Mono";
-  src: url("fonts/RobotoMono/RobotoMono-Thin.ttf");
+  src: url("/fonts/RobotoMono/RobotoMono-Thin.ttf");
   font-weight: 100;
   font-display: swap;
 }
@@ -63,7 +63,8 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard Black"),
-    url("fonts/Pretendard-subset/Pretendard-Black.subset.woff2") format("woff2");
+    url("/fonts/Pretendard-subset/Pretendard-Black.subset.woff2")
+      format("woff2");
 }
 
 @font-face {
@@ -72,7 +73,7 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard ExtraBold"),
-    url("fonts/Pretendard-subset/Pretendard-ExtraBold.subset.woff2")
+    url("/fonts/Pretendard-subset/Pretendard-ExtraBold.subset.woff2")
       format("woff2");
 }
 
@@ -82,7 +83,7 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard Bold"),
-    url("fonts/Pretendard-subset/Pretendard-Bold.subset.woff2") format("woff2");
+    url("/fonts/Pretendard-subset/Pretendard-Bold.subset.woff2") format("woff2");
 }
 
 @font-face {
@@ -91,7 +92,7 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard SemiBold"),
-    url("fonts/Pretendard-subset/Pretendard-SemiBold.subset.woff2")
+    url("/fonts/Pretendard-subset/Pretendard-SemiBold.subset.woff2")
       format("woff2");
 }
 
@@ -101,7 +102,7 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard Medium"),
-    url("fonts/Pretendard-subset/Pretendard-Medium.subset.woff2")
+    url("/fonts/Pretendard-subset/Pretendard-Medium.subset.woff2")
       format("woff2");
 }
 
@@ -111,7 +112,7 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard Regular"),
-    url("fonts/Pretendard-subset/Pretendard-Regular.subset.woff2")
+    url("/fonts/Pretendard-subset/Pretendard-Regular.subset.woff2")
       format("woff2");
 }
 
@@ -121,7 +122,8 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard Light"),
-    url("fonts/Pretendard-subset/Pretendard-Light.subset.woff2") format("woff2");
+    url("/fonts/Pretendard-subset/Pretendard-Light.subset.woff2")
+      format("woff2");
 }
 
 @font-face {
@@ -130,7 +132,7 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard ExtraLight"),
-    url("fonts/Pretendard-subset/Pretendard-ExtraLight.subset.woff2")
+    url("/fonts/Pretendard-subset/Pretendard-ExtraLight.subset.woff2")
       format("woff2");
 }
 
@@ -140,5 +142,5 @@ http://scripts.sil.org/OFL
   font-display: swap;
   src:
     local("Pretendard Thin"),
-    url("fonts/Pretendard-subset/Pretendard-Thin.subset.woff2") format("woff2");
+    url("/fonts/Pretendard-subset/Pretendard-Thin.subset.woff2") format("woff2");
 }

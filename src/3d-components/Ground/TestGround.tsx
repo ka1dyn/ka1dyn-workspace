@@ -1,4 +1,4 @@
-import { MeshReflectorMaterial, useTexture } from "@react-three/drei";
+import { useTexture } from "@react-three/drei";
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
