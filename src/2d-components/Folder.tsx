@@ -1,3 +1,4 @@
+import { PUBLIC_IMAGES } from "@/constants/images";
 import { useModalStore } from "@/stores";
 import { useRef } from "react";
 import { useShallow } from "zustand/shallow";
@@ -42,7 +43,7 @@ export default function Folder({
             group-focus:bg-black/20 group-focus:border-2"
           >
             <img
-              src="/images/folder.png"
+              src={PUBLIC_IMAGES.FOLDER}
               className="w-20 h-auto pointer-events-none"
             ></img>
           </div>

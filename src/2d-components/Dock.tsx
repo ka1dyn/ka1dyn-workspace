@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import ModalDockItem from "./ModalDockItem";
 import React from "react";
 import { useShallow } from "zustand/shallow";
+import { PUBLIC_IMAGES } from "@/constants/images";
 
 export default function Dock({ className }: { className?: string }) {
   const thumnailRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -19,13 +20,13 @@ export default function Dock({ className }: { className?: string }) {
     let type = 0;
 
     switch (path) {
-      case "/images/happy_dog.webp":
+      case PUBLIC_IMAGES.DOG:
         type = 0;
         break;
-      case "/images/bike_rain.webp":
+      case PUBLIC_IMAGES.BIKE:
         type = 1;
         break;
-      case "/images/city_rain.webp":
+      case PUBLIC_IMAGES.CITY:
         type = 2;
         break;
     }
@@ -50,22 +51,31 @@ export default function Dock({ className }: { className?: string }) {
           ref={(node) => {
             thumnailRefs.current[0] = node;
           }}
-          className="relative cursor-pointer size-16 rounded-xl bg-[url(/images/happy_dog_thumbnail.jpg)] bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
-          onClick={() => changeBackground("/images/happy_dog.webp")}
+          className="relative cursor-pointer size-16 rounded-xl bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
+          style={{
+            backgroundImage: `url(${PUBLIC_IMAGES.DOG_THUMBNAIL})`,
+          }}
+          onClick={() => changeBackground(PUBLIC_IMAGES.DOG)}
         ></div>
         <div
           ref={(node) => {
             thumnailRefs.current[1] = node;
           }}
-          className="relative cursor-pointer size-16 rounded-xl bg-[url(/images/bike_rain_thumbnail.jpg)] bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
-          onClick={() => changeBackground("/images/bike_rain.webp")}
+          className="relative cursor-pointer size-16 rounded-xl bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
+          onClick={() => changeBackground(PUBLIC_IMAGES.BIKE)}
+          style={{
+            backgroundImage: `url(${PUBLIC_IMAGES.BIKE_THUMBNAIL})`,
+          }}
         ></div>
         <div
           ref={(node) => {
             thumnailRefs.current[2] = node;
           }}
-          className="relative cursor-pointer size-16 rounded-xl bg-[url(/images/city_rain_thumbnail.jpg)] bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
-          onClick={() => changeBackground("/images/city_rain.webp")}
+          className="relative cursor-pointer size-16 rounded-xl bg-center bg-no-repeat bg-cover hover:shadow-lg/50 shadow-white"
+          onClick={() => changeBackground(PUBLIC_IMAGES.CITY)}
+          style={{
+            backgroundImage: `url(${PUBLIC_IMAGES.CITY_THUMBNAIL})`,
+          }}
         ></div>
         <div
           className={`absolute bottom-0 left-8 size-1.25 rounded-full bg-white transition-all duration-400 ease-in-out`}

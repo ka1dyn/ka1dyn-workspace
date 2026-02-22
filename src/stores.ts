@@ -14,6 +14,7 @@ import {
 import { OverlayTypes } from "./types/enums";
 import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { PUBLIC_IMAGES } from "./constants/images";
 
 export const useStart = create<StartType>((set) => ({
   start: false,
@@ -266,7 +267,7 @@ export const useModalStore = create<ModalStore>()(
 export const useBgImageStore = create<BgImageStore>()(
   immer(
     devtools((set, get) => ({
-      path: "/images/happy_dog.webp",
+      path: PUBLIC_IMAGES.DOG,
       changeBackground: (newPath: string) =>
         set(
           (state) => {

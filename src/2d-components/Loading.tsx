@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { scramble, TextScramble } from "../animations/textScramble";
 import { useReady, useStart } from "../stores";
+import usePreloadImage from "@/hooks/usePreloadImage";
+import { PUBLIC_IMAGES } from "@/constants/images";
 
 export default function Loading() {
   const textRef1 = useRef<HTMLDivElement>(null!);
@@ -10,6 +12,14 @@ export default function Loading() {
   const [ready, setReady] = useState<boolean>(false);
   const setStart = useStart((state) => state.setStart);
   const frameReady = useReady((state) => state.frameReady);
+  const { isReady: preloadReady } = usePreloadImage([
+    PUBLIC_IMAGES.LOGO,
+    PUBLIC_IMAGES.DOG,
+    PUBLIC_IMAGES.DOG_THUMBNAIL,
+    PUBLIC_IMAGES.BIKE_THUMBNAIL,
+    PUBLIC_IMAGES.CITY_THUMBNAIL,
+    PUBLIC_IMAGES.FOLDER,
+  ]);
 
   const btnClick = () => {
     setStart(true);
@@ -53,7 +63,7 @@ export default function Loading() {
           {/* <span>loading...</span> */}
 
           {ready &&
-            (frameReady ? (
+            (frameReady && preloadReady ? (
               <button
                 className="
                 relative

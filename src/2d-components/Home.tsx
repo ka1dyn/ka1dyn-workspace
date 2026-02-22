@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import Folder from "./Folder";
 import ModalContainer from "./ModalContainer";
 import { LogOut } from "lucide-react";
+import { PUBLIC_IMAGES } from "@/constants/images";
+import usePreloadImage from "@/hooks/usePreloadImage";
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -23,6 +25,7 @@ export default function Home() {
   const [dockActive, setDockActive] = useState<boolean>(true);
   const setActive = useOverlay((state) => state.setActive);
   const dive = useTweaks((state) => state.dive);
+  usePreloadImage([PUBLIC_IMAGES.BIKE, PUBLIC_IMAGES.CITY]);
 
   const exitClick = async () => {
     setActive(true);
@@ -65,7 +68,7 @@ export default function Home() {
                 border-b border-black/20
                 shadow-md"
       >
-        <img src="/images/ka1dyn_logo.png" className="h-full" />
+        <img src={PUBLIC_IMAGES.LOGO} className="h-full" />
         {dive && (
           <div className="text-md font-roboto flex h-fit gap-5 text-white">
             <div

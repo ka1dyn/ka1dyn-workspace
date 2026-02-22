@@ -7,6 +7,7 @@ import { useSound } from "./Sound";
 import { useSoundVol, useStart, useTweaks } from "@/stores";
 import { fadeInAndPlay, fadeOutAndPause } from "@/utils/soundEffect";
 import { useShallow } from "zustand/shallow";
+import { PUBLIC_IMAGES } from "@/constants/images";
 // import { isDesktop } from "react-device-detect";
 
 export function RainClouds() {
@@ -117,7 +118,7 @@ export function RainClouds() {
         ref={cloudRef}
         limit={200}
         material={THREE.MeshLambertMaterial}
-        texture={"/images/cloud.png"}
+        texture={PUBLIC_IMAGES.CLOUD}
       >
         <Cloud {...config} bounds={[2, 2, 4]} position={[-9, 5, 0]} />
         <Cloud

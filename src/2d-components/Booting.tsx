@@ -1,3 +1,4 @@
+import { PUBLIC_IMAGES } from "@/constants/images";
 import { useReady, useStart } from "@/stores";
 import { useEffect, useState } from "react";
 
@@ -43,7 +44,7 @@ export default function Booting() {
           className={`text-white flex flex-col items-center transition-all transition-discrete ${done ? "opacity-0" : "block"}`}
           onTransitionEnd={loadHome}
         >
-          <img className="w-96" src="images/ka1dyn_logo.png" />
+          <img className="w-96" src={PUBLIC_IMAGES.LOGO} />
           <div className="w-100 h-1 rounded-2xl bg-[#434343] mt-2 overflow-hidden">
             <div
               className={`h-full bg-white transition-all duration-2000 ease-linear ${fill ? "w-full" : "w-0"}`}
