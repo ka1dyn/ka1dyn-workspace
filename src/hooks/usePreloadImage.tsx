@@ -1,10 +1,20 @@
 import { preloadImage } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function usePreloadImage(imagePaths: string[]) {
   const [isReady, setIsReady] = useState<boolean>(false);
+  const lastPathsRef = useRef<string[]>([]);
 
   useEffect(() => {
+    // If imagePaths are same, block load images
+    const isSame =
+      lastPathsRef.current.length === imagePaths.length &&
+      lastPathsRef.current.every((path, i) => path === imagePaths[i]);
+
+    if (isSame) return;
+
+    lastPathsRef.current = imagePaths;
+
     if (imagePaths.length === 0) {
       setIsReady(true);
       return;
