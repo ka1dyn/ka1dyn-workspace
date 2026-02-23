@@ -378,9 +378,9 @@ export default function InfoModal({
       let newHeight =
         startHeight + (moveEvent.clientY - startY) / scaleY / modalScale;
 
-      const minWidth = 850;
+      const minWidth = 1000;
       const maxWidth = (screenWidth * 0.9) / modalScale;
-      const minHeight = 200;
+      const minHeight = 500;
       const maxHeight = (screenHeight * 0.9) / modalScale;
 
       newWidth = Math.max(minWidth, newWidth);

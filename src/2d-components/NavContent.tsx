@@ -17,7 +17,7 @@ function ProjectNavContent({ name }: { name: string }) {
       <div className="flex flex-col gap-3">
         <h2 className="pl-3 text-muted-foreground">Web projects</h2>
         <div className="flex flex-col gap-2">
-          <NavItem name={name} content={"/content/test.md"}>
+          <NavItem name={name} content={"/content/project_workspace.md"}>
             <Umbrella className="text-blue-500" />
             Ka1dyn-workspace
           </NavItem>

@@ -153,7 +153,8 @@ export const useModalStore = create<ModalStore>()(
               isClosing: false,
               zIndex: 10,
               isFull: false,
-              contentPath: "/home",
+              contentPath:
+                name == "about_me" ? "/content/about_me.md" : "/home",
             };
             state.count += 1;
           },

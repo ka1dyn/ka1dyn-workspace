@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 export default function MDViewer({ path }: { path: string }) {
   const [content, setContent] = useState<string>("");
@@ -11,8 +12,8 @@ export default function MDViewer({ path }: { path: string }) {
   }, [path]);
 
   return (
-    <div className="prose text-[28px] leading-relaxed">
-      <Markdown>{content}</Markdown>
+    <div className="pt-10 pb-50 prose prose-blockquote:not-italic text-[28px] leading-relaxed">
+      <Markdown rehypePlugins={[rehypeRaw]}>{content}</Markdown>
     </div>
   );
 }
