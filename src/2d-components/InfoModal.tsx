@@ -484,7 +484,7 @@ export default function InfoModal({
         >
           <NavContent name={name} />
         </div>
-        <div className="flex flex-col flex-1 z-5">
+        <div className="flex flex-col flex-1 overflow-hidden bg-white">
           <div
             className={cn(
               "h-23 bg-[#f0f0f0] text-[#525252] flex items-center py-3 border-b border-[#e5e5e5] translate-y-px",
@@ -496,7 +496,7 @@ export default function InfoModal({
           </div>
           <div
             className={cn(
-              "bg-white w-full h-full overflow-auto flex flex-col items-center px-15 py-10",
+              "bg-white h-full overflow-auto flex flex-col items-center px-15 py-10",
             )}
           >
             {modalState.contentPath === "/home" ? (

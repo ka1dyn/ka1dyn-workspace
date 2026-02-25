@@ -21,13 +21,13 @@ function ProjectNavContent({ name }: { name: string }) {
             <Umbrella className="text-blue-500" />
             Ka1dyn-workspace
           </NavItem>
+          <NavItem name={name} content={"/content/project_ecode.md"}>
+            <Sprout className="text-blue-500" />
+            Ecode
+          </NavItem>
           <NavItem name={name} content={"/content/test1.md"}>
             <Book className="text-blue-500" />
             Ka1dyn-devlog
-          </NavItem>
-          <NavItem name={name} content={"/content/test2.md"}>
-            <Sprout className="text-blue-500" />
-            Ecode
           </NavItem>
         </div>
       </div>

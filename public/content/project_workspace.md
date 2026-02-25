@@ -1,7 +1,5 @@
 # Ka1dyn-workspace
 
-<img src="/content/images/workspace_thumbnail.png"  style="width: 100%;" />
-
 ## 프로젝트 개요
 
 - 📌 &nbsp; 프로젝트명: Ka1dyn-workspace
@@ -90,13 +88,13 @@
 ## UI 설명
 
 1. Loading Page
-![](/content/images/loading_page.png)
+<img src="/content/images/loading.gif" style="width:100%;">
 이미지, 3d model을 로드하는 동안 사용자 경험을 해치지 않기 위해 추가한 UI이다.
 텍스트 애니메이션이 끝나도 로드가 끝나지 않았다면 `Loading...` 메시지가 출력되며,
 로드가 완료되면 start버튼이 나온다. 시작 버튼을 누르면 Scene이 보이면서 시작 애니메이션 실행된다.
 
 2. Canvas Scene
-   ![](/content/images/workspace_thumbnail.png)
+   <img src="/content/images/zoom.gif" style="width:100%;">
    
    마우스로 카메라 위치와 회전을 조절할 수 있다. 클릭 및 이동 시 회전이 가능하고,
    스크롤을 통해 줌인, 줌아웃이 가능하다. 구성 요소들은 다음과 같다.
@@ -109,22 +107,24 @@
    - 배경음, 환경음
 
 3. Overlay
-    ![](/content/images/overlay-1.png)
+    <img src="/content/images/overlay-1.gif" style="width:100%;">
     왼쪽 상단에 시각효과와 사운드 옵션을 수정할 수 있는 버튼을 추가했다.
     빛의 색과 강도를 바꿀 수 있으며, 음량을 조절할 수 있다.
 
 
-    ![](/content/images/overlay-2.png)
+    <img src="/content/images/overlay-2.gif" style="width:100%;">
     오른쪽 상단에 audio visualizer, github link, 전체화면 버튼을 추가했다.
     audio visualizer 클릭을 통해 음소거할 수 있다.
 
 4. Screen Page
-    ![](/content/images/screen_page.png)
+    <img src="/content/images/dock.gif" style="width:100%;">
     맥북의 ui를 참고하여 만든 스크린 디자인이다. 하단 Dock을 통해 배경화면 변경, 폴더 내리기 등의 액션을 수행할 수 있다. <br>
+
+    <img src="/content/images/modal.gif" style="width:100%;">
     폴더를 더블클릭할 경우 각 폴더에 맞는 내용의 modal이 열린다. modal은 움직이고 리사이징이 가능하도록 만들었으며, 해상도에 맞게 자동으로 반응한다.
 
-    ![](/content/images/exit.png)
-    screen dive상태인 경우 우측 상단의 exit 버튼을 클릭하면 다시 3d scene으로 나갈 수 있다.
+    <img src="/content/images/dive.gif" style="width:100%;">
+    screen dive 버튼을 누르면 맥북 스크린이 전체화면으로 채워지고, 우측 상단 exit 버튼을 누르면 다시 3d scene으로 돌아온다.
 
 ## 느낀점
 

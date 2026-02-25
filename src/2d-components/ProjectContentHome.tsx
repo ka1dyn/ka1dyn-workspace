@@ -22,6 +22,18 @@ export default function ProjectContentHome({ name }: { name: string }) {
           </div>
         </Card>
         <Card
+          name="Ecode"
+          onClick={() => setContentPath(name, "/content/project_ecode.md")}
+          thumbnail={PUBLIC_IMAGES.PROJECT_ECODE_THUMBNAIL}
+          pCnt={6}
+        >
+          <div className="flex flex-col gap-4">
+            <span className="text-muted-foreground">
+              JAVA 코드 탄소배출량 측정
+            </span>
+          </div>
+        </Card>
+        <Card
           name="Ka1dyn-devlog"
           onClick={() => setContentPath(name, "/content/test1.md")}
           thumbnail={PUBLIC_IMAGES.PROJECT_DEVLIBRARY_THUMBNAIL}
@@ -31,17 +43,8 @@ export default function ProjectContentHome({ name }: { name: string }) {
             <span className="text-muted-foreground">
               Obsidian 노트 기반 자동화 개발 블로그
             </span>
-            <div className="absolute bottom-5 left-4">
-              <div className="flex gap-2 flex-wrap"></div>
-            </div>
           </div>
         </Card>
-        <Card
-          name="Ecode"
-          onClick={() => setContentPath(name, "/content/test2.md")}
-          thumbnail={PUBLIC_IMAGES.PROJECT_WORKSPACE_THUMBNAIL}
-          pCnt={6}
-        ></Card>
       </div>
       {/* <div className="bg-amber-400">홈입니다</div> */}
     </div>

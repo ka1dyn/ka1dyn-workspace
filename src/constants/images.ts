@@ -10,6 +10,7 @@ export const PUBLIC_IMAGES = {
   CLOUD: "/images/cloud.png",
   PROJECT_WORKSPACE_THUMBNAIL: "/content/images/workspace_thumbnail.png",
   PROJECT_DEVLIBRARY_THUMBNAIL: "/content/images/dev_libary.jpg",
+  PROJECT_ECODE_THUMBNAIL: "/content/images/ecode.png",
 } as const;
 
 export type PUBLIC_IMAGES = typeof PUBLIC_IMAGES;
