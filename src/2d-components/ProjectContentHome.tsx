@@ -1,6 +1,7 @@
 import { useModalStore } from "@/stores";
 import Card from "./Card";
 import { PUBLIC_IMAGES } from "@/constants/images";
+import { useEffect, type RefObject } from "react";
 
 export default function ProjectContentHome({ name }: { name: string }) {
   const setContentPath = useModalStore((state) => state.setContentPath);
@@ -35,7 +36,7 @@ export default function ProjectContentHome({ name }: { name: string }) {
         </Card>
         <Card
           name="Ka1dyn-devlog"
-          onClick={() => setContentPath(name, "/content/test1.md")}
+          onClick={() => setContentPath(name, "/content/project_devlibrary.md")}
           thumbnail={PUBLIC_IMAGES.PROJECT_DEVLIBRARY_THUMBNAIL}
           pCnt={1}
         >

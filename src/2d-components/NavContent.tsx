@@ -25,7 +25,7 @@ function ProjectNavContent({ name }: { name: string }) {
             <Sprout className="text-blue-500" />
             Ecode
           </NavItem>
-          <NavItem name={name} content={"/content/test1.md"}>
+          <NavItem name={name} content={"/content/project_devlibrary.md"}>
             <Book className="text-blue-500" />
             Ka1dyn-devlog
           </NavItem>
