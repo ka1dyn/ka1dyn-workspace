@@ -19,7 +19,7 @@ function ProjectNavContent({ name }: { name: string }) {
         <div className="flex flex-col gap-2">
           <NavItem name={name} content={"/content/project_workspace.md"}>
             <Umbrella className="text-blue-500" />
-            Ka1dyn-workspace
+            Ka1dyn workspace
           </NavItem>
           <NavItem name={name} content={"/content/project_ecode.md"}>
             <Sprout className="text-blue-500" />
@@ -27,7 +27,7 @@ function ProjectNavContent({ name }: { name: string }) {
           </NavItem>
           <NavItem name={name} content={"/content/project_devlibrary.md"}>
             <Book className="text-blue-500" />
-            Ka1dyn-devlog
+            Dev libary
           </NavItem>
         </div>
       </div>

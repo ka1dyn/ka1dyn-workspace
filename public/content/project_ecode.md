@@ -5,8 +5,8 @@
 - 📌 &nbsp; 프로젝트명: Ecode
 - 🧑🏻‍💻 &nbsp; 팀원: 6명
 - 🗓️ &nbsp; 기간: 2023.9.17 ~ 2023.12.21
-- 🍀 &nbsp; github: https://github.com/ka1dyn/2023fall_41class_team2
-- ✈️ &nbsp; service url: https://test.com
+- 🍀 &nbsp; github:  <a href="https://github.com/ka1dyn/2023fall_41class_team2" target="_blank" rel="noopener noreferrer">github repo</a>
+- ✈️ &nbsp; service url: <a href="https://ecode.ka1dyn.com" target="_blank" rel="noopener noreferrer">ecode</a>
 - ✅ &nbsp; 맡은 역할: 팀장, 구조설계, 프론트엔드, 배포
 
 ## 프로젝트 배경

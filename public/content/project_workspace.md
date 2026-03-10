@@ -1,12 +1,12 @@
-# Ka1dyn-workspace
+# Ka1dyn workspace
 
 ## 프로젝트 개요
 
-- 📌 &nbsp; 프로젝트명: Ka1dyn-workspace
+- 📌 &nbsp; 프로젝트명: Ka1dyn workspace
 - 🧑🏻‍💻 &nbsp; 팀원: 1명
 - 🗓️ &nbsp; 기간: 2025.12.05 ~ 2026.2.24
-- 🍀 &nbsp; github: https://github.com/ka1dyn/ka1dyn-workspace
-- ✈️ &nbsp; service url: https://test.com
+- 🍀 &nbsp; github: <a href="https://github.com/ka1dyn/ka1dyn-workspace" target="_blank" rel="noopener noreferrer">github repo</a>
+- ✈️ &nbsp; service url: <a href="https://workspace.ka1dyn.com" target="_blank" rel="noopener noreferrer">ka1dyn-workspace</a>
 - ✅ &nbsp; 맡은 역할: 기획, 디자인, 프론트엔드 개발, 배포
 
 ## 프로젝트 배경
