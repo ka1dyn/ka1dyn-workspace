@@ -13,13 +13,6 @@
 
 대학 과정 중 그린 코드라는 주제에 맞게 JAVA 코드를 실행시켜 탄소배출량을 계산해주는 사이트를 제작했다. 해당 사이트를 사용하여 여러 그린화 패턴을 적용한 코드를 실행한 뒤, 적용 전후 탄소배출량의 차이를 직접 확인하며 보고서를 작성했다.
 
-## 프로젝트 구조
-
-Sequence diagram
-![](/content/images/sequence.png)
-
-![](/content/images/backend_diagram.png)
-
 
 ## 기술스택
 <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; min-height: 40px;">
@@ -53,18 +46,15 @@ Sequence diagram
 
 ## 프로젝트 기여
 
+### 📌 팀원 간 개발규칙 설정
+
 팀원 6명 중 비전공자 인원도 있었기에, 팀장으로서 프로젝트에서 소외되는 인원이 없도록
 팀원 간 소통에 집중했다.
 
-- Technique
-  - 백엔드 구조 설계, 개별 컨테이너 생성을 통한 코드 실행환경 분리 테스트
-  - Github action을 활용한 프론트엔드 배포 자동화
-  - Landing page 디자인 및 Framer motion을 사용한 애니메이션 구현
-  - Recoil과 React query를 사용한 간단한 API 사용
-  - 팀원 간 개발 환경을 맞추기 위한 백엔드 서버 도커라이징, 전 인원 로컬 테스트
-- Soft skills
-  - git flow 설정, issue나 pr 적극 사용
-  - notion, slack 등 소통을 위한 초기 세팅
+- 로컬 개발 환경을 맞추기 위한 백엔드 서버 도커라이징
+- prettier, lint, editor 설정 추가
+- git flow 설정, issue나 pr 사용
+- notion, slack 등 소통을 위한 초기 세팅
 
 git flow 도식화
 ![](/content/images/gitflow.png)
@@ -72,7 +62,7 @@ git flow 도식화
 <details>
   <summary>상세 git flow 확인하기</summary>
 
-  ### 기본 룰
+  **기본 룰**
   - 작업하기 전 이슈 남기기
   - merge 대신 rebase 사용하기 ( pr하기 전 현재까지 개발된 내용을 rebase해서 올리기)
   - 함께 협업하는 브랜치는 PR로 관리하기, 긴급한 bug fix만 직접 push
@@ -80,7 +70,8 @@ git flow 도식화
   - PR 머지 이후 브랜치 삭제하기
   - PR 내용은 자세히 적기
 
-  ### Git Flow
+  **Git Flow**
+
   주요 브랜치는 다음과 같다
 
   - main : 최종 개발된 내용
@@ -92,7 +83,7 @@ git flow 도식화
   - feature/[만들 내용] : 개별 기능 개발 브랜치
   - test/[테스트 내용]
 
-  ### 브랜치 머지 전략
+  **브랜치 머지 전략**
 
   main : 리뷰어 2명 필수, pr로 관리
 
@@ -110,9 +101,37 @@ git flow 도식화
   - git 명령어 치는게 뭔가 애매하면 꼭 로컬에 branch backup해두기 (잘못하면 그냥 날라감)
 </details>
 
-## 핵심 UI 설명
+### 📌 백엔드 구조 설계
 
-### Landing Page
+사용자가 입력하는 자바 코드를 시스템 상에서 실행할 때,
+보안을 강화하기 위해 도커 컨테이너를 활용해 사용자 환경을 분리하는 방식을 설계했다.
+
+![](/content/images/backend_diagram.png)
+
+### 📌 서비스 배포
+
+![](/content/images/ecode_deploy.png)
+
+- Github action을 활용한 프론트엔드 서버 배포 자동화
+    - aws cli를 통한 S3, Cloudfront 배포
+    - 현재 Vercel로 변경
+- Docker hub를 이용한 EC2 백엔드 서버 배포
+    - Production 환경을 위한 Dockerfile 작성
+    - SSL 설정
+    - NGINX 설정
+    - Route53 설정
+
+관련 블로그 글
+
+<a href="https://blog.ka1dyn.com/blog/Projects/Ecode/%EB%B0%B1%EC%97%94%EB%93%9C%20%EC%84%9C%EB%B2%84%20%EB%8F%84%EC%BB%A4%EB%9D%BC%EC%9D%B4%EC%A7%95,%20EC2%20%EB%B0%B0%ED%8F%AC%ED%95%98%EB%8A%94%20%EA%B3%BC%EC%A0%95%20%EA%B8%B0%EB%A1%9D" target="_blank" rel="noopener noreferrer">백엔드 서버 도커라이징, EC2 배포과정 정리</a>
+
+### 📌 Frontend UI, API 호출 구현
+
+- Landing Page 디자인
+- Framer motion을 사용한 애니메이션 구현
+- Recoil과 React query를 사용한 간단한 API 사용
+
+**Landing Page**
 <img src="/content/images/Ecode_UI.gif" style="width:100%;">
 
 적용한 애니메이션 종류
@@ -121,6 +140,7 @@ git flow 도식화
 - react-animated-numbers를 활용한 숫자변동 애니메이션
 - 스크롤 시 컴포넌트 view 감지를 통한 마운트 애니메이션
 
+**Calculate Page**
 <img src="/content/images/calculate.gif" style="width:100%;">
 
 - code mirror를 사용한 코드 에디터

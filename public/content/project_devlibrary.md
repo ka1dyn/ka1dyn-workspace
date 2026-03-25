@@ -57,7 +57,7 @@
 ## 핵심 기술 설명
 ---
 
-### 콘텐츠 보호를 위한 구조 설계 및 배포 자동화
+### 📌 콘텐츠 보호를 위한 구조 설계 및 배포 자동화
 
 ![alt text](/content/images/devlibrary_structure.png)
 
@@ -71,7 +71,7 @@
 - <a href="https://www.blog.ka1dyn.com/blog/Projects/Dev-library/git%20submodule%EC%9D%84%20%ED%99%9C%EC%9A%A9%ED%95%9C%20%EC%BD%98%ED%85%90%EC%B8%A0%20%EB%B6%84%EB%A6%AC" target="_blank" rel="noopener noreferrer">Submodule 도입 과정 정리</a>
 - <a href="https://www.blog.ka1dyn.com/blog/Projects/Dev-library/vercel%20private%20submodule%20%EB%B0%B0%ED%8F%AC%20%EC%8B%9C%20%EC%9D%B8%EC%A6%9D%EB%AC%B8%EC%A0%9C%20%ED%95%B4%EA%B2%B0%EB%B0%A9%EB%B2%95" target="_blank" rel="noopener noreferrer">vercel의 private submodule 배포 시 인증문제 해결과정</a>
 
-### 마크다운 렌더링 파이프라인 구축
+### 📌 마크다운 렌더링 파이프라인 구축
 
 페이지 렌더링 흐름
 1. obsidian의 플러그인을 활용한 frontmatter 템플릿 자동생성 및 글 작성
@@ -89,7 +89,7 @@
 <a href="https://www.blog.ka1dyn.com/blog/Projects/Dev-library/Next.js%EC%9D%98%20SSG%EB%A5%BC%20%ED%99%9C%EC%9A%A9%ED%95%9C%20%EB%A7%88%ED%81%AC%EB%8B%A4%EC%9A%B4%20%ED%8E%98%EC%9D%B4%EC%A7%80%20%EB%A0%8C%EB%8D%94%EB%A7%81%20%EC%9E%90%EB%8F%99%ED%99%94" target="_blank" rel="noopener noreferrer">Next.js의 SSG를 활용한 마크다운 페이지 렌더링</a>
 
 
-### 모바일 사용자의 UX를 위한 다양한 반응형 전략
+### 📌 모바일 사용자의 UX를 위한 다양한 반응형 전략
 
 - tailwindcss breakpoint의 폭넓은 사용
 - 커스텀 media query 훅을 사용한 코드 재사용
