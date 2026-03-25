@@ -65,7 +65,6 @@
     - 텍스처 아틀라스 및 압축
     - DPR(Device Pixel Ratio) 조절을 통한 해상도 낮추기
     - useFrame 로직 최대한 줄이기
-    - 그림자 해상도 조절
     - Screen raycasting을 occlude 방식으로 수정
 - 폰트 및 이미지 Preloading
     - 개발 환경에서는 괜찮았지만, 배포 이후 네트워크 차이로 인한 프레임 드랍과 이미지 로딩 지연 문제가 있어서 여러 preload 방식을 도입했다.
@@ -108,7 +107,7 @@
    - 배경음, 환경음
 
 3. Overlay
-    <img src="/content/images/overlay-1.gif" style="width:100%;">
+    <img src="/content/images/workspace_overlay.gif" style="width:100%;">
     왼쪽 상단에 시각효과와 사운드 옵션을 수정할 수 있는 버튼을 추가했다.
     빛의 색과 강도를 바꿀 수 있으며, 음량을 조절할 수 있다.
 
