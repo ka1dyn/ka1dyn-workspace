@@ -93,5 +93,44 @@
 
 - tailwindcss breakpoint의 폭넓은 사용
 - 커스텀 media query 훅을 사용한 코드 재사용
-- 반응형 콘텐츠 인디케이터 UI 구현
+- 반응형 페이지 인디케이터 UI 구현
 
+## 핵심 UI 설명
+
+1. Hero page
+    <img src="/content/images/library_heropage.gif" style="width:100%;">
+
+    적용한 애니메이션
+    - 마우스 트래킹, glow 애니메이션
+    - 타이핑 애니메이션
+    - 버튼 마운트 애니메이션
+
+2. Side Nav
+    <img src="/content/images/library_nav.gif" style="width:100%;">
+
+    - 모바일 화면 overlay 추가
+    - 폴더 트리 구조 ui
+    - 펼치기 / 접기 기능
+    - 버튼 hover 애니메이션
+
+3. Posts Page
+    <img src="/content/images/library_posts.gif" style="width:100%;">
+
+    - 카드 마운트 애니메이션
+    - URL기반 모음집, 카테고리 필터링
+    - 페이지 인디케이터 UI
+
+4. Content Page
+    <img src="/content/images/library_toc.gif" style="width:100%;">
+
+    - 태그 기반 목차, Side TOC 자동생성
+    - 스크롤 위치 기반 목차 하이라이트 적용
+    - 클릭 시 section 스크롤 이동
+
+## 느낀점
+
+배포 환경에서 환경변수를 관리할 때 항상 github나 vercel에 변수를 등록해서
+사용했었는데, 이번 기회에 private repository로 쉽게 관리하는 방법도 알게 되어 좋았다.
+
+성급히 데스크탑 기반 UI를 만들고 추후 모바일을 대응하려니 수정이 어려웠다. 역시
+모바일 화면을 기준으로 해서 디자인 및 구현하는 방식이 좋다고 느꼈다.
