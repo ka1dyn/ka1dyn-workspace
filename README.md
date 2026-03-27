@@ -52,6 +52,12 @@
 
 단일 페이지(Single Page) 기반의 UI 기능이 핵심인 프로젝트 특성을 고려하여 React를 개발 프레임워크로 채택했다. 또한, React 생태계와 높은 호환성을 가진 React Three Fiber(R3F)를 활용하여, 순수 Three.js 대비 효율적인 방식으로 3D Scene을 구축했다.
 
+## Test
+```
+$ npm install
+$ npm run dev
+```
+
 ## 핵심 기술 설명
 
 - FPS 최적화
