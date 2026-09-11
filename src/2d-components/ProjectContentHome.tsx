@@ -30,7 +30,7 @@ export default function ProjectContentHome({ name }: { name: string }) {
         >
           <div className="flex flex-col gap-4">
             <span className="text-muted-foreground">
-              JAVA 코드 탄소배출량 측정
+              입력된 Java code의 carbon footprint를 보여주는 웹사이트
             </span>
           </div>
         </Card>

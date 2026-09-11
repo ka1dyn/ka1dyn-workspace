@@ -3,8 +3,15 @@ import Home from "@/2d-components/Home";
 import { useCameraInit, useOverlay, useReady, useTweaks } from "@/stores";
 import { OverlayTypes } from "@/types/enums";
 import { Html } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
+import {
+  ASPECT_EPSILON,
+  SCREEN_DISTANCE_FACTOR,
+  SCREEN_PX,
+  SCREEN_WORLD,
+} from "@/constants/camera";
+import { fitDistance } from "@/utils/cameraFit";
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
 
@@ -23,9 +30,25 @@ export default function Screen({ ...props }: screenProps) {
   const dive = useTweaks((state) => state.dive);
   const type = useOverlay((state) => state.type);
 
-  // Get World position
+  const { size } = useThree();
+  const lastAspect = useRef(0);
+
+  // Place the camera on the screen's normal, far enough back that the monitor
+  // fills SCREEN_FILL of the frame. Distance rather than FOV does the fitting,
+  // so the room behind the monitor keeps a natural perspective on every aspect.
   useEffect(() => {
-    // Init camera target position
+    const aspect = size.width / size.height;
+
+    // Hysteresis: the mobile URL bar sliding in and out fires a resize on every
+    // scroll. Without this the camera breathes.
+    if (
+      lastAspect.current &&
+      Math.abs(aspect - lastAspect.current) < ASPECT_EPSILON
+    ) {
+      return;
+    }
+    lastAspect.current = aspect;
+
     const worldPosition = new THREE.Vector3();
 
     groupRef.current.updateWorldMatrix(true, false);
@@ -37,17 +60,24 @@ export default function Screen({ ...props }: screenProps) {
       z: worldPosition.z,
     });
 
-    // Init camera position
     const direction = new THREE.Vector3();
     groupRef.current.getWorldDirection(direction);
-    const cameraPos = worldPosition.add(direction.multiplyScalar(0.38));
+
+    const distance = fitDistance(
+      SCREEN_WORLD.w / 2,
+      SCREEN_WORLD.h / 2,
+      aspect,
+    );
+    const cameraPos = worldPosition
+      .clone()
+      .addScaledVector(direction, distance);
 
     setCameraPos({
       x: cameraPos.x,
       y: cameraPos.y,
       z: cameraPos.z,
     });
-  }, [groupRef]);
+  }, [groupRef, size.width, size.height, setTarget, setCameraPos]);
 
   const worldPosition = new THREE.Vector3();
   const screenVec = new THREE.Vector3();
@@ -91,7 +121,8 @@ export default function Screen({ ...props }: screenProps) {
     <group ref={groupRef} {...props}>
       {/* <axesHelper /> */}
       <Html
-        className={`w-640 h-425 overflow-hidden ${!dive && "rounded-4xl"} ${type !== OverlayTypes.SCREEN && "select-none"}`}
+        className={`overflow-hidden ${!dive && "rounded-4xl"} ${type !== OverlayTypes.SCREEN && "select-none"}`}
+        style={dive ? undefined : { width: SCREEN_PX.w, height: SCREEN_PX.h }}
         pointerEvents={type === OverlayTypes.SCREEN ? "auto" : "none"}
         {...(dive
           ? {
@@ -99,7 +130,7 @@ export default function Screen({ ...props }: screenProps) {
             }
           : {
               transform: true,
-              distanceFactor: 0.069,
+              distanceFactor: SCREEN_DISTANCE_FACTOR,
               occlude: "blending",
             })}
       >

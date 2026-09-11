@@ -3,6 +3,9 @@ import { GsapEase, OverlayTypes } from "@/types/enums";
 import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 import gsap from "gsap";
+import type * as THREE from "three";
+import { BASE_FOV } from "@/constants/camera";
+import { overviewFov } from "@/utils/cameraFit";
 
 export default function useCameraAnim() {
   const { cameraRef, controlRef } = useCameraInit(
@@ -28,6 +31,32 @@ export default function useCameraAnim() {
       pos: state.pos,
     })),
   );
+
+  /**
+   * Tween the vertical FOV alongside the pose move. The two poses want opposite
+   * things -- the overview needs a wide angle to keep the room in frame on a
+   * narrow viewport, the screen close-up needs a tight one so the room behind
+   * the monitor doesn't stretch -- so the lens travels with the camera instead
+   * of snapping at the cut.
+   */
+  const tweenFov = (
+    tl: gsap.core.Timeline,
+    camera: THREE.PerspectiveCamera,
+    fov: number,
+    duration: number,
+    ease: GsapEase,
+  ) => {
+    tl.to(
+      camera,
+      {
+        fov,
+        duration,
+        ease,
+        onUpdate: () => camera.updateProjectionMatrix(),
+      },
+      0,
+    );
+  };
 
   const startAnimation = useCallback(() => {
     const camera = cameraRef?.current;
@@ -71,6 +100,7 @@ export default function useCameraAnim() {
       },
       0,
     );
+    tweenFov(tl, camera, overviewFov(camera.aspect), 4, GsapEase.POWER4_INOUT);
   }, [cameraRef, controlRef]);
 
   const screenAnimation = useCallback(() => {
@@ -113,6 +143,7 @@ export default function useCameraAnim() {
       },
       0,
     );
+    tweenFov(tl, camera, BASE_FOV, 2, GsapEase.POWER2_INOUT);
   }, [target, pos, cameraRef, controlRef]);
 
   const backAnimation = useCallback(() => {
@@ -155,6 +186,7 @@ export default function useCameraAnim() {
       },
       0,
     );
+    tweenFov(tl, camera, overviewFov(camera.aspect), 2.5, GsapEase.POWER3_INOUT);
   }, [cameraRef, controlRef]);
 
   return { startAnimation, screenAnimation, backAnimation };
