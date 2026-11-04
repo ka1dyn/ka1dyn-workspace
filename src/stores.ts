@@ -9,6 +9,7 @@ import {
   type TweaksType,
   type SoundVolType,
   type ModalStore,
+  type ModalViewStore,
   type BgImageStore,
 } from "./types/types";
 import { OverlayTypes } from "./types/enums";
@@ -119,13 +120,49 @@ export const useSoundVol = create<SoundVolType>((set) => ({
   },
 }));
 
+export const useModalViewStore = create<ModalViewStore>()(
+  immer(
+    devtools((set) => ({
+      rects: {},
+      scrolls: {},
+
+      setRect: (name, rect) =>
+        set(
+          (state) => {
+            state.rects[name] = { ...state.rects[name], ...rect };
+          },
+          undefined,
+          "view/rect",
+        ),
+
+      setScroll: (name, top) =>
+        set(
+          (state) => {
+            state.scrolls[name] = top;
+          },
+          undefined,
+          "view/scroll",
+        ),
+
+      clear: (name) =>
+        set(
+          (state) => {
+            delete state.rects[name];
+            delete state.scrolls[name];
+          },
+          undefined,
+          "view/clear",
+        ),
+    })),
+  ),
+);
+
 export const useModalStore = create<ModalStore>()(
   immer(
-    devtools((set, get) => ({
+    devtools((set) => ({
       zStack: 10,
       count: 0,
       modals: {},
-      backupFns: {},
 
       bringToFront: (name) => {
         set(
@@ -141,14 +178,14 @@ export const useModalStore = create<ModalStore>()(
       },
 
       openModal: (name, x, y) => {
+        useModalViewStore
+          .getState()
+          .setRect(name, { x, y, width: 1400, height: 1100 });
+
         set(
           (state) => {
             state.modals[name] = {
               name,
-              x,
-              y,
-              width: 1400,
-              height: 1100,
               isDown: false,
               isClosing: false,
               zIndex: 10,
@@ -173,16 +210,18 @@ export const useModalStore = create<ModalStore>()(
           "modal/close-start",
         ),
 
-      closeModalComplete: (name) =>
+      closeModalComplete: (name) => {
         set(
           (state) => {
             state.count -= 1;
             delete state.modals[name];
-            delete state.backupFns[name];
           },
           undefined,
           "modal/close-complete",
-        ),
+        );
+
+        useModalViewStore.getState().clear(name);
+      },
 
       downupModal: (name, newState) =>
         set(
@@ -196,17 +235,11 @@ export const useModalStore = create<ModalStore>()(
           "modal/down",
         ),
 
-      expandModal: (name, backupPos) =>
+      expandModal: (name) =>
         set(
           (state) => {
             if (!state.modals[name]) return;
-            const { x, y, width, height } = backupPos;
-
             state.modals[name].isFull = true;
-            state.modals[name].x = x;
-            state.modals[name].y = y;
-            state.modals[name].width = width;
-            state.modals[name].height = height;
           },
           undefined,
           "modal/expand",
@@ -224,6 +257,9 @@ export const useModalStore = create<ModalStore>()(
       },
 
       setContentPath: (name, newPath) => {
+        // New content -> scroll top
+        useModalViewStore.getState().setScroll(name, 0);
+
         set(
           (state) => {
             if (!state.modals[name]) return;
@@ -232,34 +268,6 @@ export const useModalStore = create<ModalStore>()(
           undefined,
           "modal/changePath",
         );
-      },
-
-      // Backup state from external input
-      registerBackup: (name, backupFn) =>
-        set(
-          (state) => {
-            state.backupFns[name] = backupFn;
-          },
-          undefined,
-          "modal/register-backup",
-        ),
-
-      saveModalState: async (name, curState) =>
-        set(
-          (state) => {
-            state.modals[name] = {
-              ...state.modals[name],
-              ...curState,
-            };
-          },
-          undefined,
-          "modal/save",
-        ),
-
-      backupAll: async () => {
-        const { backupFns } = get();
-        const backupPromises = Object.values(backupFns).map((fn) => fn());
-        await Promise.all(backupPromises);
       },
     })),
   ),

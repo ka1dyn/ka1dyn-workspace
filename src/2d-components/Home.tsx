@@ -1,6 +1,5 @@
 import {
   useBgImageStore,
-  useModalStore,
   useOverlay,
   useTweaks,
 } from "@/stores";
@@ -27,11 +26,8 @@ export default function Home() {
   const dive = useTweaks((state) => state.dive);
   usePreloadImage([PUBLIC_IMAGES.BIKE, PUBLIC_IMAGES.CITY]);
 
-  const exitClick = async () => {
+  const exitClick = () => {
     setActive(true);
-
-    await useModalStore.getState().backupAll();
-
     setDive(false);
     setAudioActive(audioPrev);
   };

@@ -1,4 +1,4 @@
-import { useModalStore, useOverlay, useTweaks } from "@/stores";
+import { useOverlay, useTweaks } from "@/stores";
 import { OverlayTypes } from "@/types/enums";
 import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
@@ -60,11 +60,8 @@ function ScreenOverlay({ backClick }: ScreenOverlayProps) {
   );
   const setActive = useOverlay((state) => state.setActive);
 
-  const diveClick = async () => {
+  const diveClick = () => {
     setActive(false);
-
-    await useModalStore.getState().backupAll();
-
     setDive(true);
     setAudioPrev(audioActive);
     setAudioActive(false);

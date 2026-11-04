@@ -5,45 +5,75 @@ import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
 import ExpandIcon from "@/icons/expand.svg?react";
 import CollapseIcon from "@/icons/collapse.svg?react";
-import { useModalStore, useTweaks } from "@/stores";
-import MDViewer from "./MDViewer";
+import { useModalStore, useModalViewStore, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import NavContent from "./NavContent";
-import ProjectContentHome from "./ProjectContentHome";
 import MDContent from "./MDContent";
+import type { ModalPos } from "@/types/types";
 
 interface InfoModalProps {
   className?: string;
   name: string;
-  style: Object;
   navActive?: boolean;
 }
 
 export default function InfoModal({
   className = "",
   name,
-  style,
   navActive = true,
 }: InfoModalProps) {
+  const modalState = useModalStore((state) => state.modals[name]);
+  const zIndex = modalState.zIndex;
   const {
-    zIndex,
-    modalState,
     bringToFront,
     closeModalStart,
     downupModal,
     expandModal,
     collapseModal,
-    saveModalState,
-    registerBackup,
   } = useModalStore(
     useShallow((state) => ({
-      ...state,
-      zIndex: state.modals[name].zIndex,
-      modalState: state.modals[name],
+      bringToFront: state.bringToFront,
+      closeModalStart: state.closeModalStart,
+      downupModal: state.downupModal,
+      expandModal: state.expandModal,
+      collapseModal: state.collapseModal,
     })),
   );
   const modalRef = useRef<HTMLDivElement>(null!);
   const dive = useTweaks((state) => state.dive);
+
+  // Not subscribe, just read (always same with DOM)
+  const rect = useModalViewStore.getState().rects[name];
+  const style = modalState.isFull
+    ? {
+        top: "64px",
+        left: "0px",
+        width: "100%",
+        height: "calc(100% - 64px)",
+        zIndex,
+      }
+    : {
+        top: rect.y,
+        left: rect.x,
+        width: rect.width,
+        height: rect.height,
+        zIndex,
+      };
+
+  // Update DOM + store together, no rerender
+  const applyRect = (next: Partial<ModalPos>) => {
+    const modalDiv = modalRef.current;
+    if (!modalDiv) return;
+
+    if (next.x !== undefined) modalDiv.style.left = `${next.x}px`;
+    if (next.y !== undefined) modalDiv.style.top = `${next.y}px`;
+    if (next.width !== undefined) modalDiv.style.width = `${next.width}px`;
+    if (next.height !== undefined) modalDiv.style.height = `${next.height}px`;
+
+    // Keep rect before expand
+    if (useModalStore.getState().modals[name]?.isFull) return;
+    useModalViewStore.getState().setRect(name, next);
+  };
 
   useLayoutEffect(() => {
     const modalDiv = modalRef.current;
@@ -72,8 +102,7 @@ export default function InfoModal({
       const newWidth = modalDiv.offsetWidth / properScale;
       const newHeight = modalDiv.offsetHeight / properScale;
 
-      modalDiv.style.width = `${newWidth}px`;
-      modalDiv.style.height = `${newHeight}px`;
+      applyRect({ width: newWidth, height: newHeight });
     } else {
       // Position setting
       let newTop = parseInt(modalDiv.style.top);
@@ -91,9 +120,6 @@ export default function InfoModal({
       newLeft = Math.max(minLeft, newLeft);
       newLeft = Math.min(maxLeft, newLeft);
 
-      modalDiv.style.top = `${newTop}px`;
-      modalDiv.style.left = `${newLeft}px`;
-
       // Size setting
       let newWidth = modalDiv.offsetWidth;
       let newHeight = modalDiv.offsetHeight;
@@ -108,32 +134,13 @@ export default function InfoModal({
       newHeight = Math.max(minHeight, newHeight);
       newHeight = Math.min(newHeight, maxHeight);
 
-      modalRef.current.style.width = `${newWidth}px`;
-      modalRef.current.style.height = `${newHeight}px`;
+      applyRect({ x: newLeft, y: newTop, width: newWidth, height: newHeight });
     }
-  }, [style]);
+  }, [modalState.isFull, dive]);
 
   useEffect(() => {
     const modalDiv = modalRef.current;
     if (!modalDiv || !modalState) return;
-
-    const backupModal = async () => {
-      const curModalState = useModalStore.getState().modals[name];
-
-      await saveModalState(name, {
-        ...curModalState,
-        ...(!curModalState.isFull && {
-          x: parseFloat(modalDiv.style.left) || modalDiv.offsetLeft,
-          y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
-          width: modalDiv.offsetWidth,
-          height: modalDiv.offsetHeight,
-        }),
-
-        zIndex: parseInt(modalDiv.style.zIndex),
-      });
-    };
-
-    registerBackup(name, backupModal);
 
     const resizeModalBoundary = () => {
       const modalContainer = document.getElementById("modals");
@@ -145,18 +152,19 @@ export default function InfoModal({
       const screenWidth = modalContainer?.offsetWidth as number;
       const screenHeight = modalContainer?.offsetHeight as number;
 
-      if (offsetLeft > screenWidth)
-        modalDiv.style.left = `${screenWidth - 50}px`;
-      if (offsetTop > screenHeight)
-        modalDiv.style.top = `${screenHeight - 30}px`;
+      if (offsetLeft > screenWidth) applyRect({ x: screenWidth - 50 });
+      if (offsetTop > screenHeight) applyRect({ y: screenHeight - 30 });
     };
 
     window.addEventListener("resize", resizeModalBoundary);
+    const cleanup = () => {
+      window.removeEventListener("resize", resizeModalBoundary);
+    };
 
     // Init state, if isDown is false -> animating
     if (modalState.isDown) {
       modalDiv.style.transform = `scale(0)`;
-      return;
+      return cleanup;
     }
 
     // Folder center
@@ -170,9 +178,7 @@ export default function InfoModal({
 
     moveFromTarget(folderDiv);
 
-    return () => {
-      window.removeEventListener("resize", resizeModalBoundary);
-    };
+    return cleanup;
   }, []);
 
   useEffect(() => {
@@ -341,8 +347,7 @@ export default function InfoModal({
       newLeft = Math.max(minLeft, newLeft);
       newLeft = Math.min(maxLeft, newLeft);
 
-      modalDiv.style.left = `${newLeft}px`;
-      modalDiv.style.top = `${newTop}px`;
+      applyRect({ x: newLeft, y: newTop });
     };
 
     const onMouseUp = () => {
@@ -389,8 +394,7 @@ export default function InfoModal({
       newHeight = Math.max(minHeight, newHeight);
       newHeight = Math.min(newHeight, maxHeight);
 
-      modalRef.current.style.width = `${newWidth}px`;
-      modalRef.current.style.height = `${newHeight}px`;
+      applyRect({ width: newWidth, height: newHeight });
     };
 
     const onMouseUp = () => {
@@ -403,20 +407,10 @@ export default function InfoModal({
   };
 
   const expandClick = () => {
-    const modalDiv = modalRef.current;
-    if (!modalDiv || !modalState) return;
-
-    const { isFull } = modalState;
-
-    if (isFull) {
+    if (modalState.isFull) {
       collapseModal(name);
     } else {
-      expandModal(name, {
-        x: parseFloat(modalDiv.style.left) || modalDiv.offsetLeft,
-        y: parseFloat(modalDiv.style.top) || modalDiv.offsetTop,
-        width: modalDiv.offsetWidth,
-        height: modalDiv.offsetHeight,
-      });
+      expandModal(name);
     }
   };
 
