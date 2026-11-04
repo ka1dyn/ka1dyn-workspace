@@ -59,16 +59,32 @@ export default function CameraControl() {
     })),
   );
 
-  // Screen.tsx re-derives `pos` whenever the aspect changes, so a rotation while
-  // already zoomed in has to be followed. Entering the pose is screenAnimation's
-  // job, so skip the run where `pos` is unchanged and only the type flipped.
+  // Camera position is owned imperatively too -- do NOT pass a `position` prop
+  // to <PerspectiveCamera>. Screen.tsx re-derives `pos` on every resize, and a
+  // prop would teleport the camera to the close-up pose even while in the
+  // overview or mid-tween.
+  //
+  // - NONE (boot): the camera is parked at the close-up, so follow `pos`
+  //   directly, unless startAnimation is already moving it.
+  // - SCREEN: ease to the re-fitted distance. Skip the run where only the type
+  //   flipped; entering the pose is screenAnimation's job.
+  // - DEFAULT: `pos` is irrelevant to the overview pose, leave the camera alone.
   const posRef = useRef(pos);
   useEffect(() => {
     const camera = localCameraRef.current;
     const prev = posRef.current;
     posRef.current = pos;
 
-    if (!camera || type !== OverlayTypes.SCREEN || prev === pos) return;
+    if (!camera) return;
+
+    if (type === OverlayTypes.NONE) {
+      if (!gsap.isTweening(camera.position)) {
+        camera.position.set(pos.x, pos.y, pos.z);
+      }
+      return;
+    }
+
+    if (type !== OverlayTypes.SCREEN || prev === pos) return;
 
     gsap.to(camera.position, {
       x: pos.x,
@@ -103,7 +119,6 @@ export default function CameraControl() {
         ref={localCameraRef}
         near={0.01}
         far={50}
-        position={[pos.x, pos.y, pos.z]}
         makeDefault
       />
     </>
