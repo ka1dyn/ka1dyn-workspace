@@ -9,10 +9,20 @@ import Helpers from "./Helpers";
 import FrameDetector from "./FrameDetector";
 import { useOverlay, useReady } from "@/stores";
 import StartAnimaion from "./StartAnimaion";
+import { Post } from "./Post";
+import { useLab } from "@/lab/store";
 
 export default function Scene() {
   const frameReady = useReady((state) => state.frameReady);
   const lowDpr = useOverlay((state) => state.lowDpr);
+  const labDpr = useLab((state) => state.dpr);
+  const labPost = useLab((state) => state.post);
+  const dpr =
+    labDpr !== "default"
+      ? labDpr
+      : lowDpr
+        ? 0.6
+        : ([1, 1.5] as [number, number]);
 
   useEffect(() => {
     if (!frameReady) return;
@@ -23,7 +33,7 @@ export default function Scene() {
 
   return (
     <Canvas
-      dpr={lowDpr ? 0.6 : [1, 1.5]}
+      dpr={dpr}
       gl={{
         powerPreference: "high-performance",
         alpha: false,
@@ -47,6 +57,7 @@ export default function Scene() {
           {!frameReady && <FrameDetector />}
 
           {/* <Post /> */}
+          {labPost && <Post />}
         </Suspense>
       </AudioProvider>
       {/* <Helpers /> */}
