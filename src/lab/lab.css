@@ -1,0 +1,12 @@
+/*
+ * drei StatsGl은 stats-gl의 인라인 스타일(position: fixed)을 항상 지운다.
+ * 그대로 두면 body 끝에 일반 블록으로 쌓여 페이지 스크롤이 생기므로 직접 고정한다.
+ */
+.lab-statsgl {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 10000003;
+  display: flex;
+  pointer-events: none;
+}
