@@ -39,6 +39,7 @@ const f = (x: number | null | undefined, d = 2) =>
 export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
   // eslint는 훅이 돌려준 값의 수정을 막지만, renderer 설정을 바꾸는 것이 이 컴포넌트의 목적이다.
   const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
     const ctx = gl.getContext() as WebGL2RenderingContext;
@@ -56,12 +57,22 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       t: number;
       interval: number;
       cpu: number;
+      render: number;
     };
     let samples: Sample[] = [];
     let gpu: { t: number; ms: number }[] = [];
     let lastStart = 0;
     let frameStart = 0;
+    let renderStart = 0; // 이 프레임에서 renderer.render가 처음 시작된 시각
     let info = { calls: 0, triangles: 0 };
+
+    // renderer.render가 시작되는 시점을 표시한다. CPU 시간을 useFrame 구간과 렌더 제출 구간으로 나누기 위함.
+    // three는 render() 초반에 scene.onBeforeRender를 부른다.
+    const prevSceneBefore = scene.onBeforeRender;
+    scene.onBeforeRender = function (...args) {
+      if (!renderStart) renderStart = performance.now();
+      return prevSceneBefore.apply(this, args);
+    };
 
     // ---- GPU 타이머 쿼리 (결과는 몇 프레임 뒤에 나오므로 대기열로 관리) ----
     let active: WebGLQuery | null = null;
@@ -83,11 +94,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
 
     const unsubBefore = addEffect((now) => {
       frameStart = performance.now();
+      renderStart = 0;
       if (lastStart) {
         samples.push({
           t: now,
           interval: now - lastStart,
           cpu: NaN,
+          render: NaN,
         });
       }
       lastStart = now;
@@ -115,6 +128,7 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       if (last) {
         const end = performance.now();
         last.cpu = end - frameStart;
+        if (renderStart) last.render = end - renderStart;
       }
       info = {
         calls: gl.info.render.calls,
@@ -158,7 +172,15 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
 
       const intervals = samples.map((s) => s.interval);
       const cpus = samples.map((s) => s.cpu).filter((x) => !Number.isNaN(x));
+      const renders = samples
+        .map((s) => s.render)
+        .filter((x) => !Number.isNaN(x));
+      const useFrames = samples
+        .filter((s) => !Number.isNaN(s.cpu) && !Number.isNaN(s.render))
+        .map((s) => s.cpu - s.render);
       const gpus = gpu.map((s) => s.ms);
+      const mean = (xs: number[]) =>
+        xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN;
       const fps = samples.length / (WINDOW_MS / 1000);
       const gpuMed = median(gpus);
 
@@ -175,9 +197,10 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
         `FPS          ${f(fps, 0)}`,
         `프레임 간격  ${f(median(intervals))} ms   p95 ${f(pct(intervals, 0.95))}`,
         `CPU          ${f(median(cpus))} ms   p95 ${f(pct(cpus, 0.95))}`,
+        `  useFrame   ${f(median(useFrames))} ms   렌더 제출 ${f(median(renders))} ms`,
         !ext
           ? `GPU          ${gpuTimer ? "미지원" : "끔 (다른 도구가 타이머 사용 중)"}`
-          : `GPU          ${f(gpuMed)} ms   p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
+          : `GPU          ${f(gpuMed)} ms   평균 ${f(mean(gpus))}   p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
         ``,
         `드로우콜     ${info.calls}`,
         `삼각형       ${info.triangles.toLocaleString()}`,
@@ -205,10 +228,11 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       es.close();
       hud.remove();
       gl.info.autoReset = prevAutoReset;
+      scene.onBeforeRender = prevSceneBefore;
       if (active && ext) ctx.endQuery(ext.TIME_ELAPSED_EXT);
       pending.forEach(({ q }) => ctx.deleteQuery(q));
     };
-  }, [gl, gpuTimer]);
+  }, [gl, scene, gpuTimer]);
 
   return null;
 }
