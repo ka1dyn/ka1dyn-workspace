@@ -5,7 +5,17 @@ import { useEffect } from "react";
 // 시간을 재고, 그 사이에 나간 GPU 명령 전체를 타이머 쿼리 하나로 감싼다.
 // 화면 갱신은 0.5초마다 DOM에 직접 써서 React 렌더 비용을 측정에 섞지 않는다.
 
+const POWER_URL = "http://127.0.0.1:7071/power";
 const WINDOW_MS = 1000;
+
+interface Power {
+  mhz: number; // GPU 활성 시간 가중 평균 클럭
+  gpuMw: number;
+  cpuMw: number | null;
+  active: number; // GPU 활성 비율 0~1
+  thermal: string;
+  t: number;
+}
 
 interface TimerExt {
   TIME_ELAPSED_EXT: number;
@@ -111,6 +121,17 @@ export default function LabProbe() {
       };
     });
 
+    // ---- 전력 브리지 (터미널의 powermetrics 값을 SSE로 받음) ----
+    let power: Power | null = null;
+    const es = new EventSource(POWER_URL);
+    es.onmessage = (e) => {
+      try {
+        power = JSON.parse(e.data);
+      } catch {
+        /* ignore */
+      }
+    };
+
     // ---- HUD ----
     const hud = document.createElement("pre");
     hud.style.cssText = [
@@ -142,6 +163,9 @@ export default function LabProbe() {
 
       const canvas = gl.domElement;
       const mp = (canvas.width * canvas.height) / 1e6;
+      const powerAge = power ? (Date.now() - power.t) / 1000 : Infinity;
+      const p = powerAge < 3 ? power : null;
+      const cycles = p && !Number.isNaN(gpuMed) ? (gpuMed * p.mhz) / 1000 : NaN;
 
       hud.textContent = [
         `FPS          ${f(fps, 0)}`,
@@ -156,6 +180,16 @@ export default function LabProbe() {
         `프로그램     ${gl.info.programs?.length ?? "–"}`,
         `텍스처       ${gl.info.memory.textures}   지오메트리 ${gl.info.memory.geometries}`,
         `해상도       ${canvas.width}×${canvas.height} (${f(mp)} MP, DPR ${f(gl.getPixelRatio(), 2)})`,
+        ``,
+        p
+          ? [
+              `GPU 클럭     ${f(p.mhz, 0)} MHz   활성 ${f(p.active * 100, 0)}%`,
+              `GPU 전력     ${f(p.gpuMw, 0)} mW`,
+              `CPU 전력     ${p.cpuMw == null ? "–" : f(p.cpuMw, 0)} mW`,
+              `GPU 사이클   ${f(cycles)} M/프레임`,
+              `열 상태      ${p.thermal}`,
+            ].join("\n")
+          : `전력 브리지  연결 안 됨 (README의 power-bridge 참고)`,
       ].join("\n");
     }, 500);
 
@@ -163,6 +197,7 @@ export default function LabProbe() {
       unsubBefore();
       unsubAfter();
       window.clearInterval(timer);
+      es.close();
       hud.remove();
       gl.info.autoReset = prevAutoReset;
       if (active && ext) ctx.endQuery(ext.TIME_ELAPSED_EXT);
