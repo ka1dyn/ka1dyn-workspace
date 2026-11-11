@@ -15,21 +15,47 @@ interface Entry {
   parts: Map<string, number>; // (면·밉맵 단계) → 바이트
   rt: boolean; // 프레임버퍼에 붙은 적이 있으면 렌더 타깃으로 분류
 }
+// WebGL 객체를 Map 키로 직접 잡으면 추적기 때문에 객체가 GC되지 못한다(= 추적기가 누수를 만든다).
+// 그래서 객체 → 번호는 WeakMap으로만 잇고, 객체가 GC되면 FinalizationRegistry로 항목을 지운다.
+// 브라우저는 dispose 없이 버려진 WebGL 객체도 GC 시점에 GPU에서 해제한다.
 interface Tracker {
-  entries: Map<object, Entry>;
+  entries: Map<number, Entry>;
+  ids: WeakMap<object, number>;
   unknownFormat: boolean;
 }
+let nextId = 1;
+const collected = new FinalizationRegistry<{ t: Tracker; id: number }>(
+  ({ t, id }) => {
+    t.entries.delete(id);
+  },
+);
 
 const trackers = new WeakMap<WebGL2RenderingContext, Tracker>();
 const trackerOf = (gl: WebGL2RenderingContext) => {
   let t = trackers.get(gl);
-  if (!t) trackers.set(gl, (t = { entries: new Map(), unknownFormat: false }));
+  if (!t)
+    trackers.set(
+      gl,
+      (t = { entries: new Map(), ids: new WeakMap(), unknownFormat: false }),
+    );
   return t;
 };
 const entryOf = (t: Tracker, obj: object, kind: Kind) => {
-  let e = t.entries.get(obj);
-  if (!e) t.entries.set(obj, (e = { kind, parts: new Map(), rt: false }));
+  let id = t.ids.get(obj);
+  if (id == null) {
+    id = nextId++;
+    t.ids.set(obj, id);
+    collected.register(obj, { t, id }, obj);
+  }
+  let e = t.entries.get(id);
+  if (!e) t.entries.set(id, (e = { kind, parts: new Map(), rt: false }));
   return e;
+};
+const forget = (t: Tracker, obj: object | null) => {
+  const id = obj && t.ids.get(obj);
+  if (id == null || !obj) return;
+  t.entries.delete(id);
+  collected.unregister(obj);
 };
 
 // ---- 포맷별 픽셀당 바이트 ----
@@ -252,12 +278,13 @@ function install() {
   // 가변 저장소에서 밉맵을 만들면 0단계의 약 1/3이 더 든다 (1 + 1/4 + 1/16 + … ≈ 4/3)
   wrap("generateMipmap", (gl, t, [target]) => {
     const tex = boundTexture(gl, target);
-    const e = tex && t.entries.get(tex);
+    const id = tex && t.ids.get(tex);
+    const e = id != null ? t.entries.get(id) : undefined;
     if (!e || e.parts.has("storage")) return;
     for (const [k, v] of [...e.parts])
       if (k.endsWith(":0")) e.parts.set(k.replace(/:0$/, ":mips"), v / 3);
   });
-  wrap("deleteTexture", (_gl, t, [tex]) => tex && t.entries.delete(tex));
+  wrap("deleteTexture", (_gl, t, [tex]) => forget(t, tex));
 
   // 프레임버퍼에 붙는 텍스처 = 렌더 타깃 (후처리 버퍼, 그림자 맵, PMREM 등)
   wrap("framebufferTexture2D", (_gl, t, [, , , tex]) => {
@@ -288,7 +315,7 @@ function install() {
   wrap("renderbufferStorageMultisample", (gl, t, [, samples, ifmt, w0, h0]) =>
     rbStore(gl, t, samples, ifmt, w0, h0),
   );
-  wrap("deleteRenderbuffer", (_gl, t, [rb]) => rb && t.entries.delete(rb));
+  wrap("deleteRenderbuffer", (_gl, t, [rb]) => forget(t, rb));
 
   // 정점·인덱스·유니폼 버퍼
   wrap("bufferData", (gl, t, [target, src, , srcOffset, length]) => {
@@ -303,7 +330,7 @@ function install() {
       bytes = src.byteLength - (srcOffset ?? 0) * (src.BYTES_PER_ELEMENT ?? 1);
     entryOf(t, buf, "buffer").parts = new Map([["s", bytes]]);
   });
-  wrap("deleteBuffer", (_gl, t, [buf]) => buf && t.entries.delete(buf));
+  wrap("deleteBuffer", (_gl, t, [buf]) => forget(t, buf));
 }
 
 if (IS_LAB) install();
