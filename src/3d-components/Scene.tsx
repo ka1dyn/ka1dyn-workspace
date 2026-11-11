@@ -10,7 +10,8 @@ import FrameDetector from "./FrameDetector";
 import { useOverlay, useReady } from "@/stores";
 import StartAnimaion from "./StartAnimaion";
 import { Post } from "./Post";
-import { useLab } from "@/lab/store";
+import { IS_LAB, useLab } from "@/lab/store";
+import LabProbe from "@/lab/LabProbe";
 
 export default function Scene() {
   const frameReady = useReady((state) => state.frameReady);
@@ -61,6 +62,7 @@ export default function Scene() {
         </Suspense>
       </AudioProvider>
       {/* <Helpers /> */}
+      {IS_LAB && <LabProbe />}
     </Canvas>
   );
 }

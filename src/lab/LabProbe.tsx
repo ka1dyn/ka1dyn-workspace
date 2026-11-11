@@ -1,0 +1,174 @@
+import { addAfterEffect, addEffect, useThree } from "@react-three/fiber";
+import { useEffect } from "react";
+
+// 매 프레임 R3F 루프의 앞(addEffect, 모든 useFrame 이전)과 뒤(addAfterEffect, 렌더 이후)에서
+// 시간을 재고, 그 사이에 나간 GPU 명령 전체를 타이머 쿼리 하나로 감싼다.
+// 화면 갱신은 0.5초마다 DOM에 직접 써서 React 렌더 비용을 측정에 섞지 않는다.
+
+const WINDOW_MS = 1000;
+
+interface TimerExt {
+  TIME_ELAPSED_EXT: number;
+  GPU_DISJOINT_EXT: number;
+}
+
+const median = (xs: number[]) => {
+  if (!xs.length) return NaN;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const pct = (xs: number[], p: number) => {
+  if (!xs.length) return NaN;
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.min(s.length - 1, Math.floor(p * s.length))];
+};
+const f = (x: number | null | undefined, d = 2) =>
+  x == null || Number.isNaN(x) ? "–" : x.toFixed(d);
+
+export default function LabProbe() {
+  // eslint는 훅이 돌려준 값의 수정을 막지만, renderer 설정을 바꾸는 것이 이 컴포넌트의 목적이다.
+  const gl = useThree((s) => s.gl);
+
+  useEffect(() => {
+    const ctx = gl.getContext() as WebGL2RenderingContext;
+    const ext = ctx.getExtension(
+      "EXT_disjoint_timer_query_webgl2",
+    ) as TimerExt | null;
+
+    // 후처리처럼 한 프레임에 render가 여러 번 불려도 합계를 보려고 자동 초기화를 끈다.
+    const prevAutoReset = gl.info.autoReset;
+    gl.info.autoReset = false;
+
+    // ---- 프레임 단위 기록 (최근 1초) ----
+    type Sample = {
+      t: number;
+      interval: number;
+      cpu: number;
+    };
+    let samples: Sample[] = [];
+    let gpu: { t: number; ms: number }[] = [];
+    let lastStart = 0;
+    let frameStart = 0;
+    let info = { calls: 0, triangles: 0 };
+
+    // ---- GPU 타이머 쿼리 (결과는 몇 프레임 뒤에 나오므로 대기열로 관리) ----
+    let active: WebGLQuery | null = null;
+    const pending: { q: WebGLQuery; t: number }[] = [];
+    let queryError = false;
+
+    const pollQueries = () => {
+      if (!ext) return;
+      const disjoint = ctx.getParameter(ext.GPU_DISJOINT_EXT);
+      while (pending.length) {
+        const { q, t } = pending[0];
+        if (!ctx.getQueryParameter(q, ctx.QUERY_RESULT_AVAILABLE)) break;
+        const ns = ctx.getQueryParameter(q, ctx.QUERY_RESULT) as number;
+        ctx.deleteQuery(q);
+        pending.shift();
+        if (!disjoint) gpu.push({ t, ms: ns / 1e6 });
+      }
+    };
+
+    const unsubBefore = addEffect((now) => {
+      frameStart = performance.now();
+      if (lastStart) {
+        samples.push({
+          t: now,
+          interval: now - lastStart,
+          cpu: NaN,
+        });
+      }
+      lastStart = now;
+      gl.info.reset();
+      pollQueries();
+      if (ext && !active && pending.length < 8) {
+        const q = ctx.createQuery();
+        try {
+          ctx.beginQuery(ext.TIME_ELAPSED_EXT, q);
+          active = q;
+        } catch {
+          queryError = true;
+          ctx.deleteQuery(q);
+        }
+      }
+    });
+
+    const unsubAfter = addAfterEffect((now) => {
+      if (active && ext) {
+        ctx.endQuery(ext.TIME_ELAPSED_EXT);
+        pending.push({ q: active, t: now });
+        active = null;
+      }
+      const last = samples[samples.length - 1];
+      if (last) {
+        const end = performance.now();
+        last.cpu = end - frameStart;
+      }
+      info = {
+        calls: gl.info.render.calls,
+        triangles: gl.info.render.triangles,
+      };
+    });
+
+    // ---- HUD ----
+    const hud = document.createElement("pre");
+    hud.style.cssText = [
+      "position:fixed",
+      "left:8px",
+      "top:8px",
+      "z-index:10000003",
+      "margin:0",
+      "padding:10px 12px",
+      "background:rgba(10,10,12,0.82)",
+      "color:#e8e8e8",
+      "font:12px/1.5 ui-monospace,Menlo,monospace",
+      "border-radius:8px",
+      "pointer-events:none",
+      "white-space:pre",
+    ].join(";");
+    document.body.appendChild(hud);
+
+    const timer = window.setInterval(() => {
+      const cut = performance.now() - WINDOW_MS;
+      samples = samples.filter((s) => s.t >= cut);
+      gpu = gpu.filter((s) => s.t >= cut);
+
+      const intervals = samples.map((s) => s.interval);
+      const cpus = samples.map((s) => s.cpu).filter((x) => !Number.isNaN(x));
+      const gpus = gpu.map((s) => s.ms);
+      const fps = samples.length / (WINDOW_MS / 1000);
+      const gpuMed = median(gpus);
+
+      const canvas = gl.domElement;
+      const mp = (canvas.width * canvas.height) / 1e6;
+
+      hud.textContent = [
+        `FPS          ${f(fps, 0)}`,
+        `프레임 간격  ${f(median(intervals))} ms   p95 ${f(pct(intervals, 0.95))}`,
+        `CPU          ${f(median(cpus))} ms   p95 ${f(pct(cpus, 0.95))}`,
+        !ext
+          ? `GPU          미지원`
+          : `GPU          ${f(gpuMed)} ms   p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
+        ``,
+        `드로우콜     ${info.calls}`,
+        `삼각형       ${info.triangles.toLocaleString()}`,
+        `프로그램     ${gl.info.programs?.length ?? "–"}`,
+        `텍스처       ${gl.info.memory.textures}   지오메트리 ${gl.info.memory.geometries}`,
+        `해상도       ${canvas.width}×${canvas.height} (${f(mp)} MP, DPR ${f(gl.getPixelRatio(), 2)})`,
+      ].join("\n");
+    }, 500);
+
+    return () => {
+      unsubBefore();
+      unsubAfter();
+      window.clearInterval(timer);
+      hud.remove();
+      gl.info.autoReset = prevAutoReset;
+      if (active && ext) ctx.endQuery(ext.TIME_ELAPSED_EXT);
+      pending.forEach(({ q }) => ctx.deleteQuery(q));
+    };
+  }, [gl]);
+
+  return null;
+}
