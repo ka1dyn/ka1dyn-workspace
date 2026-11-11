@@ -1,5 +1,6 @@
 import { addAfterEffect, addEffect, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
+import { getVram } from "./vram";
 
 // 매 프레임 R3F 루프의 앞(addEffect, 모든 useFrame 이전)과 뒤(addAfterEffect, 렌더 이후)에서
 // 시간을 재고, 그 사이에 나간 GPU 명령 전체를 타이머 쿼리 하나로 감싼다.
@@ -192,6 +193,8 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       // 프레임당 에너지: 전력(mW = mJ/s) ÷ 초당 프레임. FPS가 다른 상황끼리 비교할 수 있다.
       // GPU 전력은 시스템 전체 값이라 브라우저 합성 등도 포함되고, 기준선을 빼지 않은 값이다.
       const mjPerFrame = p && p.gpuMw != null && fps > 0 ? p.gpuMw / fps : NaN;
+      const vr = getVram(ctx);
+      const mb = (b: number) => f(b / 1024 / 1024, 1);
 
       hud.textContent = [
         `FPS          ${f(fps, 0)}`,
@@ -207,6 +210,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
         `프로그램     ${gl.info.programs?.length ?? "–"}`,
         `텍스처       ${gl.info.memory.textures}   지오메트리 ${gl.info.memory.geometries}`,
         `해상도       ${canvas.width}×${canvas.height} (${f(mp)} MP, DPR ${f(gl.getPixelRatio(), 2)})`,
+        vr
+          ? [
+              `GPU 메모리   ${mb(vr.textures + vr.renderTargets + vr.buffers + vr.canvas)} MB (추정)${vr.unknownFormat ? "  *모르는 포맷 있음" : ""}`,
+              `  텍스처     ${mb(vr.textures)}   렌더 타깃 ${mb(vr.renderTargets)}`,
+              `  버퍼       ${mb(vr.buffers)}   캔버스 ${mb(vr.canvas)}`,
+            ].join("\n")
+          : `GPU 메모리   추적 안 됨 (새로고침 필요)`,
         ``,
         p
           ? [
