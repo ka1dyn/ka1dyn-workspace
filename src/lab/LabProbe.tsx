@@ -166,6 +166,9 @@ export default function LabProbe() {
       const powerAge = power ? (Date.now() - power.t) / 1000 : Infinity;
       const p = powerAge < 3 ? power : null;
       const cycles = p && !Number.isNaN(gpuMed) ? (gpuMed * p.mhz) / 1000 : NaN;
+      // 프레임당 에너지: 전력(mW = mJ/s) ÷ 초당 프레임. FPS가 다른 상황끼리 비교할 수 있다.
+      // GPU 전력은 시스템 전체 값이라 브라우저 합성 등도 포함되고, 기준선을 빼지 않은 값이다.
+      const mjPerFrame = p && p.gpuMw != null && fps > 0 ? p.gpuMw / fps : NaN;
 
       hud.textContent = [
         `FPS          ${f(fps, 0)}`,
@@ -187,6 +190,7 @@ export default function LabProbe() {
               `GPU 전력     ${f(p.gpuMw, 0)} mW`,
               `CPU 전력     ${p.cpuMw == null ? "–" : f(p.cpuMw, 0)} mW`,
               `GPU 사이클   ${f(cycles)} M/프레임`,
+              `프레임당     ${f(mjPerFrame)} mJ   (${f(mjPerFrame / mp, 2)} mJ/MP)`,
               `열 상태      ${p.thermal}`,
             ].join("\n")
           : `전력 브리지  연결 안 됨 (README의 power-bridge 참고)`,
