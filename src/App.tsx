@@ -5,6 +5,8 @@ import { Route } from "wouter";
 import Overlay from "./2d-components/Overlay";
 import { useEffect } from "react";
 import Home from "./2d-components/Home";
+import { IS_LAB } from "./lab/store";
+import LabPanel from "./lab/LabPanel";
 
 function App() {
   const start = useStart((state) => state.start);
@@ -30,6 +32,7 @@ function App() {
         <Route path="/">
           {/* <Scene /> */}
           <>
+            {IS_LAB && <LabPanel />}
             <Overlay />
             <Scene />
             {!start && <Loading />}
