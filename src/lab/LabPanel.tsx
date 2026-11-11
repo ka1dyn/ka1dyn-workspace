@@ -1,10 +1,18 @@
 import { Leva, folder, useControls } from "leva";
 import { useEffect } from "react";
-import { useLab } from "./store";
+import { useLab, type LabTool } from "./store";
 
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {
   const v = useControls({
+    "측정 도구": {
+      value: "none",
+      options: {
+        "실험실 HUD만": "none",
+        "stats-gl": "statsgl",
+        "r3f-perf": "r3fperf",
+      },
+    },
     DPR: {
       value: "default",
       options: {
@@ -35,6 +43,7 @@ export default function LabPanel() {
   const key = JSON.stringify(v);
   useEffect(() => {
     useLab.setState({
+      tool: v["측정 도구"] as LabTool,
       dpr: v.DPR as "default" | number,
       post: v["후처리 (Bloom + 대비)"],
       environment: v["Environment (Lightformer)"],

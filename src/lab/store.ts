@@ -12,7 +12,10 @@ export type ModelKey =
   | "floor"
   | "clouds";
 
+export type LabTool = "none" | "statsgl" | "r3fperf";
+
 export interface LabState {
+  tool: LabTool;
   dpr: "default" | number;
   post: boolean;
   environment: boolean;
@@ -23,6 +26,7 @@ export interface LabState {
 
 // 기본값은 실제 사이트와 같게 둔다. 그래야 패널을 처음 열었을 때가 곧 기준 장면이다.
 export const useLab = create<LabState>(() => ({
+  tool: "none",
   dpr: "default",
   post: false,
   environment: true,

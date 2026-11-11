@@ -36,15 +36,16 @@ const pct = (xs: number[], p: number) => {
 const f = (x: number | null | undefined, d = 2) =>
   x == null || Number.isNaN(x) ? "–" : x.toFixed(d);
 
-export default function LabProbe() {
+export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
   // eslint는 훅이 돌려준 값의 수정을 막지만, renderer 설정을 바꾸는 것이 이 컴포넌트의 목적이다.
   const gl = useThree((s) => s.gl);
 
   useEffect(() => {
     const ctx = gl.getContext() as WebGL2RenderingContext;
-    const ext = ctx.getExtension(
-      "EXT_disjoint_timer_query_webgl2",
-    ) as TimerExt | null;
+    // 다른 도구가 타이머 쿼리를 쓰는 동안에는 충돌을 피하려고 GPU 측정을 끈다.
+    const ext = gpuTimer
+      ? (ctx.getExtension("EXT_disjoint_timer_query_webgl2") as TimerExt | null)
+      : null;
 
     // 후처리처럼 한 프레임에 render가 여러 번 불려도 합계를 보려고 자동 초기화를 끈다.
     const prevAutoReset = gl.info.autoReset;
@@ -175,7 +176,7 @@ export default function LabProbe() {
         `프레임 간격  ${f(median(intervals))} ms   p95 ${f(pct(intervals, 0.95))}`,
         `CPU          ${f(median(cpus))} ms   p95 ${f(pct(cpus, 0.95))}`,
         !ext
-          ? `GPU          미지원`
+          ? `GPU          ${gpuTimer ? "미지원" : "끔 (다른 도구가 타이머 사용 중)"}`
           : `GPU          ${f(gpuMed)} ms   p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
         ``,
         `드로우콜     ${info.calls}`,
@@ -207,7 +208,7 @@ export default function LabProbe() {
       if (active && ext) ctx.endQuery(ext.TIME_ELAPSED_EXT);
       pending.forEach(({ q }) => ctx.deleteQuery(q));
     };
-  }, [gl]);
+  }, [gl, gpuTimer]);
 
   return null;
 }

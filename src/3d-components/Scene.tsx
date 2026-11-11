@@ -12,12 +12,14 @@ import StartAnimaion from "./StartAnimaion";
 import { Post } from "./Post";
 import { IS_LAB, useLab } from "@/lab/store";
 import LabProbe from "@/lab/LabProbe";
+import LabTools from "@/lab/LabTools";
 
 export default function Scene() {
   const frameReady = useReady((state) => state.frameReady);
   const lowDpr = useOverlay((state) => state.lowDpr);
   const labDpr = useLab((state) => state.dpr);
   const labPost = useLab((state) => state.post);
+  const labTool = useLab((state) => state.tool);
   const dpr =
     labDpr !== "default"
       ? labDpr
@@ -62,7 +64,10 @@ export default function Scene() {
         </Suspense>
       </AudioProvider>
       {/* <Helpers /> */}
-      {IS_LAB && <LabProbe />}
+      {IS_LAB && (
+        <LabProbe gpuTimer={labTool !== "statsgl" && labTool !== "r3fperf"} />
+      )}
+      {IS_LAB && <LabTools />}
     </Canvas>
   );
 }
