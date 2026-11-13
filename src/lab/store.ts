@@ -23,6 +23,21 @@ export interface ScreenLab {
   res: number; // 화면 DOM의 CSS 해상도 배율 (월드 크기는 유지)
 }
 
+// 밤 씬 실험용 스위치. 이 브랜치의 기본값이 곧 새 기준 장면이다.
+export interface NightLab {
+  scene: "old" | "night"; // old: 기존 돌 지형·스튜디오 조명, night: 밤 잔디밭
+  grass: boolean;
+  grassCount: number;
+  grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할)
+  wind: boolean;
+  puddles: boolean;
+  reflection: boolean; // 평면 반사 패스 (끄면 하늘색만 비침)
+  reflectionRes: number; // 반사 타깃 해상도 (CSS 크기 대비)
+  blur: boolean; // 반사 밉맵 흐림
+  grassInReflection: boolean;
+  rippleRadius: number; // 빗방울 파문 탐색 반경 R. 픽셀당 (2R+1)² 반복, 0이면 끔
+}
+
 export interface LabState {
   tool: LabTool;
   dpr: "default" | number;
@@ -32,6 +47,7 @@ export interface LabState {
   ambient: boolean;
   models: Record<ModelKey, boolean>;
   screen: ScreenLab;
+  night: NightLab;
 }
 
 // 기본값은 실제 사이트와 같게 둔다. 그래야 패널을 처음 열었을 때가 곧 기준 장면이다.
@@ -57,5 +73,18 @@ export const useLab = create<LabState>(() => ({
     backdrop: true,
     occlude: true,
     res: 1,
+  },
+  night: {
+    scene: "night",
+    grass: true,
+    grassCount: 25000,
+    grassSegments: 6,
+    wind: true,
+    puddles: true,
+    reflection: true,
+    reflectionRes: 0.5,
+    blur: true,
+    grassInReflection: false,
+    rippleRadius: 2,
   },
 }));

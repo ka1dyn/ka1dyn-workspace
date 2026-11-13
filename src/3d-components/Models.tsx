@@ -6,21 +6,26 @@ import { degToRad } from "three/src/math/MathUtils.js";
 import { RainClouds } from "./Cloud";
 import Mac from "./Mac";
 import { useLab } from "@/lab/store";
+import NightScene from "./Night";
 
 export default function Models() {
   const m = useLab((state) => state.models);
+  const night = useLab((state) => state.night.scene === "night");
 
   return (
     <>
       <group name="rain">
-        {m.rainGround && <RainGround rotation={[0, degToRad(50), 0]} />}
+        {!night && m.rainGround && (
+          <RainGround rotation={[0, degToRad(50), 0]} />
+        )}
         {m.pergola && (
           <Splashes>
             <Test glb_path="/models/pergola/pergola.glb" />
           </Splashes>
         )}
       </group>
-      {m.groundBase && (
+      {night && <NightScene />}
+      {!night && m.groundBase && (
         <GroundBase position={[0, -0.03, 0]} rotation={[0, degToRad(50), 0]} />
       )}
 

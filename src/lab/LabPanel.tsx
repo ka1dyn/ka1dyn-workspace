@@ -5,6 +5,31 @@ import { useLab, type LabTool } from "./store";
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {
   const v = useControls({
+    "밤 씬": folder({
+      씬: {
+        value: "night",
+        options: { "밤 잔디밭 (새)": "night", "기존 (돌 지형)": "old" },
+      },
+      잔디: true,
+      "잔디 개수": {
+        value: 25000,
+        options: { "10k": 10000, "25k": 25000, "50k": 50000, "100k": 100000 },
+      },
+      "잎 분할": { value: 6, options: { "2": 2, "6": 6, "10": 10 } },
+      바람: true,
+      물웅덩이: true,
+      "평면 반사": true,
+      "반사 해상도": {
+        value: 0.5,
+        options: { "1/2 CSS": 0.5, "1/4 CSS": 0.25, "1 CSS": 1 },
+      },
+      "반사 흐림 (밉맵)": true,
+      "반사에 잔디 포함": false,
+      "파문 반경 R": {
+        value: 2,
+        options: { 끔: 0, "1 (9회)": 1, "2 (25회)": 2, "3 (49회)": 3 },
+      },
+    }),
     "측정 도구": {
       value: "none",
       options: {
@@ -78,6 +103,19 @@ export default function LabPanel() {
         backdrop: v["backdrop-blur"],
         occlude: v["occlude (blending)"],
         res: v["화면 DOM 해상도"] as number,
+      },
+      night: {
+        scene: v["씬"] as "old" | "night",
+        grass: v["잔디"],
+        grassCount: v["잔디 개수"] as number,
+        grassSegments: v["잎 분할"] as number,
+        wind: v["바람"],
+        puddles: v["물웅덩이"],
+        reflection: v["평면 반사"],
+        reflectionRes: v["반사 해상도"] as number,
+        blur: v["반사 흐림 (밉맵)"],
+        grassInReflection: v["반사에 잔디 포함"],
+        rippleRadius: v["파문 반경 R"] as number,
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
