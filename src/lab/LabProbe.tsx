@@ -18,6 +18,13 @@ interface Power {
   t: number;
 }
 
+// Chrome GPU 프로세스 메모리 (브리지가 footprint로 읽음). 모든 탭과 브라우저 UI가 섞인 값이다.
+interface Mem {
+  graphics: number; // IOAccelerator (graphics): Metal GPU 자원 (WebGL 텍스처·버퍼·렌더 타깃 등)
+  iosurface: number; // IOSurface: 화면 합성용 공유 버퍼 (캔버스 출력, DOM 레이어 등)
+  t: number;
+}
+
 interface TimerExt {
   TIME_ELAPSED_EXT: number;
   GPU_DISJOINT_EXT: number;
@@ -139,10 +146,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
 
     // ---- 전력 브리지 (터미널의 powermetrics 값을 SSE로 받음) ----
     let power: Power | null = null;
+    let mem: Mem | null = null;
     const es = new EventSource(POWER_URL);
     es.onmessage = (e) => {
       try {
-        power = JSON.parse(e.data);
+        const d = JSON.parse(e.data);
+        if (d.type === "mem") mem = d;
+        else power = d;
       } catch {
         /* ignore */
       }
@@ -194,6 +204,7 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       // GPU 전력은 시스템 전체 값이라 브라우저 합성 등도 포함되고, 기준선을 빼지 않은 값이다.
       const mjPerFrame = p && p.gpuMw != null && fps > 0 ? p.gpuMw / fps : NaN;
       const vr = getVram(ctx);
+      const m = mem && Date.now() - mem.t < 3000 ? mem : null;
       const mb = (b: number) => f(b / 1024 / 1024, 1);
 
       hud.textContent = [
@@ -217,6 +228,9 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
               `  버퍼       ${mb(vr.buffers)}   캔버스 ${mb(vr.canvas)}`,
             ].join("\n")
           : `GPU 메모리   추적 안 됨 (새로고침 필요)`,
+        m
+          ? `  OS 실측    그래픽 ${mb(m.graphics)}   IOSurface ${mb(m.iosurface)}  (Chrome GPU 프로세스 전체)`
+          : `  OS 실측    브리지 연결 안 됨`,
         ``,
         p
           ? [
