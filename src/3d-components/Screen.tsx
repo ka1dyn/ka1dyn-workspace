@@ -14,6 +14,7 @@ import {
 import { fitDistance } from "@/utils/cameraFit";
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
+import { useLab } from "@/lab/store";
 
 type screenProps = React.JSX.IntrinsicElements["group"];
 
@@ -29,6 +30,9 @@ export default function Screen({ ...props }: screenProps) {
   const screenReady = useReady((state) => state.screenReady);
   const dive = useTweaks((state) => state.dive);
   const type = useOverlay((state) => state.type);
+  const lab = useLab((state) => state.screen);
+  // 해상도 배율을 낮추면 CSS 크기는 줄이고 distanceFactor는 키워, 월드에서 보이는 크기는 그대로 둔다.
+  const screenPx = { w: SCREEN_PX.w * lab.res, h: SCREEN_PX.h * lab.res };
 
   const { size } = useThree();
   const lastAspect = useRef(0);
@@ -83,8 +87,15 @@ export default function Screen({ ...props }: screenProps) {
   const screenVec = new THREE.Vector3();
   const screenToCameraVec = new THREE.Vector3();
 
+  // 실험실에서 매 프레임 갱신을 끄면 filter·opacity를 지워 효과가 남지 않게 한다.
+  useEffect(() => {
+    if (lab.frameStyle || !contentRef.current) return;
+    contentRef.current.style.filter = "";
+    contentRef.current.style.opacity = "";
+  }, [lab.frameStyle, lab.html]);
+
   useFrame((state) => {
-    if (!groupRef.current || !contentRef.current) return;
+    if (!groupRef.current || !contentRef.current || !lab.frameStyle) return;
 
     // Screen World Postiion
 
@@ -120,27 +131,29 @@ export default function Screen({ ...props }: screenProps) {
   return (
     <group ref={groupRef} {...props}>
       {/* <axesHelper /> */}
-      <Html
-        className={`overflow-hidden ${!dive && "rounded-4xl"} ${type !== OverlayTypes.SCREEN && "select-none"}`}
-        style={dive ? undefined : { width: SCREEN_PX.w, height: SCREEN_PX.h }}
-        pointerEvents={type === OverlayTypes.SCREEN ? "auto" : "none"}
-        {...(dive
-          ? {
-              fullscreen: true,
-            }
-          : {
-              transform: true,
-              distanceFactor: SCREEN_DISTANCE_FACTOR,
-              occlude: "blending",
-            })}
-      >
-        <div
-          ref={contentRef}
-          className="w-full h-full @container-[size] font-pretendard"
+      {lab.html && (
+        <Html
+          className={`overflow-hidden ${!dive && "rounded-4xl"} ${type !== OverlayTypes.SCREEN && "select-none"} ${!lab.backdrop && "lab-noblur"}`}
+          style={dive ? undefined : { width: screenPx.w, height: screenPx.h }}
+          pointerEvents={type === OverlayTypes.SCREEN ? "auto" : "none"}
+          {...(dive
+            ? {
+                fullscreen: true,
+              }
+            : {
+                transform: true,
+                distanceFactor: SCREEN_DISTANCE_FACTOR / lab.res,
+                occlude: lab.occlude ? "blending" : undefined,
+              })}
         >
-          {screenReady ? <Home /> : <Booting />}
-        </div>
-      </Html>
+          <div
+            ref={contentRef}
+            className="w-full h-full @container-[size] font-pretendard"
+          >
+            {screenReady ? <Home /> : <Booting />}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }

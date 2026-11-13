@@ -38,6 +38,20 @@ export default function LabPanel() {
       "ambient + hemisphere": true,
     }),
     "후처리 (Bloom + 대비)": false,
+    "맥북 화면 (DOM)": folder({
+      "화면 Html 표시": true,
+      "매 프레임 밝기·투명도 갱신": true,
+      "backdrop-blur": true,
+      "occlude (blending)": true,
+      "화면 DOM 해상도": {
+        value: 1,
+        options: {
+          "2560×1700 (기본)": 1,
+          "1280×850": 0.5,
+          "640×425": 0.25,
+        },
+      },
+    }),
   });
 
   const key = JSON.stringify(v);
@@ -57,6 +71,13 @@ export default function LabPanel() {
         mac: v["맥북 + 화면"],
         floor: v["타일 바닥"],
         clouds: v["구름 (반투명)"],
+      },
+      screen: {
+        html: v["화면 Html 표시"],
+        frameStyle: v["매 프레임 밝기·투명도 갱신"],
+        backdrop: v["backdrop-blur"],
+        occlude: v["occlude (blending)"],
+        res: v["화면 DOM 해상도"] as number,
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
