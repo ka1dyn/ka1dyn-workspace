@@ -7,7 +7,7 @@ import { AudioProvider, BackgroundBGM } from "@/3d-components/Sound.tsx";
 import CameraControl from "./CameraControl";
 import Helpers from "./Helpers";
 import FrameDetector from "./FrameDetector";
-import { useOverlay, useReady } from "@/stores";
+import { useOverlay, useReady, useStart, useTweaks } from "@/stores";
 import StartAnimaion from "./StartAnimaion";
 import { Post } from "./Post";
 import { IS_LAB, IS_MSAA, useLab } from "@/lab/store";
@@ -20,6 +20,15 @@ export default function Scene() {
   const labDpr = useLab((state) => state.dpr);
   const labPost = useLab((state) => state.post);
   const labTool = useLab((state) => state.tool);
+  const labPause = useLab((state) => state.pause);
+  const start = useStart((state) => state.start);
+  const dive = useTweaks((state) => state.dive);
+  // 캔버스가 완전히 가려져 있는 동안은 그리지 않는다:
+  //   - 시작 화면: 첫 프레임(셰이더 컴파일·텍스처 올리기)이 끝난 뒤 start를 누르기 전까지
+  //   - dive: 맥북 화면 DOM이 창 전체를 덮고 있는 동안
+  // "demand"는 무언가 바뀌어 invalidate될 때만 그리므로, 창 크기 변경이나 상태 변경은 계속 반영된다.
+  const covered = (!start && frameReady) || dive;
+  const frameloop = labPause && covered ? "demand" : "always";
   const dpr =
     labDpr !== "default"
       ? labDpr
@@ -37,6 +46,7 @@ export default function Scene() {
   return (
     <Canvas
       dpr={dpr}
+      frameloop={frameloop}
       gl={{
         powerPreference: "high-performance",
         alpha: false,

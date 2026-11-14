@@ -102,6 +102,7 @@ export interface NightLab {
 }
 
 export interface LabState {
+  pause: boolean; // 캔버스가 완전히 가려진 동안(시작 화면, dive) 렌더 루프를 멈춘다
   tool: LabTool;
   dpr: "default" | number;
   post: boolean;
@@ -115,6 +116,7 @@ export interface LabState {
 
 // 기본값은 실제 사이트와 같게 둔다. 그래야 패널을 처음 열었을 때가 곧 기준 장면이다.
 export const useLab = create<LabState>(() => ({
+  pause: true,
   tool: "none",
   dpr: "default",
   post: false,

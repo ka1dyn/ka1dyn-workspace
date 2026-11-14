@@ -17,6 +17,9 @@ export default function LabPanel() {
       "타일 바닥": true,
       "구름 (반투명)": false,
     }),
+    최적화: folder({
+      "가려진 동안 렌더 멈춤": true,
+    }),
     "맥북 화면": folder({
       "화면 Html 표시": true,
       "보호필름 효과": true,
@@ -225,6 +228,7 @@ export default function LabPanel() {
         floor: v["타일 바닥"],
         clouds: v["구름 (반투명)"],
       },
+      pause: v["가려진 동안 렌더 멈춤"],
       screen: {
         html: v["화면 Html 표시"],
         frameStyle: v["보호필름 효과"],
