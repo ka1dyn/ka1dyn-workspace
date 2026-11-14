@@ -45,6 +45,7 @@ const vertexShader = /* glsl */ `
   uniform float uHeightScale;
   uniform float uWidthScale;
   uniform float uWindStrength;
+  uniform float uWindSpeed;
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -58,14 +59,15 @@ const vertexShader = /* glsl */ `
       // 잎 뿌리(인스턴스 행렬의 이동 성분)와 잎 길이(인스턴스 y 배율 × 높이 배율)
       vec3 root = (modelMatrix * instanceMatrix[3]).xyz;
       float len = length(instanceMatrix[1].xyz) * uHeightScale;
+      float time = uTime * uWindSpeed; // 바람 속도 배율
 
       // 1) 바람 방향 자체가 공간과 시간에 따라 천천히 돌아서 한쪽으로만 눕지 않는다
-      float ang = 0.6 + (texture2D(uWind, root.xz * 0.02 + uTime * 0.012).a - 0.5) * 4.0;
+      float ang = 0.6 + (texture2D(uWind, root.xz * 0.02 + time * 0.008).a - 0.5) * 4.0;
       vec2 dir = vec2(cos(ang), sin(ang));
       vec2 perp = vec2(-dir.y, dir.x);
 
       // 2) 돌풍: 큰 노이즈 덩어리가 흘러가며 어떤 곳은 세고 어떤 곳은 거의 잔잔하다
-      float gust = texture2D(uWind, root.xz * 0.025 - dir * uTime * 0.05).g;
+      float gust = texture2D(uWind, root.xz * 0.025 - dir * time * 0.03).g;
       gust = smoothstep(0.25, 0.8, gust);
 
       // 3) 출렁임: 똑바로 선 자세를 가운데 두고 앞뒤로 흔들린다(바람 쪽으로 조금 더).
@@ -73,15 +75,15 @@ const vertexShader = /* glsl */ `
       float seed = texture2D(uWind, root.xz * 0.5).b; // 잎마다 다른 값
       float stiff = 0.6 + seed * 0.8;                 // 잎마다 다른 뻣뻣함
       float phase = dot(root.xz, vec2(1.7, 2.3)) + seed * 6.28;
-      float sway = sin(uTime * (1.6 + seed) + phase - uv.y * 1.2);
-      float idle = sin(uTime * 0.9 + phase * 1.3) * 0.08; // 바람이 없어도 살랑임
+      float sway = sin(time * (0.8 + seed * 0.5) + phase - uv.y * 1.0);
+      float idle = sin(time * 0.5 + phase * 1.3) * 0.06; // 바람이 없어도 살랑임
 
-      // 4) 잔떨림: 옆 방향으로 빠르게 떨린다
-      float flutter = texture2D(uWind, root.xz * 0.2 + uTime * vec2(0.4, 0.27)).r - 0.5;
+      // 4) 잔떨림: 옆 방향으로 살짝 흔들린다 (너무 빠르면 진동처럼 보여서 느리고 작게)
+      float flutter = texture2D(uWind, root.xz * 0.2 + time * vec2(0.06, 0.04)).r - 0.5;
 
       // 잎끝의 휘는 각도(라디안). 방향 성분과 옆 성분을 합친다.
       float lean = (gust * (0.35 + 0.65 * sway) * 0.95 + idle) * uWindStrength / stiff;
-      vec2 b = dir * lean + perp * flutter * 0.35 * uWindStrength;
+      vec2 b = dir * lean + perp * flutter * 0.15 * uWindStrength;
       float theta = clamp(length(b), 0.0, 1.35);
       vec2 bdir = theta > 1e-4 ? b / length(b) : dir;
 
@@ -174,6 +176,7 @@ export default function Grass({
           uHeightScale: { value: 1 },
           uWidthScale: { value: 1 },
           uWindStrength: { value: 1 },
+          uWindSpeed: { value: 1 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           uLampPos: { value: new THREE.Vector3() },
@@ -237,6 +240,7 @@ export default function Grass({
     u.uHeightScale.value = n.grassHeight;
     u.uWidthScale.value = n.grassWidth;
     u.uWindStrength.value = n.windStrength;
+    u.uWindSpeed.value = n.windSpeed;
     u.uLampPos.value.fromArray(n.lampPos);
     u.uLampColor.value.set(n.lampColor);
     u.uLampIntensity.value = n.lampIntensity;
