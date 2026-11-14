@@ -147,7 +147,7 @@ export const useLab = create<LabState>(() => ({
     starBright: 1,
     starTwinkle: 0.15,
     milkyWay: 1,
-    milkyRotation: 0,
+    milkyRotation: -40,
     treeLayers: 3,
     treeHeight: 1,
     fireflies: 30,
@@ -178,3 +178,7 @@ export const useLab = create<LabState>(() => ({
     envIntensity: 0.12,
   },
 }));
+
+// 콘솔에서 실험실 값을 직접 바꿔 측정할 수 있게 실험실에서만 노출한다
+// (예: __lab.setState((s) => ({ night: { ...s.night, starDensity: 0 } })))
+if (IS_LAB) (window as unknown as { __lab?: unknown }).__lab = useLab;

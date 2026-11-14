@@ -39,6 +39,7 @@ const fragmentShader = /* glsl */ `
   uniform float uTwinkle;
   uniform float uTreeLayers;  // 숲 겹 수 (1~3)
   uniform float uTreeHeight;  // 숲 높이 배율
+  uniform float uReflect;     // 물웅덩이 반사 카메라로 그릴 때 1 (별을 건너뛴다)
   varying vec3 vDir;
 
   // ---- 해시 / 노이즈 ----
@@ -79,16 +80,20 @@ const fragmentShader = /* glsl */ `
     vec3 j = hash33(cell + seed + 17.0);
     vec3 sp = normalize(cell + 0.2 + 0.6 * j) * scale; // 구면 위의 별 위치 (칸 좌표)
     vec3 q = sp - cell;
-    if (any(lessThan(q, vec3(0.12))) || any(greaterThan(q, vec3(0.88)))) return vec3(0.0);
+    if (any(lessThan(q, vec3(0.25))) || any(greaterThan(q, vec3(0.75)))) return vec3(0.0);
+    // 별은 자기 칸 안에서만 계산되므로, 크기와 번짐이 칸 가장자리 여유(0.25칸) 안에서
+    // 0이 되어야 한다. 넘치면 번짐이 칸 경계에서 잘려 사각형으로 보인다.
+    float maxR = 0.22 / scale;
 
     float dist = length(p - sp) / scale;          // 각거리 (라디안 근사)
     float mag = pow(h.y, 5.0);                     // 등급: 대부분 희미, 소수만 밝게
     float radius = (0.00045 + 0.0011 * mag) * sizeMul;
     // 1픽셀보다 작게 그리면 지글거리므로 크기는 픽셀만큼 키우고 그만큼 밝기를 나눈다
-    float r = max(radius, pixAng * 0.75);
+    float r = min(max(radius, pixAng * 0.75), maxR * 0.5);
     float energy = (radius * radius) / (r * r);
     float core = exp(-dist * dist / (r * r) * 2.5) * energy;
-    float glow = exp(-dist / (r * 5.0)) * mag * 0.08;
+    float g = 1.0 - smoothstep(0.0, maxR, dist);
+    float glow = g * g * mag * 0.12;
 
     float tw = 1.0 + uTwinkle * sin(uTime * (1.3 + h.z * 3.0) + h.y * 40.0);
     vec3 tint = mix(vec3(0.72, 0.82, 1.0), vec3(1.0, 0.9, 0.74), h.z);
@@ -141,18 +146,28 @@ const fragmentShader = /* glsl */ `
     float moonWash = smoothstep(0.75, 0.97, c);
     float skyVis = smoothstep(0.0, 0.22, h) * (1.0 - 0.85 * moonWash);
 
+    // 화면 미분(fwidth)은 픽셀마다 갈라지는 분기 안에서 정의되지 않으므로 분기 밖에서 먼저 구한다
+    float pixAng = length(fwidth(d));
+    float aa = fwidth(h) * 1.2 + 1e-5;
+
+    // 별·은하수는 보이는 곳(지평선 위)에서만 계산한다
+    if (skyVis > 0.001) {
     // 은하수: 미리 구운 텍스처 1번 읽기 (방위 회전은 읽을 때 적용)
     float cr = cos(uMilkyRot), sr = sin(uMilkyRot);
     vec3 md = vec3(cr * d.x - sr * d.z, d.y, sr * d.x + cr * d.z);
     vec2 muv = vec2(atan(md.z, md.x) / 6.2831853 + 0.5, asin(clamp(md.y, -1.0, 1.0)) / 3.1415927 + 0.5);
     vec4 milky = textureLod(uMilkyTex, muv, 0.0); // LOD 0: 경도 이음매에서 밉이 튀지 않게
-    color += milky.rgb * 0.16 * uMilky * skyVis;
+    color += milky.rgb * 0.45 * uMilky * skyVis;
 
-    // 별: 촘촘하고 희미한 층(은하수 띠 안에서 더 많이) + 성기고 밝은 층
-    float pixAng = length(fwidth(d));
-    vec3 stars = starLayer(d, 260.0, (0.10 + 0.35 * milky.a * uMilky) * uStarDensity, 0.8, pixAng, 3.1)
-               + starLayer(d, 90.0, 0.22 * uStarDensity, 1.4, pixAng, 11.7);
+    // 별: 촘촘하고 희미한 층(은하수 띠 안에서 더 많이) + 성기고 밝은 층.
+    // 반사에서는 물결로 흐려져 보이지 않으므로 계산하지 않는다
+    if (uReflect < 0.5) {
+    // (칸 안쪽 여유를 넓힌 만큼 별이 생길 확률을 올려 밀도를 맞춘다)
+    vec3 stars = starLayer(d, 260.0, (0.2 + 0.6 * milky.a * uMilky) * uStarDensity, 0.6, pixAng, 3.1)
+               + starLayer(d, 90.0, 0.4 * uStarDensity, 1.4, pixAng, 11.7);
     color += stars * 0.55 * uStarBright * skyVis;
+    }
+    }
 
     // 달: 원판(가장자리 어둡게 + 옅은 바다 무늬) + 두 겹 번짐
     float disk = smoothstep(0.99955, 0.99975, c);
@@ -170,8 +185,14 @@ const fragmentShader = /* glsl */ `
     color += uHorizon * 0.35 * exp(-max(h, 0.0) / 0.05);
 
     // 숲: 먼 겹(낮고 촘촘, 안개에 가까운 색) → 가까운 겹(높고 성기고 어두움)
+    // 숲은 지평선 근처 좁은 띠(0 ~ 0.1 × 숲 높이 배율)에만 윤곽이 있다.
+    // 지평선 아래는 모든 겹이 덮어 가장 가까운 숲 색뿐이므로 루프 없이 바로 칠한다.
+    // (하늘 돔은 반투명 돌 지형 뒤에서도 그려져 GPU가 가려진 픽셀을 건너뛰지 못하므로,
+    //  이걸 빼먹으면 화면 아래쪽 땅 영역 전체에서 숲 루프가 돈다)
+    if (h < -aa) {
+      color = uTree;
+    } else if (h < 0.105 * uTreeHeight + aa) {
     float az = atan(d.z, d.x);
-    float aa = fwidth(h) * 1.2 + 1e-5;
     vec3 farTree = mix(uTree, uHorizon, 0.55);
     vec3 midTree = mix(uTree, uHorizon, 0.25);
     if (uTreeLayers > 2.5) {
@@ -184,6 +205,7 @@ const fragmentShader = /* glsl */ `
     }
     float t2 = treeLine(az, 32.0, 0.03, 0.07, 303.0);
     color = mix(color, uTree, smoothstep(aa, -aa, h - t2));
+    }
   #endif
 
     gl_FragColor = vec4(color, 1.0);
@@ -220,6 +242,7 @@ export default function Sky() {
           uTwinkle: { value: 0.15 },
           uTreeLayers: { value: 3 },
           uTreeHeight: { value: 1 },
+          uReflect: { value: 0 },
         },
       }),
     [old],
@@ -229,6 +252,21 @@ export default function Sky() {
   // 은하수는 처음 한 번만 굽는다 (재질이 바뀌어도 같은 텍스처를 쓴다)
   const milky = useMemo(() => bakeMilkyWay(gl, MILKY_NORMAL), [gl]);
   useEffect(() => () => milky.dispose(), [milky]);
+
+  // 그리기 직전에 카메라를 보고 물웅덩이 반사인지 판단한다.
+  // 반사 카메라는 반사 레이어만 보고 레이어 0(메인)은 보지 않는다 (Water.tsx).
+  // 카메라가 바뀌면 three가 uniform을 다시 올리므로 같은 프레임 안에서도 값이 반영된다.
+  useEffect(() => {
+    const m = mesh.current;
+    m.onBeforeRender = (_r, _s, camera, _g, mat) => {
+      const sm = mat as THREE.ShaderMaterial;
+      sm.uniforms.uReflect.value = camera.layers.isEnabled(0) ? 0 : 1;
+      sm.uniformsNeedUpdate = true; // 같은 프레임 안에서 값이 바뀌므로 다시 올리게 한다
+    };
+    return () => {
+      m.onBeforeRender = () => {};
+    };
+  }, []);
 
   useFrame(({ clock }) => {
     const n = useLab.getState().night;
