@@ -55,25 +55,45 @@ const vertexShader = /* glsl */ `
     vec4 world = modelMatrix * instanceMatrix * vec4(local, 1.0);
     float wind = 0.5;
     #ifdef WIND
-      // 잎 뿌리 위치 (인스턴스 행렬의 이동 성분). 잎마다 위상을 다르게 주는 데 쓴다.
-      vec2 root = (modelMatrix * instanceMatrix[3]).xz;
-      vec2 dir = normalize(vec2(1.0, 0.55)); // 주 바람 방향
-      // 1) 돌풍: 큰 노이즈 덩어리가 바람 방향으로 천천히 흘러가며 어떤 곳은 세고 어떤 곳은 약하다
-      float gust = texture2D(uWind, root * 0.025 - dir * uTime * 0.045).g;
-      gust = smoothstep(0.3, 0.75, gust);
-      // 2) 흔들림: 돌풍 세기만큼 앞뒤로 출렁인다. 위상은 뿌리 위치로 흩뜨린다
-      float phase = dot(root, vec2(1.7, 2.3)) + texture2D(uWind, root * 0.3).b * 6.28;
-      float sway = sin(uTime * 2.1 + phase) * 0.5 + 0.5;
-      // 3) 잔떨림: 작은 노이즈를 빠르게 흘려 잎끝이 제각각 떨리게 한다
-      vec2 flutter = texture2D(uWind, root * 0.18 + uTime * vec2(0.35, 0.22)).rg - 0.5;
-      float bend = (0.15 + gust * (0.55 + 0.45 * sway)) * uWindStrength;
-      vec2 offset = dir * bend * 0.32 + flutter * 0.12 * uWindStrength;
-      // 끝으로 갈수록 크게 휘고(높이의 제곱), 휜 만큼 잎끝이 내려앉게 한다
-      float h = uv.y * uv.y;
-      offset *= h * uHeightScale;
-      world.xz += offset;
-      world.y -= dot(offset, offset) * 1.2;
-      wind = gust * (0.6 + 0.4 * sway);
+      // 잎 뿌리(인스턴스 행렬의 이동 성분)와 잎 길이(인스턴스 y 배율 × 높이 배율)
+      vec3 root = (modelMatrix * instanceMatrix[3]).xyz;
+      float len = length(instanceMatrix[1].xyz) * uHeightScale;
+
+      // 1) 바람 방향 자체가 공간과 시간에 따라 천천히 돌아서 한쪽으로만 눕지 않는다
+      float ang = 0.6 + (texture2D(uWind, root.xz * 0.02 + uTime * 0.012).a - 0.5) * 4.0;
+      vec2 dir = vec2(cos(ang), sin(ang));
+      vec2 perp = vec2(-dir.y, dir.x);
+
+      // 2) 돌풍: 큰 노이즈 덩어리가 흘러가며 어떤 곳은 세고 어떤 곳은 거의 잔잔하다
+      float gust = texture2D(uWind, root.xz * 0.025 - dir * uTime * 0.05).g;
+      gust = smoothstep(0.25, 0.8, gust);
+
+      // 3) 출렁임: 똑바로 선 자세를 가운데 두고 앞뒤로 흔들린다(바람 쪽으로 조금 더).
+      //    잎끝이 뿌리보다 늦게 따라오도록 높이만큼 위상을 늦춰 낭창하게 휘게 한다.
+      float seed = texture2D(uWind, root.xz * 0.5).b; // 잎마다 다른 값
+      float stiff = 0.6 + seed * 0.8;                 // 잎마다 다른 뻣뻣함
+      float phase = dot(root.xz, vec2(1.7, 2.3)) + seed * 6.28;
+      float sway = sin(uTime * (1.6 + seed) + phase - uv.y * 1.2);
+      float idle = sin(uTime * 0.9 + phase * 1.3) * 0.08; // 바람이 없어도 살랑임
+
+      // 4) 잔떨림: 옆 방향으로 빠르게 떨린다
+      float flutter = texture2D(uWind, root.xz * 0.2 + uTime * vec2(0.4, 0.27)).r - 0.5;
+
+      // 잎끝의 휘는 각도(라디안). 방향 성분과 옆 성분을 합친다.
+      float lean = (gust * (0.35 + 0.65 * sway) * 0.95 + idle) * uWindStrength / stiff;
+      vec2 b = dir * lean + perp * flutter * 0.35 * uWindStrength;
+      float theta = clamp(length(b), 0.0, 1.35);
+      vec2 bdir = theta > 1e-4 ? b / length(b) : dir;
+
+      // 원호를 따라 휜다: 잎 길이를 유지하므로 센 바람에도 잎이 늘어나지 않는다.
+      // 높이 t에서의 위치 = ∫(sin θs, cos θs) ds  →  수평 L(1-cos θt)/θ, 수직 L sin(θt)/θ
+      float t = uv.y;
+      float horiz = theta > 1e-3 ? len * (1.0 - cos(theta * t)) / theta : 0.0;
+      float vert = theta > 1e-3 ? len * sin(theta * t) / theta : len * t;
+      vec3 rel = world.xyz - root; // 잎 폭과 기울기 성분
+      world.xyz = root + vec3(rel.x, 0.0, rel.z) + vec3(bdir.x * horiz, vert, bdir.y * horiz);
+
+      wind = gust * (0.6 + 0.4 * (sway * 0.5 + 0.5));
     #endif
     vHeight = uv.y;
     vWind = wind;

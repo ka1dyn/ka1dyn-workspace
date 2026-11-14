@@ -28,7 +28,7 @@ export interface NightLab {
   scene: "old" | "night"; // old: 기존 돌 지형·스튜디오 조명, night: 밤 잔디밭
   grass: boolean;
   grassCount: number;
-  grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할)
+  grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할). 2면 꺾인 막대처럼 휜다
   wind: boolean;
   windStrength: number; // 바람 세기 배율
   grassHeight: number; // 잎 높이 배율 (셰이더 uniform이라 다시 심지 않는다)
@@ -90,10 +90,10 @@ export const useLab = create<LabState>(() => ({
     scene: "night",
     grass: true,
     grassCount: 100000,
-    grassSegments: 2,
+    grassSegments: 4,
     wind: true,
     windStrength: 1,
-    grassHeight: 2,
+    grassHeight: 1.7,
     grassWidth: 1.3,
     grassOnWater: false,
     puddles: true,
