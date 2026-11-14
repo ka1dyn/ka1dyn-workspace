@@ -4,6 +4,7 @@ import { Splashes } from "../Rain/Splashes";
 import { FOG_COLOR, FOG_FAR, FOG_NEAR } from "./constants";
 import Sky from "./Sky";
 import Grass from "./Grass";
+import Water from "./Water";
 import ReflectLayer from "./ReflectLayer";
 import { useLab } from "@/lab/store";
 
@@ -24,6 +25,15 @@ export default function NightScene() {
           segments={n.grassSegments}
           wind={n.wind}
           inReflection={n.grassInReflection}
+        />
+      )}
+      {n.puddles && (
+        <Water
+          reflection={n.reflection}
+          reflectionRes={n.reflectionRes}
+          blur={n.blur}
+          grassInReflection={n.grassInReflection}
+          rippleRadius={n.rippleRadius}
         />
       )}
       <NightRain />
