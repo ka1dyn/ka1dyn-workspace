@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "./constants";
 import { clumpNoise, getWindTexture } from "./noise";
+import { InteractionMap } from "./interaction";
 import { terrainLayout, useTerrainSampler } from "./terrain";
 
 // 인스턴스 잔디: 위로 갈수록 좁아지는 띠 하나를 InstancedMesh로 수만 번 그린다 (드로우콜 1).
@@ -47,8 +48,9 @@ const vertexShader = /* glsl */ `
   uniform float uWidthScale;
   uniform float uWindStrength;
   uniform float uWindSpeed;
-  uniform vec3 uCursor; // x, z: 커서가 가리키는 땅 위의 점, z: 밀기 세기
-  uniform float uCursorRadius;
+  uniform sampler2D uPush;   // 눌림 지도 (interaction.ts): rg = 눕는 방향 × 세기
+  uniform float uPushExtent; // 눌림 지도가 덮는 월드 한 변 (m)
+  uniform float uPushAngle;  // 세기 1일 때 휘는 각도 (라디안)
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -107,13 +109,13 @@ const vertexShader = /* glsl */ `
     #endif
 
     #ifdef CURSOR
-      // 커서 밀기: 커서(땅 위의 점)에서 멀어지는 쪽으로 눕힌다. 가까울수록 세게.
-      // uCursor.z는 커서가 땅 위에 있고 움직일수록 커지는 세기(0이면 효과 없음)
-      vec2 fromCursor = root.xz - uCursor.xy;
-      float dist = length(fromCursor);
-      float near = 1.0 - smoothstep(uCursorRadius * 0.2, uCursorRadius, dist);
-      vec2 away = dist > 1e-4 ? fromCursor / dist : dir;
-      b += away * near * near * 1.25 * uCursor.z;
+      // 커서 밀기: 커서가 쓸고 지나간 방향으로 눕고, 눌림 지도가 옅어지는 만큼 천천히 다시 선다.
+      // 세기는 끝부분에서 감속하도록 smoothstep을 거쳐 "툭" 서지 않고 부드럽게 일어나게 한다.
+      vec2 push = texture2D(uPush, root.xz / uPushExtent + 0.5).rg;
+      float pushLen = length(push);
+      if (pushLen > 1e-4) {
+        b += push / pushLen * smoothstep(0.0, 1.0, pushLen) * uPushAngle;
+      }
     #endif
 
     float theta = clamp(length(b), 0.0, 1.35);
@@ -229,8 +231,9 @@ export default function Grass({
           uWidthScale: { value: 1 },
           uWindStrength: { value: 1 },
           uWindSpeed: { value: 1 },
-          uCursor: { value: new THREE.Vector3(0, 0, 0) },
-          uCursorRadius: { value: 1 },
+          uPush: { value: null },
+          uPushExtent: { value: 1 },
+          uPushAngle: { value: 1.2 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           // 땅 너머로 보이는 하늘 아래쪽(Sky.tsx의 숲 실루엣 색)과 맞춘다
@@ -306,7 +309,7 @@ export default function Grass({
     else mesh.current.layers.disable(GRASS_LAYER);
   }, [inReflection]);
 
-  // ---- 커서 밀기: 화면 커서를 땅 높이 평면에 투영한 점을 셰이더로 넘긴다 ----
+  // ---- 커서 밀기: 화면 커서를 땅 높이 평면에 투영하고, 지나간 길을 눌림 지도에 기록한다 ----
   // 장면 전체에 레이캐스트하지 않고 평면 하나와만 교차시켜서 비용이 거의 없다.
   const gl = useThree((s) => s.gl);
   // 매 프레임 바뀌는 값이라 렌더와 상관없는 ref에 둔다
@@ -315,13 +318,22 @@ export default function Grass({
     plane: new THREE.Plane(new THREE.Vector3(0, 1, 0), -CURSOR_PLANE_Y),
     hit: new THREE.Vector3(),
     pos: new THREE.Vector2(), // 부드럽게 따라가는 커서 위치 (x, z)
+    prev: new THREE.Vector2(), // 지난 프레임 위치
     target: new THREE.Vector2(),
-    last: new THREE.Vector2(),
+    dir: new THREE.Vector2(1, 0), // 이동 방향 (부드럽게 돈다)
+    move: new THREE.Vector2(),
     speed: 0,
-    amount: 0,
     inside: false,
     ready: false,
+    map: null as InteractionMap | null,
   });
+  useEffect(() => {
+    const c = cursorRef.current;
+    return () => {
+      c.map?.dispose();
+      c.map = null;
+    };
+  }, []);
   useEffect(() => {
     // 캔버스 밖(패널·HUD 위 포함)으로 나가면 밀기를 서서히 끈다
     const cursor = cursorRef.current;
@@ -342,32 +354,51 @@ export default function Grass({
     const n = useLab.getState().night;
     const u = (mesh.current.material as THREE.ShaderMaterial).uniforms;
     if (n.cursorPush) {
-      const cursor = cursorRef.current;
+      const c = cursorRef.current;
       const dt = Math.min(delta, 0.05);
-      cursor.raycaster.setFromCamera(pointer, camera);
+      c.map ??= new InteractionMap();
+      c.raycaster.setFromCamera(pointer, camera);
       const onGround =
-        cursor.inside &&
-        cursor.raycaster.ray.intersectPlane(cursor.plane, cursor.hit) !== null;
-      if (onGround) {
-        if (!cursor.ready) {
-          cursor.pos.set(cursor.hit.x, cursor.hit.z);
-          cursor.last.copy(cursor.pos);
-          cursor.ready = true;
-        }
-        // 위치는 빠르게 따라가고(떨림 제거), 속도는 이동 거리로 구해 천천히 따라간다
-        cursor.target.set(cursor.hit.x, cursor.hit.z);
-        cursor.pos.lerp(cursor.target, 1 - Math.exp(-dt * 25));
-        const v = cursor.pos.distanceTo(cursor.last) / Math.max(dt, 1e-3);
-        cursor.last.copy(cursor.pos);
-        cursor.speed += (v - cursor.speed) * (1 - Math.exp(-dt * 6));
+        c.inside && c.raycaster.ray.intersectPlane(c.plane, c.hit) !== null;
+      if (onGround && !c.ready) {
+        c.pos.set(c.hit.x, c.hit.z);
+        c.prev.copy(c.pos);
+        c.ready = true;
       }
-      // 땅 위에 있으면 기본 세기, 빠르게 움직일수록 더 세게 (초당 3m 이상이면 최대)
-      const target = onGround
-        ? n.cursorStrength * (0.55 + 0.45 * Math.min(cursor.speed / 3, 1))
-        : 0;
-      cursor.amount += (target - cursor.amount) * (1 - Math.exp(-dt * 8));
-      u.uCursor.value.set(cursor.pos.x, cursor.pos.y, cursor.amount);
-      u.uCursorRadius.value = n.cursorRadius;
+      c.prev.copy(c.pos);
+      let stamp = 0;
+      if (onGround) {
+        // 위치는 빠르게 따라가서 떨림만 없앤다
+        c.target.set(c.hit.x, c.hit.z);
+        c.pos.lerp(c.target, 1 - Math.exp(-dt * 25));
+        c.move.subVectors(c.pos, c.prev);
+        const dist = c.move.length();
+        c.speed +=
+          (dist / Math.max(dt, 1e-3) - c.speed) * (1 - Math.exp(-dt * 8));
+        // 이동 방향을 부드럽게 따라가 잎이 커서가 움직인 쪽으로 눕는다
+        if (dist > 1e-4) {
+          c.move.divideScalar(dist);
+          c.dir.lerp(c.move, 1 - Math.exp(-dt * 12)).normalize();
+        }
+        // 빠를수록 세게 (초당 2m 이상이면 최대). 프레임 길이에 비례해 쌓여 프레임 속도와 무관하다
+        stamp =
+          n.cursorStrength * Math.min(c.speed / 2, 1) * Math.min(dt * 10, 1);
+      } else {
+        c.speed = 0;
+      }
+      // 들판 전체(잔디를 심는 원)를 덮는 크기
+      const extent = outer * 2;
+      c.map.update(gl, {
+        extent,
+        from: c.prev,
+        to: c.pos,
+        dir: c.dir,
+        stamp,
+        radius: n.cursorRadius,
+        recover: dt / Math.max(n.cursorRecover, 0.05),
+      });
+      u.uPush.value = c.map.texture;
+      u.uPushExtent.value = extent;
     }
     u.uTime.value = clock.elapsedTime;
     u.uHeightScale.value = n.grassHeight;

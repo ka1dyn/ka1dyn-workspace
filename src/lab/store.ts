@@ -38,7 +38,8 @@ export interface NightLab {
   grassOnWater: boolean;
   cursorPush: boolean; // 커서가 닿는 잔디가 바깥으로 눕는다
   cursorRadius: number; // 커서 밀기 반경 (m)
-  cursorStrength: number; // 커서 밀기 세기 // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
+  cursorStrength: number; // 커서 밀기 세기
+  cursorRecover: number; // 눌린 잔디가 다시 서는 데 걸리는 시간 (초) // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
   puddles: boolean; // 수면 평면 (돌 지형의 낮은 곳에만 물이 보인다)
   waterLevel: number; // 수면 월드 높이 (m)
   reflection: boolean; // 평면 반사 패스 (끄면 하늘색만 비침)
@@ -106,6 +107,7 @@ export const useLab = create<LabState>(() => ({
     cursorPush: true,
     cursorRadius: 0.9,
     cursorStrength: 1,
+    cursorRecover: 2,
     puddles: true,
     waterLevel: -0.03,
     reflection: true,

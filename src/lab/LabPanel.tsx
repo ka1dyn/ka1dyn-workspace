@@ -26,6 +26,7 @@ export default function LabPanel() {
       "커서로 잔디 밀기": true,
       "커서 반경 (m)": { value: 0.9, min: 0.2, max: 3, step: 0.05 },
       "커서 세기": { value: 1, min: 0, max: 2, step: 0.05 },
+      "다시 서는 시간 (초)": { value: 2, min: 0.3, max: 6, step: 0.1 },
       물웅덩이: true,
       // 패널 칸이 좁아 m 단위 소수(-0.030)가 "-0.0"으로 잘려 보이므로 cm로 표시한다
       "수면 높이 (cm)": { value: -3, min: -12, max: 8, step: 0.5 },
@@ -138,6 +139,7 @@ export default function LabPanel() {
         cursorPush: v["커서로 잔디 밀기"],
         cursorRadius: v["커서 반경 (m)"],
         cursorStrength: v["커서 세기"],
+        cursorRecover: v["다시 서는 시간 (초)"],
         puddles: v["물웅덩이"],
         waterLevel: v["수면 높이 (cm)"] / 100,
         reflection: v["평면 반사"],
