@@ -20,7 +20,7 @@ export default function LabPanel() {
       바람: true,
       "바람 세기": { value: 1, min: 0, max: 3, step: 0.05 },
       "바람 속도": { value: 1, min: 0.1, max: 3, step: 0.05 },
-      "잔디 높이 배율": { value: 1.7, min: 0.5, max: 4, step: 0.1 },
+      "잔디 높이 배율": { value: 1.9, min: 0.5, max: 4, step: 0.1 },
       "잔디 폭 배율": { value: 1.3, min: 0.5, max: 3, step: 0.1 },
       "물웅덩이에도 심기": false,
       물웅덩이: true,
@@ -34,12 +34,12 @@ export default function LabPanel() {
       "반사 흐림 (밉맵)": true,
       "반사에 잔디 포함": false,
       "파문 반경 R": {
-        value: 2,
+        value: 1,
         options: { 끔: 0, "1 (9회)": 1, "2 (25회)": 2, "3 (49회)": 3 },
       },
     }),
     "밤 조명": folder({
-      달빛: { value: 0.8, min: 0, max: 3, step: 0.05 },
+      달빛: { value: 1.6, min: 0, max: 3, step: 0.05 },
       "등 세기": { value: 4, min: 0, max: 20, step: 0.1 },
       "등 색": "#ffb36b",
       "등 위치": { value: [0, 2.3, 0], step: 0.05 },
