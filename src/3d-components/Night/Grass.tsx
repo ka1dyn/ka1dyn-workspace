@@ -4,13 +4,14 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "./constants";
 import { clumpNoise, getWindTexture } from "./noise";
-import { terrainLayout, useTerrainSampler } from "./terrain";
+import { useTerrainSampler } from "./terrain";
 
 // 인스턴스 잔디: 위로 갈수록 좁아지는 띠 하나를 InstancedMesh로 수만 번 그린다 (드로우콜 1).
 // 조명 계산 없이 높이 그라데이션 + 바람 밝기 + 퍼걸러 등의 따뜻한 빛을 셰이더에서 흉내 낸다.
 // 돌 지형 표면에 심고, 수면보다 낮은 곳(물웅덩이)은 비우며, 지형 알파맵을 따라 가장자리에서 작아진다.
 
 const INNER = 1.75; // 타일 바닥(3.2×3.2)과 퍼걸러를 비우는 정사각형 반폭
+const OUTER = 7.5; // 잔디를 심는 원의 반지름. 지형 알파맵이 약 7.3m에서 0이 된다
 const SHORE = 0.015; // 수면보다 이만큼 높은 곳부터 심는다
 
 function createBladeGeometry(segments: number) {
@@ -162,11 +163,7 @@ export default function Grass({
   inReflection,
 }: GrassProps) {
   const mesh = useRef<THREE.InstancedMesh>(null!);
-  const groundSize = useLab((s) => s.night.groundSize);
-  const layout = useMemo(() => terrainLayout(groundSize), [groundSize]);
-  const terrain = useTerrainSampler(layout);
-  // 잔디를 심는 원의 반지름. 지형 알파맵이 한 변의 약 0.49배 거리에서 0이 된다
-  const outer = groundSize * 0.5;
+  const terrain = useTerrainSampler();
   // 수면 높이가 바뀌면 물에 잠기는 자리가 달라지므로 다시 심는다
   const waterLevel = useLab((s) => s.night.waterLevel);
   const puddles = useLab((s) => s.night.puddles);
@@ -211,7 +208,7 @@ export default function Grass({
     let guard = 0;
     while (placed < count && guard++ < count * 20) {
       // 원 안에 균일하게 뽑는다
-      const r = Math.sqrt(rand()) * outer;
+      const r = Math.sqrt(rand()) * OUTER;
       const a = rand() * Math.PI * 2;
       const x = Math.cos(a) * r;
       const z = Math.sin(a) * r;
@@ -238,7 +235,7 @@ export default function Grass({
     }
     m.count = placed;
     m.instanceMatrix.needsUpdate = true;
-  }, [count, terrain, outer, waterLevel, puddles, onWater]);
+  }, [count, terrain, waterLevel, puddles, onWater]);
 
   useLayoutEffect(() => {
     if (inReflection) mesh.current.layers.enable(GRASS_LAYER);

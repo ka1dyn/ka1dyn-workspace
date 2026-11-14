@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { GRASS_LAYER, REFLECT_LAYER } from "./constants";
 import { getWindTexture } from "./noise";
 import { PlanarReflection } from "./PlanarReflection";
-import { TERRAIN, terrainLayout, useTerrainTextures } from "./terrain";
+import { TERRAIN, useTerrainTextures } from "./terrain";
 
 // 돌 지형 위에 까는 수면 평면. 지형보다 낮은 곳에서만 보여서 그 자리가 곧 물웅덩이가 된다
 // (높은 바위는 깊이 테스트로 수면을 가린다). 지형과 같은 그룹·크기·회전이라 UV가 같으므로
@@ -151,8 +151,6 @@ export default function Water({
   const mesh = useRef<THREE.Mesh>(null!);
   const size = useThree((s) => s.size);
   const { disp, alpha } = useTerrainTextures();
-  const groundSize = useLab((s) => s.night.groundSize);
-  const layout = useMemo(() => terrainLayout(groundSize), [groundSize]);
 
   const planar = useMemo(() => new PlanarReflection(0), []);
 
@@ -198,7 +196,7 @@ export default function Water({
         uDispScale: { value: TERRAIN.dispScale },
         uDispBias: { value: TERRAIN.dispBias },
         uBaseY: { value: TERRAIN.y },
-        uRepeat: { value: layout.repeat },
+        uRepeat: { value: TERRAIN.repeat },
         uTime: { value: 0 },
         uWaterTint: { value: new THREE.Color("#c4cfe6") },
         uDeepColor: { value: new THREE.Color("#030508") },
@@ -208,7 +206,7 @@ export default function Water({
         uLampIntensity: { value: 0 },
       },
     });
-  }, [reflection, blur, rippleRadius, planar, disp, alpha, layout]);
+  }, [reflection, blur, rippleRadius, planar, disp, alpha]);
   useEffect(() => () => material.dispose(), [material]);
 
   useFrame(({ gl, scene, camera, clock }) => {
@@ -251,7 +249,7 @@ export default function Water({
         // 반투명 지형 다음에 그려서 지형 깊이로 가려지게 한다
         renderOrder={1}
       >
-        <planeGeometry args={[layout.size, layout.size]} />
+        <planeGeometry args={[TERRAIN.size, TERRAIN.size]} />
       </mesh>
     </group>
   );

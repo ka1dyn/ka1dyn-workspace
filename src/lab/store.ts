@@ -28,7 +28,6 @@ export interface NightLab {
   scene: "old" | "night"; // old: 기존 돌 지형·스튜디오 조명, night: 밤 잔디밭
   grass: boolean;
   grassCount: number;
-  groundSize: number; // 밤 씬 돌 지형 한 변(m). 기존 씬은 15
   grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할). 2면 꺾인 막대처럼 휜다
   wind: boolean;
   windStrength: number; // 바람 세기 배율
@@ -92,7 +91,6 @@ export const useLab = create<LabState>(() => ({
     scene: "night",
     grass: true,
     grassCount: 100000,
-    groundSize: 24,
     grassSegments: 4,
     wind: true,
     windStrength: 1,

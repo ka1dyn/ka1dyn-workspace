@@ -12,7 +12,6 @@ import ReflectLayer from "./Night/ReflectLayer";
 export default function Models() {
   const m = useLab((state) => state.models);
   const night = useLab((state) => state.night.scene === "night");
-  const groundSize = useLab((state) => state.night.groundSize);
 
   return (
     <>
@@ -33,7 +32,6 @@ export default function Models() {
         // 밤 씬에서는 물웅덩이에 비치도록 반사 레이어에도 올린다 (위치·회전은 Night/terrain.ts와 같아야 한다)
         <ReflectLayer>
           <GroundBase
-            size={night ? groundSize : 15}
             position={[0, -0.03, 0]}
             rotation={[0, degToRad(50), 0]}
           />
