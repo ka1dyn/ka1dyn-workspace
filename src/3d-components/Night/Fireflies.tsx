@@ -28,7 +28,7 @@ const vertexShader = /* glsl */ `
     // 서로 나누어떨어지지 않는 주파수의 사인파를 겹쳐 같은 길을 반복하지 않게 떠다닌다
     p.x += sin(t * (0.21 + s.x * 0.2) + s.y * 6.28) * 0.6 + sin(t * (0.53 + s.z * 0.3) + s.w * 6.28) * 0.25;
     p.z += cos(t * (0.17 + s.y * 0.2) + s.z * 6.28) * 0.6 + sin(t * (0.47 + s.x * 0.3) + s.x * 12.0) * 0.25;
-    p.y += sin(t * (0.31 + s.w * 0.3) + s.x * 6.28) * 0.25 + sin(t * 1.3 + s.y * 20.0) * 0.05;
+    p.y += sin(t * (0.31 + s.w * 0.3) + s.x * 6.28) * 0.12 + sin(t * 1.3 + s.y * 20.0) * 0.04;
 
     // 깜빡임: 주기의 앞쪽에서 서서히 켜졌다가 꺼진다
     float period = 3.0 + s.z * 3.0;
@@ -83,6 +83,7 @@ const PERGOLA = 1.8; // 퍼걸러 안(정사각형 반폭)은 비운다
 export default function Fireflies() {
   const count = useLab((s) => s.night.fireflies);
   const groundSize = useLab((s) => s.night.groundSize);
+  const maxHeight = useLab((s) => s.night.fireflyMaxHeight);
   const points = useRef<THREE.Points>(null!);
 
   const geometry = useMemo(() => {
@@ -97,8 +98,9 @@ export default function Fireflies() {
       const x = Math.cos(a) * r;
       const z = Math.sin(a) * r;
       if (Math.abs(x) < PERGOLA && Math.abs(z) < PERGOLA) continue;
-      // 잔디(최대 약 0.8m) 위로 주로 날도록 0.4~1.8m
-      pos.set([x, 0.4 + rand() * 1.4, z], i * 3);
+      // 잔디 끝(평균 약 0.4m, 최대 약 0.8m) 근처에 붙어 날고 가끔만 높이 오르도록
+      // 낮은 쪽에 몰린 분포(거듭제곱)로 0.25m ~ 최대 높이 사이에 둔다
+      pos.set([x, 0.25 + Math.pow(rand(), 2.2) * (maxHeight - 0.25), z], i * 3);
       seed.set([rand(), rand(), rand(), rand()], i * 4);
       i++;
     }
@@ -106,7 +108,7 @@ export default function Fireflies() {
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     g.setAttribute("aSeed", new THREE.BufferAttribute(seed, 4));
     return g;
-  }, [count, groundSize]);
+  }, [count, groundSize, maxHeight]);
 
   const material = useMemo(
     () =>

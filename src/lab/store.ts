@@ -54,6 +54,7 @@ export interface NightLab {
   fireflySpeed: number; // 떠다니는 속도 배율
   fireflyFalloff: number; // 거리 감쇠 (1 = 실제 원근, 0 = 같은 크기)
   fireflyMinPx: number; // 최소 크기 (CSS px)
+  fireflyMaxHeight: number; // 가장 높이 나는 높이 (m). 대부분은 잔디 끝 근처에 머문다
   rainCount: number; // 빗방울 개수 (기존 300)
   rainSpeed: number; // 떨어지는 속도 m/s (기존 6)
   rainSpread: number; // 비가 내리는 정사각형 한 변 m (기존 10)
@@ -139,6 +140,7 @@ export const useLab = create<LabState>(() => ({
     fireflySpeed: 1.2,
     fireflyFalloff: 0.4,
     fireflyMinPx: 5,
+    fireflyMaxHeight: 1.1,
     rainCount: 300,
     rainSpeed: 7.5,
     rainSpread: 12,
