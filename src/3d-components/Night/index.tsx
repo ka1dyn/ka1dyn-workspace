@@ -6,6 +6,7 @@ import Sky from "./Sky";
 import Grass from "./Grass";
 import Water from "./Water";
 import ReflectLayer from "./ReflectLayer";
+import Grain from "./Grain";
 import { useLab } from "@/lab/store";
 
 // 밤 잔디밭 씬. 기존 돌 지형(Models.tsx의 GroundBase)은 그대로 두고,
@@ -37,6 +38,7 @@ export default function NightScene() {
         />
       )}
       <NightRain />
+      <Grain />
     </>
   );
 }

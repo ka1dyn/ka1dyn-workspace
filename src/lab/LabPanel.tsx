@@ -42,6 +42,11 @@ export default function LabPanel() {
         options: { 끔: 0, "1 (9회)": 1, "2 (25회)": 2, "3 (49회)": 3 },
       },
     }),
+    "필름 그레인": folder({
+      "그레인 켜기": true,
+      "그레인 세기": { value: 0.15, min: 0, max: 0.6, step: 0.01 },
+      "입자 크기 (px)": { value: 1.5, min: 1, max: 4, step: 0.25 },
+    }),
     "밤 조명": folder({
       달빛: { value: 1.6, min: 0, max: 3, step: 0.05 },
       "등 세기": { value: 4, min: 0, max: 20, step: 0.1 },
@@ -140,6 +145,9 @@ export default function LabPanel() {
         cursorRadius: v["커서 반경 (m)"],
         cursorStrength: v["커서 세기"],
         cursorRecover: v["다시 서는 시간 (초)"],
+        grain: v["그레인 켜기"],
+        grainAmount: v["그레인 세기"],
+        grainSize: v["입자 크기 (px)"],
         puddles: v["물웅덩이"],
         waterLevel: v["수면 높이 (cm)"] / 100,
         reflection: v["평면 반사"],

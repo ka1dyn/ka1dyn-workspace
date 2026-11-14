@@ -39,7 +39,10 @@ export interface NightLab {
   cursorPush: boolean; // 커서가 닿는 잔디가 바깥으로 눕는다
   cursorRadius: number; // 커서 밀기 반경 (m)
   cursorStrength: number; // 커서 밀기 세기
-  cursorRecover: number; // 눌린 잔디가 다시 서는 데 걸리는 시간 (초) // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
+  cursorRecover: number; // 눌린 잔디가 다시 서는 데 걸리는 시간 (초)
+  grain: boolean; // 필름 그레인 (Night/Grain.tsx)
+  grainAmount: number; // 그레인 세기 (밝기 변화 폭)
+  grainSize: number; // 그레인 입자 크기 (화면 픽셀) // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
   puddles: boolean; // 수면 평면 (돌 지형의 낮은 곳에만 물이 보인다)
   waterLevel: number; // 수면 월드 높이 (m)
   reflection: boolean; // 평면 반사 패스 (끄면 하늘색만 비침)
@@ -108,6 +111,9 @@ export const useLab = create<LabState>(() => ({
     cursorRadius: 1.2,
     cursorStrength: 1.5,
     cursorRecover: 0.5,
+    grain: true,
+    grainAmount: 0.15,
+    grainSize: 1.5,
     puddles: true,
     waterLevel: -0.03,
     reflection: true,
