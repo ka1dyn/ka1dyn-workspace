@@ -18,6 +18,7 @@ export default function LabPanel() {
       "잎 분할": { value: 6, options: { "2": 2, "6": 6, "10": 10 } },
       바람: true,
       물웅덩이: true,
+      "수면 높이": { value: -0.03, min: -0.15, max: 0.2, step: 0.005 },
       "평면 반사": true,
       "반사 해상도": {
         value: 0.5,
@@ -29,6 +30,14 @@ export default function LabPanel() {
         value: 2,
         options: { 끔: 0, "1 (9회)": 1, "2 (25회)": 2, "3 (49회)": 3 },
       },
+    }),
+    "밤 조명": folder({
+      달빛: { value: 0.8, min: 0, max: 3, step: 0.05 },
+      "등 세기": { value: 4, min: 0, max: 20, step: 0.1 },
+      "등 색": "#ffb36b",
+      "등 위치": { value: [0, 2.3, 0], step: 0.05 },
+      하늘빛: { value: 0.35, min: 0, max: 2, step: 0.05 },
+      환경맵: { value: 0.12, min: 0, max: 1, step: 0.01 },
     }),
     "측정 도구": {
       value: "none",
@@ -111,11 +120,18 @@ export default function LabPanel() {
         grassSegments: v["잎 분할"] as number,
         wind: v["바람"],
         puddles: v["물웅덩이"],
+        waterLevel: v["수면 높이"],
         reflection: v["평면 반사"],
         reflectionRes: v["반사 해상도"] as number,
         blur: v["반사 흐림 (밉맵)"],
         grassInReflection: v["반사에 잔디 포함"],
         rippleRadius: v["파문 반경 R"] as number,
+        moonIntensity: v["달빛"],
+        lampIntensity: v["등 세기"],
+        lampColor: v["등 색"],
+        lampPos: v["등 위치"] as [number, number, number],
+        hemiIntensity: v["하늘빛"],
+        envIntensity: v["환경맵"],
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

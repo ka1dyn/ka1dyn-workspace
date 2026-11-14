@@ -3,6 +3,8 @@ import { useLab } from "@/lab/store";
 import { Environment, Lightformer, useHelper } from "@react-three/drei";
 import { memo, useRef } from "react";
 import * as THREE from "three";
+import NightLights from "./Night/NightLights";
+import ReflectLayer from "./Night/ReflectLayer";
 // import { useFrame } from "@react-three/fiber";
 // import { useLayoutEffect, useMemo, useRef } from "react";
 
@@ -19,9 +21,21 @@ export default function Lights() {
   const environment = useLab((state) => state.environment);
   const rectArea = useLab((state) => state.rectArea);
   const ambient = useLab((state) => state.ambient);
+  const night = useLab((state) => state.night.scene === "night");
 
   useHelper(lightRef, THREE.PointLightHelper, 0.2, "hotpink");
   useHelper(spotRef, THREE.SpotLightHelper, "cyan");
+
+  // 밤 씬: 스튜디오 조명 대신 달빛과 등 하나. 환경맵은 PBR 재질(퍼걸러·맥북)이 너무 검지 않도록 약하게만 남긴다.
+  if (night)
+    return (
+      <>
+        <ReflectLayer>
+          <NightLights />
+        </ReflectLayer>
+        {environment && <StudioEnvironment intensity={0.12} />}
+      </>
+    );
 
   return (
     <>
@@ -57,10 +71,14 @@ export default function Lights() {
 // Environment를 분리해 memo로 고정한다.
 // Lights가 다시 렌더링될 때(intensity 슬라이더, 실험실 토글) Lightformer 자식이 새 JSX로 넘어가면
 // drei Environment(frames=1)가 큐브맵 6면을 다시 그리고 PMREM을 재생성한다.
-// props가 없는 memo 컴포넌트라 부모가 다시 렌더링돼도 자식이 바뀌지 않는다.
-const StudioEnvironment = memo(function StudioEnvironment() {
+// props가 숫자 하나뿐인 memo 컴포넌트라 부모가 다시 렌더링돼도 자식이 바뀌지 않는다.
+const StudioEnvironment = memo(function StudioEnvironment({
+  intensity = 1,
+}: {
+  intensity?: number;
+}) {
   return (
-    <Environment frames={1}>
+    <Environment frames={1} environmentIntensity={intensity}>
       {/* Front */}
 
       <Lightformer

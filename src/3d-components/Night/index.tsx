@@ -1,12 +1,20 @@
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Drops } from "../Rain/Drops";
 import { Splashes } from "../Rain/Splashes";
+import { FOG_COLOR, FOG_FAR, FOG_NEAR } from "./constants";
+import Sky from "./Sky";
+import ReflectLayer from "./ReflectLayer";
 
-// 밤 잔디밭 씬. 기존 씬의 돌 지형·금속 빗물 바닥을 대신한다.
-// 퍼걸러, 타일 바닥, 맥북, 소품은 Models.tsx에서 그대로 쓴다.
+// 밤 잔디밭 씬. 기존 돌 지형(Models.tsx의 GroundBase)은 그대로 두고,
+// 금속 빗물 바닥 대신 수면 평면을 깔아 지형의 낮은 곳을 물웅덩이로 만든다.
+// 퍼걸러, 타일 바닥, 맥북, 소품도 Models.tsx에서 그대로 쓴다.
 export default function NightScene() {
   return (
     <>
+      <fog attach="fog" args={[FOG_COLOR, FOG_NEAR, FOG_FAR]} />
+      <ReflectLayer>
+        <Sky />
+      </ReflectLayer>
       <NightRain />
     </>
   );

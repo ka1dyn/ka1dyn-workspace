@@ -30,12 +30,20 @@ export interface NightLab {
   grassCount: number;
   grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할)
   wind: boolean;
-  puddles: boolean;
+  puddles: boolean; // 수면 평면 (돌 지형의 낮은 곳에만 물이 보인다)
+  waterLevel: number; // 수면 월드 높이 (m)
   reflection: boolean; // 평면 반사 패스 (끄면 하늘색만 비침)
   reflectionRes: number; // 반사 타깃 해상도 (CSS 크기 대비)
   blur: boolean; // 반사 밉맵 흐림
   grassInReflection: boolean;
   rippleRadius: number; // 빗방울 파문 탐색 반경 R. 픽셀당 (2R+1)² 반복, 0이면 끔
+  // 조명 (밤 씬 전용)
+  moonIntensity: number;
+  lampIntensity: number;
+  lampColor: string;
+  lampPos: [number, number, number];
+  hemiIntensity: number;
+  envIntensity: number;
 }
 
 export interface LabState {
@@ -81,10 +89,17 @@ export const useLab = create<LabState>(() => ({
     grassSegments: 6,
     wind: true,
     puddles: true,
+    waterLevel: -0.03,
     reflection: true,
     reflectionRes: 0.5,
     blur: true,
     grassInReflection: false,
     rippleRadius: 2,
+    moonIntensity: 0.8,
+    lampIntensity: 4,
+    lampColor: "#ffb36b",
+    lampPos: [0, 2.3, 0],
+    hemiIntensity: 0.35,
+    envIntensity: 0.12,
   },
 }));
