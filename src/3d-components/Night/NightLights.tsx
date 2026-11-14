@@ -1,7 +1,7 @@
 import { useLab } from "@/lab/store";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
-import { MOON_DIR } from "./constants";
+import { setMoonDir } from "./constants";
 
 // 밤 조명: 달빛(차가운 방향광) + 퍼걸러 아래 따뜻한 등 + 약한 하늘빛. 값은 실험실 "밤 조명" 슬라이더에서 온다.
 // 그림자는 쓰지 않는다. 잔디와 수면은 조명 없는 셰이더라 이 조명을 직접 받지 않고,
@@ -12,6 +12,8 @@ export default function NightLights() {
   const lampColor = useLab((s) => s.night.lampColor);
   const lampPos = useLab((s) => s.night.lampPos);
   const hemiIntensity = useLab((s) => s.night.hemiIntensity);
+  const moonAz = useLab((s) => s.night.moonAz);
+  const moonEl = useLab((s) => s.night.moonEl);
   const scene = useThree((s) => s.scene);
 
   // 환경맵 세기는 scene에 직접 쓴다. drei Environment의 prop으로 바꾸면 자식이 다시 렌더링되며
@@ -26,7 +28,8 @@ export default function NightLights() {
     [scene],
   );
 
-  const moon = MOON_DIR.clone().multiplyScalar(20);
+  // 달빛 방향도 하늘의 달 위치를 따라간다
+  const moon = setMoonDir(moonAz, moonEl).clone().multiplyScalar(20);
   return (
     <>
       <directionalLight

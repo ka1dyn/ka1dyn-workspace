@@ -2,7 +2,7 @@ import { useLab } from "@/lab/store";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { MOON_DIR } from "./constants";
+import { MOON_DIR, setMoonDir } from "./constants";
 import { bakeMilkyWay } from "./milkyway";
 
 // 하늘 돔: 조명 계산 없이 방향만으로 색을 정한다.
@@ -274,6 +274,7 @@ export default function Sky() {
     // 재질은 메시에서 꺼내 쓴다 (useMemo 값을 직접 고치면 React 컴파일러 규칙에 걸린다)
     const u = (mesh.current.material as THREE.ShaderMaterial).uniforms;
     u.uTime.value = clock.elapsedTime;
+    setMoonDir(n.moonAz, n.moonEl); // uMoonDir가 같은 객체를 참조한다
     u.uMilkyTex.value = milky.texture;
     u.uMilky.value = n.milkyWay;
     u.uMilkyRot.value = THREE.MathUtils.degToRad(n.milkyRotation);

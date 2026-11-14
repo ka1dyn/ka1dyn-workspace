@@ -1,7 +1,21 @@
 import * as THREE from "three";
 
-// 전체 장면 카메라(7.5, 2, 6 → 원점)에서 정면 약간 왼쪽 위에 달이 보이도록 잡은 방향
-export const MOON_DIR = new THREE.Vector3(-0.72, 0.28, -0.62).normalize();
+// 달 방향. 실험실 "달 방위·고도"에서 바꿀 수 있어 값을 제자리에서 고친다
+// (하늘 셰이더 uniform이 이 객체를 그대로 참조한다).
+export const MOON_DIR = new THREE.Vector3();
+
+/** 방위(°, atan2(z, x) 기준)와 고도(°)로 달 방향을 정한다 */
+export function setMoonDir(azDeg: number, elDeg: number) {
+  const az = THREE.MathUtils.degToRad(azDeg);
+  const el = THREE.MathUtils.degToRad(elDeg);
+  MOON_DIR.set(
+    Math.cos(el) * Math.cos(az),
+    Math.sin(el),
+    Math.cos(el) * Math.sin(az),
+  );
+  return MOON_DIR;
+}
+setMoonDir(-145, 21);
 
 export const FOG_COLOR = "#0a1020";
 export const FOG_NEAR = 6;

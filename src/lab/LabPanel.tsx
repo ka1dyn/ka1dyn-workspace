@@ -1,6 +1,9 @@
 import { Leva, folder, useControls } from "leva";
 import { useEffect } from "react";
 import { IS_MSAA, useLab, type LabTool } from "./store";
+import { useCameraInit, useOverlay } from "@/stores";
+import { OverlayTypes } from "@/types/enums";
+import { overviewPosition } from "@/hooks/useCameraAnim";
 
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {
@@ -41,6 +44,13 @@ export default function LabPanel() {
         value: 1,
         options: { 끔: 0, "1 (9회)": 1, "2 (25회)": 2, "3 (49회)": 3 },
       },
+    }),
+    "카메라·달": folder({
+      "카메라 방위 (°)": { value: 62.7, min: 0, max: 120, step: 0.5 },
+      "카메라 높이 (m)": { value: 1.7, min: 0.6, max: 4, step: 0.05 },
+      "카메라 거리 (m)": { value: 9.9, min: 4, max: 10, step: 0.05 },
+      "달 방위 (°)": { value: -145, min: -180, max: 180, step: 0.5 },
+      "달 고도 (°)": { value: 21, min: 5, max: 70, step: 0.5 },
     }),
     밤하늘: folder({
       "하늘 품질": { value: "new", options: { 새로: "new", 기존: "old" } },
@@ -157,6 +167,29 @@ export default function LabPanel() {
     window.location.replace(url.toString());
   }, [msaa]);
 
+  // 카메라 슬라이더는 전체 장면(overview) 상태일 때 바로 카메라에 반영한다
+  // (시작·복귀 애니메이션은 같은 값을 overviewPosition()에서 읽는다)
+  const camKey = [
+    v["카메라 방위 (°)"],
+    v["카메라 높이 (m)"],
+    v["카메라 거리 (m)"],
+  ].join();
+  useEffect(() => {
+    // 스토어가 갱신된 다음 프레임에 적용한다
+    const id = requestAnimationFrame(() => {
+      const { cameraRef, controlRef } = useCameraInit.getState();
+      if (useOverlay.getState().type !== OverlayTypes.DEFAULT) return;
+      const camera = cameraRef?.current;
+      const controls = controlRef?.current;
+      if (!camera || !controls) return;
+      const p = overviewPosition();
+      camera.position.set(p.x, p.y, p.z);
+      controls.target.set(0, 1, 0);
+      controls.update();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [camKey]);
+
   const key = JSON.stringify(v);
   useEffect(() => {
     useLab.setState({
@@ -202,6 +235,11 @@ export default function LabPanel() {
         grainAmount: v["그레인 세기"],
         grainSize: v["입자 크기 (CSS px)"],
         grainDark: v["어두운 곳 그레인"],
+        camAngle: v["카메라 방위 (°)"],
+        camHeight: v["카메라 높이 (m)"],
+        camDistance: v["카메라 거리 (m)"],
+        moonAz: v["달 방위 (°)"],
+        moonEl: v["달 고도 (°)"],
         skyQuality: v["하늘 품질"] as "new" | "old",
         starDensity: v["별 밀도"],
         starBright: v["별 밝기"],

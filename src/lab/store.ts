@@ -48,6 +48,11 @@ export interface NightLab {
   grain: boolean; // 필름 그레인 (Night/Grain.tsx)
   grainAmount: number; // 그레인 세기 (밝기 변화 폭)
   grainSize: number; // 그레인 입자 크기 (CSS 픽셀. DPR 1.5에서 0.67 = 실제 픽셀 1개)
+  camAngle: number; // 전체 장면 카메라: 퍼걸러 중심 방위 (°, atan2(z, x))
+  camHeight: number; // 높이 (m)
+  camDistance: number; // 타깃(0, 1, 0)까지 거리 (m, 조작 상한 10)
+  moonAz: number; // 달 방위 (°)
+  moonEl: number; // 달 고도 (°)
   skyQuality: "new" | "old"; // 밤하늘 셰이더 (Night/Sky.tsx). old = 이전 하늘(비교·측정용)
   starDensity: number;
   starBright: number;
@@ -142,6 +147,11 @@ export const useLab = create<LabState>(() => ({
     grainAmount: 0.08,
     grainSize: 0.67,
     grainDark: 0.05,
+    camAngle: 62.7,
+    camHeight: 1.7,
+    camDistance: 9.9,
+    moonAz: -145,
+    moonEl: 21,
     skyQuality: "new",
     starDensity: 1,
     starBright: 1,

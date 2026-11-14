@@ -8,13 +8,18 @@ import { BASE_FOV } from "@/constants/camera";
 import { overviewFov } from "@/utils/cameraFit";
 import { useLab } from "@/lab/store";
 
-// 전체 장면(overview) 카메라 위치. 밤 씬은 기존 위치에서 퍼걸러를 중심으로 24° 돌리고
-// 높이를 1.4m로 낮춰(더 수평으로 바라봄), 달이 화면 왼쪽 위(왼쪽 약 22°, 위 약 19°)에 오고
-// 은하수가 오른쪽 끝에 절반쯤 걸리게 했다.
-const overviewPosition = () =>
-  useLab.getState().night.scene === "night"
-    ? { x: 4.41, y: 1.4, z: 8.53 }
-    : { x: 7.5, y: 2, z: 6 };
+// 전체 장면(overview) 카메라 위치. 밤 씬은 실험실 "카메라" 값(퍼걸러 중심 방위·높이·거리)으로 정한다.
+// 기본값: 기존 위치에서 퍼걸러를 중심으로 24° 돌리고, 1.7m 높이, 조작 범위 상한(10m)에 가까운 9.9m.
+// 달이 화면 왼쪽 위에, 은하수가 오른쪽 끝에 절반쯤 걸린다.
+export const overviewPosition = () => {
+  const n = useLab.getState().night;
+  if (n.scene !== "night") return { x: 7.5, y: 2, z: 6 };
+  const target = { x: 0, y: 1, z: 0 }; // 아래 애니메이션의 컨트롤 타깃과 같다
+  const dy = n.camHeight - target.y;
+  const r = Math.sqrt(Math.max(n.camDistance ** 2 - dy * dy, 0.01));
+  const a = (n.camAngle * Math.PI) / 180;
+  return { x: r * Math.cos(a), y: n.camHeight, z: r * Math.sin(a) };
+};
 
 export default function useCameraAnim() {
   const { cameraRef, controlRef } = useCameraInit(
