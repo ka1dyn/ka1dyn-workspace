@@ -1,5 +1,5 @@
 import { useLab } from "@/lab/store";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "./constants";
@@ -12,6 +12,8 @@ import { terrainLayout, useTerrainSampler } from "./terrain";
 
 const INNER = 1.75; // 타일 바닥(3.2×3.2)과 퍼걸러를 비우는 정사각형 반폭
 const SHORE = 0.015; // 수면보다 이만큼 높은 곳부터 심는다
+// 커서를 투영하는 땅 높이. 지형 평균 높이 근처에 잎 중간쯤을 맞춘다
+const CURSOR_PLANE_Y = 0.1;
 
 function createBladeGeometry(segments: number) {
   const positions: number[] = [];
@@ -45,6 +47,8 @@ const vertexShader = /* glsl */ `
   uniform float uWidthScale;
   uniform float uWindStrength;
   uniform float uWindSpeed;
+  uniform vec3 uCursor; // x, z: 커서가 가리키는 땅 위의 점, z: 밀기 세기
+  uniform float uCursorRadius;
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -57,10 +61,14 @@ const vertexShader = /* glsl */ `
     vec3 local = position * vec3(uWidthScale, uHeightScale, 1.0);
     vec4 world = modelMatrix * instanceMatrix * vec4(local, 1.0);
     float wind = 0.5;
+    // 잎 뿌리(인스턴스 행렬의 이동 성분)와 잎 길이(인스턴스 y 배율 × 높이 배율)
+    vec3 root = (modelMatrix * instanceMatrix[3]).xyz;
+    float len = length(instanceMatrix[1].xyz) * uHeightScale;
+    // 잎끝이 휘는 방향과 각도(라디안)를 벡터 하나에 모은다. 바람과 커서가 각자 더한다.
+    vec2 b = vec2(0.0);
+    vec2 dir = vec2(1.0, 0.0);
+
     #ifdef WIND
-      // 잎 뿌리(인스턴스 행렬의 이동 성분)와 잎 길이(인스턴스 y 배율 × 높이 배율)
-      vec3 root = (modelMatrix * instanceMatrix[3]).xyz;
-      float len = length(instanceMatrix[1].xyz) * uHeightScale;
       float time = uTime * uWindSpeed; // 바람 속도 배율
 
       // 들판 전체가 파도치듯 움직이게 한다: 잎마다 따로 흔들리지 않고,
@@ -69,7 +77,7 @@ const vertexShader = /* glsl */ `
       // 1) 바람 방향: 들판 전체가 함께 천천히 바뀐다 (장소마다 흩뜨리지 않음)
       float ang = 0.6 + (texture2D(uWind, vec2(time * 0.004, 0.37)).a - 0.5) * 1.6
                       + (texture2D(uWind, root.xz * 0.006).a - 0.5) * 0.4;
-      vec2 dir = vec2(cos(ang), sin(ang));
+      dir = vec2(cos(ang), sin(ang));
       vec2 perp = vec2(-dir.y, dir.x);
 
       // 2) 파도: 바람 방향 좌표를 따라 흘러가는 두 개의 물결을 겹친다.
@@ -92,22 +100,33 @@ const vertexShader = /* glsl */ `
       // 잎끝이 뿌리보다 살짝 늦게 따라와 낭창하게 휜다
       float lag = sin(along * 1.4 - time * 2.0 - uv.y * 0.6) * 0.05;
 
-      // 잎끝의 휘는 각도(라디안): 마루가 지나갈 때 바람 쪽으로 눕고 골에서는 다시 선다
+      // 마루가 지나갈 때 바람 쪽으로 눕고 골에서는 다시 선다
       float lean = (0.08 + gust * wave * 0.95 + jitter + lag) * uWindStrength / stiff;
-      vec2 b = dir * lean;
-      float theta = clamp(length(b), 0.0, 1.35);
-      vec2 bdir = theta > 1e-4 ? b / length(b) : dir;
-
-      // 원호를 따라 휜다: 잎 길이를 유지하므로 센 바람에도 잎이 늘어나지 않는다.
-      // 높이 t에서의 위치 = ∫(sin θs, cos θs) ds  →  수평 L(1-cos θt)/θ, 수직 L sin(θt)/θ
-      float t = uv.y;
-      float horiz = theta > 1e-3 ? len * (1.0 - cos(theta * t)) / theta : 0.0;
-      float vert = theta > 1e-3 ? len * sin(theta * t) / theta : len * t;
-      vec3 rel = world.xyz - root; // 잎 폭과 기울기 성분
-      world.xyz = root + vec3(rel.x, 0.0, rel.z) + vec3(bdir.x * horiz, vert, bdir.y * horiz);
-
+      b += dir * lean;
       wind = gust * wave; // 마루가 지나가는 곳이 밝아져 파도가 눈에 보인다
     #endif
+
+    #ifdef CURSOR
+      // 커서 밀기: 커서(땅 위의 점)에서 멀어지는 쪽으로 눕힌다. 가까울수록 세게.
+      // uCursor.z는 커서가 땅 위에 있고 움직일수록 커지는 세기(0이면 효과 없음)
+      vec2 fromCursor = root.xz - uCursor.xy;
+      float dist = length(fromCursor);
+      float near = 1.0 - smoothstep(uCursorRadius * 0.2, uCursorRadius, dist);
+      vec2 away = dist > 1e-4 ? fromCursor / dist : dir;
+      b += away * near * near * 1.25 * uCursor.z;
+    #endif
+
+    float theta = clamp(length(b), 0.0, 1.35);
+    if (theta > 1e-3) {
+      vec2 bdir = b / length(b);
+      // 원호를 따라 휜다: 잎 길이를 유지하므로 세게 눌려도 잎이 늘어나지 않는다.
+      // 높이 t에서의 위치 = ∫(sin θs, cos θs) ds  →  수평 L(1-cos θt)/θ, 수직 L sin(θt)/θ
+      float t = uv.y;
+      float horiz = len * (1.0 - cos(theta * t)) / theta;
+      float vert = len * sin(theta * t) / theta;
+      vec3 rel = world.xyz - root; // 잎 폭과 기울기 성분
+      world.xyz = root + vec3(rel.x, 0.0, rel.z) + vec3(bdir.x * horiz, vert, bdir.y * horiz);
+    }
     vHeight = uv.y;
     vWind = wind;
     vWorld = world.xyz;
@@ -188,6 +207,7 @@ export default function Grass({
   }, [liveWaterLevel]);
   const puddles = useLab((s) => s.night.puddles);
   const onWater = useLab((s) => s.night.grassOnWater);
+  const cursorPush = useLab((s) => s.night.cursorPush);
 
   const geometry = useMemo(() => createBladeGeometry(segments), [segments]);
   const material = useMemo(
@@ -197,7 +217,10 @@ export default function Grass({
         fragmentShader,
         side: THREE.DoubleSide,
         fog: true,
-        defines: wind ? { WIND: "" } : {},
+        defines: {
+          ...(wind ? { WIND: "" } : {}),
+          ...(cursorPush ? { CURSOR: "" } : {}),
+        },
         uniforms: {
           ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
           uWind: { value: getWindTexture() },
@@ -206,6 +229,8 @@ export default function Grass({
           uWidthScale: { value: 1 },
           uWindStrength: { value: 1 },
           uWindSpeed: { value: 1 },
+          uCursor: { value: new THREE.Vector3(0, 0, 0) },
+          uCursorRadius: { value: 1 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           // 땅 너머로 보이는 하늘 아래쪽(Sky.tsx의 숲 실루엣 색)과 맞춘다
@@ -215,7 +240,7 @@ export default function Grass({
           uLampIntensity: { value: 0 },
         },
       }),
-    [wind],
+    [wind, cursorPush],
   );
 
   // 이전 지오메트리·재질은 바뀌거나 언마운트될 때 해제한다 (R3F는 prop으로 넘긴 객체를 해제하지 않는다)
@@ -281,9 +306,69 @@ export default function Grass({
     else mesh.current.layers.disable(GRASS_LAYER);
   }, [inReflection]);
 
-  useFrame(({ clock }) => {
+  // ---- 커서 밀기: 화면 커서를 땅 높이 평면에 투영한 점을 셰이더로 넘긴다 ----
+  // 장면 전체에 레이캐스트하지 않고 평면 하나와만 교차시켜서 비용이 거의 없다.
+  const gl = useThree((s) => s.gl);
+  // 매 프레임 바뀌는 값이라 렌더와 상관없는 ref에 둔다
+  const cursorRef = useRef({
+    raycaster: new THREE.Raycaster(),
+    plane: new THREE.Plane(new THREE.Vector3(0, 1, 0), -CURSOR_PLANE_Y),
+    hit: new THREE.Vector3(),
+    pos: new THREE.Vector2(), // 부드럽게 따라가는 커서 위치 (x, z)
+    target: new THREE.Vector2(),
+    last: new THREE.Vector2(),
+    speed: 0,
+    amount: 0,
+    inside: false,
+    ready: false,
+  });
+  useEffect(() => {
+    // 캔버스 밖(패널·HUD 위 포함)으로 나가면 밀기를 서서히 끈다
+    const cursor = cursorRef.current;
+    const el = gl.domElement.parentElement ?? gl.domElement;
+    const enter = () => (cursor.inside = true);
+    const leave = () => (cursor.inside = false);
+    el.addEventListener("pointerenter", enter);
+    el.addEventListener("pointerleave", leave);
+    el.addEventListener("pointermove", enter);
+    return () => {
+      el.removeEventListener("pointerenter", enter);
+      el.removeEventListener("pointerleave", leave);
+      el.removeEventListener("pointermove", enter);
+    };
+  }, [gl]);
+
+  useFrame(({ clock, pointer, camera }, delta) => {
     const n = useLab.getState().night;
     const u = (mesh.current.material as THREE.ShaderMaterial).uniforms;
+    if (n.cursorPush) {
+      const cursor = cursorRef.current;
+      const dt = Math.min(delta, 0.05);
+      cursor.raycaster.setFromCamera(pointer, camera);
+      const onGround =
+        cursor.inside &&
+        cursor.raycaster.ray.intersectPlane(cursor.plane, cursor.hit) !== null;
+      if (onGround) {
+        if (!cursor.ready) {
+          cursor.pos.set(cursor.hit.x, cursor.hit.z);
+          cursor.last.copy(cursor.pos);
+          cursor.ready = true;
+        }
+        // 위치는 빠르게 따라가고(떨림 제거), 속도는 이동 거리로 구해 천천히 따라간다
+        cursor.target.set(cursor.hit.x, cursor.hit.z);
+        cursor.pos.lerp(cursor.target, 1 - Math.exp(-dt * 25));
+        const v = cursor.pos.distanceTo(cursor.last) / Math.max(dt, 1e-3);
+        cursor.last.copy(cursor.pos);
+        cursor.speed += (v - cursor.speed) * (1 - Math.exp(-dt * 6));
+      }
+      // 땅 위에 있으면 기본 세기, 빠르게 움직일수록 더 세게 (초당 3m 이상이면 최대)
+      const target = onGround
+        ? n.cursorStrength * (0.55 + 0.45 * Math.min(cursor.speed / 3, 1))
+        : 0;
+      cursor.amount += (target - cursor.amount) * (1 - Math.exp(-dt * 8));
+      u.uCursor.value.set(cursor.pos.x, cursor.pos.y, cursor.amount);
+      u.uCursorRadius.value = n.cursorRadius;
+    }
     u.uTime.value = clock.elapsedTime;
     u.uHeightScale.value = n.grassHeight;
     u.uWidthScale.value = n.grassWidth;

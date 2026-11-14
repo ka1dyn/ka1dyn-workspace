@@ -35,7 +35,10 @@ export interface NightLab {
   windSpeed: number; // 바람 속도 배율 (흔들림·돌풍이 흐르는 빠르기)
   grassHeight: number; // 잎 높이 배율 (셰이더 uniform이라 다시 심지 않는다)
   grassWidth: number; // 잎 폭 배율
-  grassOnWater: boolean; // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
+  grassOnWater: boolean;
+  cursorPush: boolean; // 커서가 닿는 잔디가 바깥으로 눕는다
+  cursorRadius: number; // 커서 밀기 반경 (m)
+  cursorStrength: number; // 커서 밀기 세기 // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
   puddles: boolean; // 수면 평면 (돌 지형의 낮은 곳에만 물이 보인다)
   waterLevel: number; // 수면 월드 높이 (m)
   reflection: boolean; // 평면 반사 패스 (끄면 하늘색만 비침)
@@ -100,6 +103,9 @@ export const useLab = create<LabState>(() => ({
     grassHeight: 1.9,
     grassWidth: 1.3,
     grassOnWater: false,
+    cursorPush: true,
+    cursorRadius: 0.9,
+    cursorStrength: 1,
     puddles: true,
     waterLevel: -0.03,
     reflection: true,
