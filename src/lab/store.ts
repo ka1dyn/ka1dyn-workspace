@@ -48,6 +48,14 @@ export interface NightLab {
   grain: boolean; // 필름 그레인 (Night/Grain.tsx)
   grainAmount: number; // 그레인 세기 (밝기 변화 폭)
   grainSize: number; // 그레인 입자 크기 (CSS 픽셀. DPR 1.5에서 0.67 = 실제 픽셀 1개)
+  skyQuality: "new" | "old"; // 밤하늘 셰이더 (Night/Sky.tsx). old = 이전 하늘(비교·측정용)
+  starDensity: number;
+  starBright: number;
+  starTwinkle: number; // 별 반짝임 세기 (밝기 ±)
+  milkyWay: number; // 은하수 세기
+  milkyRotation: number; // 은하수 방위 회전 (도)
+  treeLayers: number; // 숲 겹 수 (1~3)
+  treeHeight: number; // 숲 높이 배율
   fireflies: number; // 반딧불이 수 (Night/Fireflies.tsx)
   fireflySize: number; // 빛 번짐까지 포함한 지름 (m)
   fireflyBright: number;
@@ -134,6 +142,14 @@ export const useLab = create<LabState>(() => ({
     grainAmount: 0.08,
     grainSize: 0.67,
     grainDark: 0.05,
+    skyQuality: "new",
+    starDensity: 1,
+    starBright: 1,
+    starTwinkle: 0.15,
+    milkyWay: 1,
+    milkyRotation: 0,
+    treeLayers: 3,
+    treeHeight: 1,
     fireflies: 30,
     fireflySize: 0.07,
     fireflyBright: 1.5,
