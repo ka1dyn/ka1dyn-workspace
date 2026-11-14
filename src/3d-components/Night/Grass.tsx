@@ -112,19 +112,25 @@ const vertexShader = /* glsl */ `
     #ifdef CURSOR
       // 커서 밀기: 커서가 쓸고 지나간 방향으로 눕고, 눌림 지도가 옅어지는 만큼 천천히 다시 선다.
       // 세기는 일정한 속도로 줄어들므로(interaction.ts) 손을 뗀 뒤 지난 시간 s를 거꾸로 구할 수 있다.
-      // 휘는 정도 = 빠른 부분 70%(시간 상수 0.07초) + 느린 부분 30%(회복 시간 끝까지 감속).
-      // 손을 떼고 0.1초면 약 60% 일어서고, 나머지는 회복 시간에 맞춰 천천히 똑바로 선다.
+      // 휘는 정도 = 빠른 부분 70% + 느린 부분 30%(회복 시간 끝까지 감속).
+      // 손을 떼고 0.1초면 약 60% 회복하고, 나머지는 회복 시간에 맞춰 감속하며 똑바로 선다.
+      // 잎마다 뻣뻣함과 복원 속도를 달리해 한 덩어리로 움직이지 않게 한다.
       vec2 push = texture2D(uPush, root.xz / uPushExtent + 0.5).rg;
       float pushLen = length(push);
       if (pushLen > 1e-4) {
-        float s = (1.0 - pushLen) * uPushRecover;
+        float pseed = texture2D(uWind, root.xz * 0.5 + 0.31).b;
+        float pstiff = 0.75 + pseed * 0.5;
+        float s = (1.0 - pushLen) * uPushRecover * (0.8 + 0.4 * pseed);
+        float fast = exp(-s / 0.08);
         float slow = pushLen * pushLen; // = (1 - s / 회복 시간)²
-        float lean = 0.7 * exp(-s / 0.07) + 0.3 * slow;
-        b += push / pushLen * lean * uPushAngle;
+        float lean = 0.7 * fast + 0.3 * slow;
+        b += push / pushLen * lean * uPushAngle / pstiff;
       }
     #endif
 
-    float theta = clamp(length(b), 0.0, 1.35);
+    // 휘는 각도 상한은 딱 자르지 않고 부드럽게 포화시킨다(tanh).
+    // clamp로 자르면 세게 눌린 잎들이 상한에 붙어 같은 각도로 멈춰 있다가, 상한 아래로 내려와서야 움직였다.
+    float theta = 1.35 * tanh(length(b) / 1.35);
     if (theta > 1e-3) {
       vec2 bdir = b / length(b);
       // 원호를 따라 휜다: 잎 길이를 유지하므로 세게 눌려도 잎이 늘어나지 않는다.
@@ -239,7 +245,7 @@ export default function Grass({
           uWindSpeed: { value: 1 },
           uPush: { value: null },
           uPushExtent: { value: 1 },
-          uPushAngle: { value: 1.2 },
+          uPushAngle: { value: 1.0 },
           uPushRecover: { value: 2 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
@@ -381,15 +387,16 @@ export default function Grass({
         c.move.subVectors(c.pos, c.prev);
         const dist = c.move.length();
         c.speed +=
-          (dist / Math.max(dt, 1e-3) - c.speed) * (1 - Math.exp(-dt * 8));
+          (dist / Math.max(dt, 1e-3) - c.speed) * (1 - Math.exp(-dt * 25));
         // 이동 방향을 부드럽게 따라가 잎이 커서가 움직인 쪽으로 눕는다
         if (dist > 1e-4) {
           c.move.divideScalar(dist);
           c.dir.lerp(c.move, 1 - Math.exp(-dt * 12)).normalize();
         }
-        // 빠를수록 세게 (초당 2m 이상이면 최대). 프레임 길이에 비례해 쌓여 프레임 속도와 무관하다
-        stamp =
-          n.cursorStrength * Math.min(c.speed / 2, 1) * Math.min(dt * 10, 1);
+        // 빠를수록 세게 (초당 2m 이상이면 최대). 거의 멈추면(초당 0.1m 미만) 누르지 않아서,
+        // 커서를 세우면 곧바로 회복이 시작된다. 프레임 길이에 비례해 쌓여 프레임 속도와 무관하다
+        const fast = THREE.MathUtils.clamp((c.speed - 0.1) / 1.9, 0, 1);
+        stamp = n.cursorStrength * fast * Math.min(dt * 10, 1);
       } else {
         c.speed = 0;
       }
