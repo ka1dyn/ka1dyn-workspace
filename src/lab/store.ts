@@ -43,10 +43,9 @@ export interface NightLab {
   grain: boolean; // 필름 그레인 (Night/Grain.tsx)
   grainAmount: number; // 그레인 세기 (밝기 변화 폭)
   grainSize: number; // 그레인 입자 크기 (CSS 픽셀. DPR 1.5에서 0.67 = 실제 픽셀 1개)
-  rainGlowOn: boolean; // 빗방울 블룸 흉내 (Night/RainGlow.ts)
-  rainGlow: number; // 번짐 세기
-  rainGlowWidth: number; // 번짐 폭
+  rainSparkleOn: boolean; // 빗방울이 가끔 살짝 반짝인다 (기존 빗방울 셰이더 그대로)
   rainSparkle: number; // 반짝임 빈도 (0~1)
+  rainSparkleBoost: number; // 반짝일 때 진해지는 배율
   grainDark: number; // 어두운 곳 그레인: 밝기와 무관하게 더하고 빼는 폭 (0이면 끔) // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
   puddles: boolean; // 수면 평면 (돌 지형의 낮은 곳에만 물이 보인다)
   waterLevel: number; // 수면 월드 높이 (m)
@@ -120,10 +119,9 @@ export const useLab = create<LabState>(() => ({
     grainAmount: 0.08,
     grainSize: 0.67,
     grainDark: 0.05,
-    rainGlowOn: true,
-    rainGlow: 1,
-    rainGlowWidth: 0.6,
+    rainSparkleOn: true,
     rainSparkle: 0.5,
+    rainSparkleBoost: 1.5,
     puddles: true,
     waterLevel: -0.03,
     reflection: true,

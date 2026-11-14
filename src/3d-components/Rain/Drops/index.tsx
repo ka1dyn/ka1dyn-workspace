@@ -9,12 +9,13 @@ import CSM from "three-custom-shader-material";
 
 type DropsProps = React.JSX.IntrinsicElements["group"] & {
   count?: number;
-  // 기본(CSM 반투명) 대신 쓸 재질. 밤 씬은 반짝이는 재질(Night/RainGlow.ts)을 넘긴다
-  material?: THREE.Material;
+  // 반짝임: 빗방울마다 다른 주기로 가끔 짧게 더 진해진다. 0이면 기존 빗방울과 똑같다
+  sparkle?: number; // 빈도 (0~1)
+  sparkleBoost?: number; // 반짝일 때 진해지는 배율
 };
 
 export const Drops = React.forwardRef<THREE.Group, DropsProps>(
-  ({ count = 300, material, ...props }, fref) => {
+  ({ count = 300, sparkle = 0, sparkleBoost = 0, ...props }, fref) => {
     const dropsRef = React.useRef<THREE.InstancedMesh>(null!);
     const _dummy = React.useMemo(() => new THREE.Object3D(), []);
     const initialY = React.useMemo(() => new Float32Array(count).fill(0), []);
@@ -89,6 +90,14 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         dropsMesh.setMatrixAt(i, _dummy.matrix);
       }
       dropsMesh.instanceMatrix.needsUpdate = true;
+
+      // CustomShaderMaterial은 material.uniforms로 uniform을 노출한다
+      const u = (dropsMesh.material as THREE.ShaderMaterial).uniforms;
+      if (u?.uSparkle) {
+        u.uTime.value = clock.elapsedTime;
+        u.uSparkle.value = sparkle;
+        u.uSparkleBoost.value = sparkleBoost;
+      }
     });
 
     const vertexShader = React.useMemo(
@@ -97,10 +106,12 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
   
         varying vec3 vInstancePosition;
         varying vec2 vUv;
+        varying float vSeed;
   
         void main() {
           vInstancePosition = (instanceMatrix * vec4(position, 1.0)).xyz;
           vUv = uv;
+          vSeed = fract(float(gl_InstanceID) * 0.6180339);
         }
       `,
       [],
@@ -109,9 +120,13 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
     const fragmentShader = React.useMemo(
       () => /* glsl */ `
         uniform float uRainProgress;
+        uniform float uTime;
+        uniform float uSparkle;
+        uniform float uSparkleBoost;
   
         varying vec3 vInstancePosition;
         varying vec2 vUv;
+        varying float vSeed;
 
         float sdUnevenCapsule( vec2 p, float r1, float r2, float h ) {
           p.x = abs(p.x);
@@ -148,6 +163,13 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           rainProgress = clamp(rainProgress, 0.0, 1.0);
           float circle = 7.0 - sdCircle(vInstancePosition.xz, 1.5);
           csm_DiffuseColor.a = dropletDistance * 0.1 * rainProgress * circle;
+
+          // 반짝임: 색·모양은 그대로 두고, 빗방울마다 다른 주기로 아주 짧게 더 진해진다
+          if (uSparkle > 0.0) {
+            float phase = uTime * (2.0 + vSeed * 5.0) + vSeed * 40.0;
+            float blink = smoothstep(1.0 - 0.2 * uSparkle, 1.0, sin(phase) * 0.5 + 0.5);
+            csm_DiffuseColor.a *= 1.0 + blink * uSparkleBoost;
+          }
           
         }
       `,
@@ -157,6 +179,9 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
     const uniforms = React.useMemo(
       () => ({
         uRainProgress: { value: 1 },
+        uTime: { value: 0 },
+        uSparkle: { value: 0 },
+        uSparkleBoost: { value: 0 },
       }),
       [],
     );
@@ -169,18 +194,14 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           renderOrder={2}
         >
           <planeGeometry args={[0.5, 1]} />
-          {material ? (
-            <primitive object={material} attach="material" />
-          ) : (
-            <CSM
-              key={vertexShader + fragmentShader}
-              baseMaterial={THREE.MeshBasicMaterial}
-              vertexShader={vertexShader}
-              fragmentShader={fragmentShader}
-              uniforms={uniforms}
-              transparent
-            />
-          )}
+          <CSM
+            key={vertexShader + fragmentShader}
+            baseMaterial={THREE.MeshBasicMaterial}
+            vertexShader={vertexShader}
+            fragmentShader={fragmentShader}
+            uniforms={uniforms}
+            transparent
+          />
         </instancedMesh>
       </group>
     );

@@ -7,7 +7,6 @@ import Grass from "./Grass";
 import Water from "./Water";
 import ReflectLayer from "./ReflectLayer";
 import Grain from "./Grain";
-import { useRainGlowMaterial } from "./RainGlow";
 import { useLab } from "@/lab/store";
 
 // 밤 잔디밭 씬. 기존 돌 지형(Models.tsx의 GroundBase)은 그대로 두고,
@@ -48,14 +47,16 @@ export default function NightScene() {
 // 변환 순서(바닥면 -90° → 자식 +90°)를 그대로 둬서 비가 떨어지는 범위가 같다.
 // (RainGround는 `{ props }`로 구조 분해해서 Models가 넘긴 50° 회전이 실제로는 적용되지 않았다.)
 function NightRain() {
-  const glow = useLab((s) => s.night.rainGlowOn);
-  const glowMaterial = useRainGlowMaterial();
+  const on = useLab((s) => s.night.rainSparkleOn);
+  const sparkle = useLab((s) => s.night.rainSparkle);
+  const boost = useLab((s) => s.night.rainSparkleBoost);
   return (
     <group>
       <group rotation={[degToRad(-90), 0, 0]}>
         <Drops
           rotation={[degToRad(90), 0, 0]}
-          material={glow ? glowMaterial : undefined}
+          sparkle={on ? sparkle : 0}
+          sparkleBoost={boost}
         />
         <Splashes count={200} rotation={[degToRad(90), 0, 0]}>
           <mesh position={[0, 0, 0.01]}>
