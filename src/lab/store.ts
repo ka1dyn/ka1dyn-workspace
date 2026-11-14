@@ -92,7 +92,7 @@ export const useLab = create<LabState>(() => ({
     scene: "night",
     grass: true,
     grassCount: 100000,
-    groundSize: 18,
+    groundSize: 17,
     grassSegments: 4,
     wind: true,
     windStrength: 1,

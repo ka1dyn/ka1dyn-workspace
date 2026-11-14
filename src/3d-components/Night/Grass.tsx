@@ -1,6 +1,6 @@
 import { useLab } from "@/lab/store";
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "./constants";
 import { clumpNoise, getWindTexture } from "./noise";
@@ -177,8 +177,15 @@ export default function Grass({
   const outer = groundSize * 0.5 + 3;
   // 잔디 색이 어두워지기 시작하는 반지름 (15m 땅에서 4.5m). outer까지 넓은 구간에 걸쳐 서서히 어두워진다
   const fadeStart = groundSize * 0.3;
-  // 수면 높이가 바뀌면 물에 잠기는 자리가 달라지므로 다시 심는다
-  const waterLevel = useLab((s) => s.night.waterLevel);
+  // 수면 높이가 바뀌면 물에 잠기는 자리가 달라지므로 다시 심는다.
+  // 다시 심기는 잎 10만 개를 도는 무거운 작업이라, 슬라이더를 끄는 동안 매번 하지 않고
+  // 멈춘 뒤 한 번만 한다 (수면 자체는 Water가 매 프레임 바로 따라간다).
+  const liveWaterLevel = useLab((s) => s.night.waterLevel);
+  const [waterLevel, setWaterLevel] = useState(liveWaterLevel);
+  useEffect(() => {
+    const t = window.setTimeout(() => setWaterLevel(liveWaterLevel), 150);
+    return () => window.clearTimeout(t);
+  }, [liveWaterLevel]);
   const puddles = useLab((s) => s.night.puddles);
   const onWater = useLab((s) => s.night.grassOnWater);
 

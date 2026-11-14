@@ -10,7 +10,7 @@ export default function LabPanel() {
         value: "night",
         options: { "밤 잔디밭 (새)": "night", "기존 (돌 지형)": "old" },
       },
-      "땅 크기 (m)": { value: 18, min: 15, max: 40, step: 1 },
+      "땅 크기 (m)": { value: 17, min: 15, max: 40, step: 1 },
       잔디: true,
       "잔디 개수": {
         value: 100000,
@@ -24,7 +24,8 @@ export default function LabPanel() {
       "잔디 폭 배율": { value: 1.3, min: 0.5, max: 3, step: 0.1 },
       "물웅덩이에도 심기": false,
       물웅덩이: true,
-      "수면 높이": { value: -0.03, min: -0.15, max: 0.2, step: 0.005 },
+      // 패널 칸이 좁아 m 단위 소수(-0.030)가 "-0.0"으로 잘려 보이므로 cm로 표시한다
+      "수면 높이 (cm)": { value: -3, min: -12, max: 8, step: 0.5 },
       "평면 반사": true,
       "반사 해상도": {
         value: 0.5,
@@ -132,7 +133,7 @@ export default function LabPanel() {
         grassWidth: v["잔디 폭 배율"],
         grassOnWater: v["물웅덩이에도 심기"],
         puddles: v["물웅덩이"],
-        waterLevel: v["수면 높이"],
+        waterLevel: v["수면 높이 (cm)"] / 100,
         reflection: v["평면 반사"],
         reflectionRes: v["반사 해상도"] as number,
         blur: v["반사 흐림 (밉맵)"],
