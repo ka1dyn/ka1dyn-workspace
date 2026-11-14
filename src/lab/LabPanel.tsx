@@ -59,7 +59,7 @@ export default function LabPanel() {
       "별 반짝임": { value: 0.15, min: 0, max: 0.6, step: 0.01 },
       "은하수 세기": { value: 1, min: 0, max: 3, step: 0.05 },
       "은하수 방위 (°)": { value: 0, min: -180, max: 180, step: 1 },
-      "암흑대 세기": { value: 0.5, min: 0, max: 1.5, step: 0.05 },
+      "암흑대 세기": { value: 0.8, min: 0, max: 1.5, step: 0.05 },
       "숲 겹 수": { value: 3, options: { "1": 1, "2": 2, "3": 3 } },
       "숲 높이": { value: 1, min: 0.3, max: 2.5, step: 0.05 },
     }),

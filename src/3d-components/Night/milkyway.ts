@@ -68,19 +68,26 @@ const fragmentShader = /* glsl */ `
     float grain = fbm(d * 24.0, 4);
     float intensity = band * (0.2 + 1.4 * pow(clouds, 2.5)) + core * 0.6 * (0.4 + grain);
 
-    // 띠 기준 좌표: 띠를 따라가는 각도(along)와 띠에서 떨어진 정도(b).
-    // 노이즈를 이 좌표로 계산하면 띠를 따라 길게 흐르는 줄무늬가 된다.
-    // (원 위의 cos·sin으로 넣어 각도가 한 바퀴 돌아도 이음매가 없다)
+    // 띠를 따라가는 각도(along). 원 위의 cos·sin으로 노이즈에 넣어 한 바퀴 돌아도 이음매가 없다
     vec3 e1 = normalize(cross(uNormal, abs(uNormal.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0)));
     vec3 e2 = cross(uNormal, e1);
     float along = atan(dot(d, e2), dot(d, e1));
-    vec3 q = vec3(cos(along) * 5.0, sin(along) * 5.0, b * 38.0);
+    vec3 ring = vec3(cos(along), sin(along), 0.0);
 
-    // 굵은 암흑대: 띠 중심 근처를 따라 길게 흐르는 어두운 줄기
-    float lane = smoothstep(0.42, 0.64, fbm(q + 3.1, 5)) * exp(-b * b / (0.11 * 0.11));
-    // 가는 먼지 가닥: 더 촘촘한 노이즈로 띠를 가로지르는 가는 어두운 가닥
-    float fil = smoothstep(0.55, 0.74, fbm(q * vec3(2.6, 2.6, 1.7) + 9.4, 4)) * exp(-b * b / (0.15 * 0.15));
-    intensity *= 1.0 - uLane * clamp(lane * 0.92 + fil * 0.3, 0.0, 0.95);
+    // 도메인 워핑: 노이즈 좌표를 다른 노이즈로 비틀어 줄무늬 대신 일렁이는 유기적인 모양을 만든다
+    vec3 warp = vec3(fbm(d * 3.0 + 1.7, 4), fbm(d * 3.0 + 8.3, 4), fbm(d * 3.0 + 4.1, 4)) - 0.5;
+    vec3 dw = d + warp * 0.22;
+
+    // 중심 균열(rift): 띠 가운데를 따라 굽이치는 어두운 틈. 위치·폭이 띠를 따라 변하고 군데군데 끊긴다
+    float riftOff = (fbm(ring * 3.0 + 2.0, 3) - 0.5) * 0.09;
+    float riftW = 0.018 + 0.04 * fbm(ring * 4.0 + vec3(0.0, 0.0, 6.0), 3);
+    float rb = (b - riftOff) / riftW;
+    float rift = exp(-rb * rb) * smoothstep(0.38, 0.62, fbm(dw * 6.0 + 5.0, 4));
+
+    // 얼룩진 암흑 성운: 띠 위에 불규칙한 덩어리로 흩어진 어두운 구름
+    float mottled = smoothstep(0.5, 0.72, fbm(dw * 9.0 + 11.0, 5)) * exp(-b * b / (0.13 * 0.13));
+
+    intensity *= 1.0 - uLane * clamp(rift * 0.85 + mottled * 0.6, 0.0, 0.92);
 
     // 색: 바깥은 푸른 회색, 중심부는 아주 약하게 따뜻한 색
     vec3 color = mix(vec3(0.55, 0.63, 0.86), vec3(0.95, 0.86, 0.74), core * 0.55);
