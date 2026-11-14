@@ -121,7 +121,16 @@ export default function Fireflies() {
         fog: true, // fogNear/fogFar를 three가 채워 준다
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        // 색은 더하되 알파는 건드리지 않는다.
+        // 맥북 화면(drei Html, occlude="blending")은 캔버스에 알파 0인 구멍을 뚫어 뒤의 DOM을 보여 준다.
+        // three의 AdditiveBlending은 알파도 더해(srcA·srcA + dstA) 구멍을 1로 메워 버려서,
+        // 반딧불이가 화면 위에 겹치면 점 모양 그대로 캔버스가 불투명해져 검은 원이 생겼다.
+        blending: THREE.CustomBlending,
+        blendEquation: THREE.AddEquation,
+        blendSrc: THREE.OneFactor,
+        blendDst: THREE.OneFactor,
+        blendSrcAlpha: THREE.ZeroFactor,
+        blendDstAlpha: THREE.OneFactor,
       }),
     [],
   );
