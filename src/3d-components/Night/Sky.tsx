@@ -247,6 +247,7 @@ const fragmentShader = /* glsl */ `
 `;
 
 const METEOR_SLOTS = [0, 1, 2, 3];
+const SKY_ORDER = 50; // 불투명 물체 중 마지막 (지형은 10, Ground/TestGround.tsx)
 
 type MeteorSlot = {
   start: number;
@@ -306,6 +307,10 @@ function spawnMeteor(
 
 export default function Sky() {
   const old = useLab((s) => s.night.skyQuality === "old");
+  // 하늘은 화면에서 가장 넓고 픽셀당 계산도 많다. 불투명 물체 중 맨 마지막에 그리면
+  // 잔디·퍼걸러·지형이 먼저 깊이를 채워서, 그 뒤에 가려진 하늘 픽셀은 깊이 테스트에서 걸러진다.
+  // (하늘은 항상 가장 먼 깊이에 그려지고 깊이를 쓰지 않으므로 순서만 바꾸면 된다)
+  const last = useLab((s) => s.night.skyLast);
   const gl = useThree((s) => s.gl);
   const mesh = useRef<THREE.Mesh>(null!);
 
@@ -452,7 +457,12 @@ export default function Sky() {
   });
 
   return (
-    <mesh ref={mesh} material={material} renderOrder={-1} frustumCulled={false}>
+    <mesh
+      ref={mesh}
+      material={material}
+      renderOrder={last ? SKY_ORDER : -1}
+      frustumCulled={false}
+    >
       <sphereGeometry args={[40, 48, 24]} />
     </mesh>
   );

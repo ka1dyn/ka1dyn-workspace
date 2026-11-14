@@ -19,6 +19,8 @@ export default function LabPanel() {
     }),
     최적화: folder({
       "가려진 동안 렌더 멈춤": true,
+      "돌 지형 불투명 처리": true,
+      "하늘을 마지막에 그리기": true,
     }),
     "맥북 화면": folder({
       "화면 Html 표시": true,
@@ -300,6 +302,8 @@ export default function LabPanel() {
         blur: v["반사 흐림 (밉맵)"],
         grassInReflection: v["반사에 잔디 포함"],
         rippleRadius: v["파문 반경 R"] as number,
+        terrainOpaque: v["돌 지형 불투명 처리"],
+        skyLast: v["하늘을 마지막에 그리기"],
         moonIntensity: v["달빛"],
         lampIntensity: v["등 세기"],
         lampColor: v["등 색"],

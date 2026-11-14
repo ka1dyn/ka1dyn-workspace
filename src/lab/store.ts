@@ -92,6 +92,8 @@ export interface NightLab {
   blur: boolean; // 반사 밉맵 흐림
   grassInReflection: boolean;
   rippleRadius: number; // 빗방울 파문 탐색 반경 R. 픽셀당 (2R+1)² 반복, 0이면 끔
+  terrainOpaque: boolean; // 돌 지형을 불투명으로 그리고 가장자리는 어두운 색으로 섞는다
+  skyLast: boolean; // 하늘을 불투명 물체 중 마지막에 그려 가려진 픽셀을 건너뛴다
   // 조명 (밤 씬 전용)
   moonIntensity: number;
   lampIntensity: number;
@@ -202,6 +204,8 @@ export const useLab = create<LabState>(() => ({
     blur: true,
     grassInReflection: false,
     rippleRadius: 1,
+    terrainOpaque: true,
+    skyLast: true,
     moonIntensity: 1.6,
     lampIntensity: 4,
     lampColor: "#ffb36b",

@@ -13,6 +13,7 @@ export default function Models() {
   const m = useLab((state) => state.models);
   const night = useLab((state) => state.night.scene === "night");
   const groundSize = useLab((state) => state.night.groundSize);
+  const terrainOpaque = useLab((state) => state.night.terrainOpaque);
 
   return (
     <>
@@ -34,6 +35,7 @@ export default function Models() {
         <ReflectLayer>
           <GroundBase
             size={night ? groundSize : 15}
+            opaque={night && terrainOpaque}
             position={[0, -0.03, 0]}
             rotation={[0, degToRad(50), 0]}
           />
