@@ -156,7 +156,7 @@ export const useLab = create<LabState>(() => ({
     skyQuality: "new",
     starDensity: 1,
     starBright: 0.3,
-    starTwinkle: 0.15,
+    starTwinkle: 0.6,
     milkyWay: 1,
     milkyRotation: 0,
     milkyLanes: 0.8,

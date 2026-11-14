@@ -98,7 +98,7 @@ export default function LabPanel() {
     밤하늘: folder({
       "별 밀도": { value: 1, min: 0, max: 3, step: 0.05 },
       "별 밝기": { value: 0.3, min: 0, max: 3, step: 0.05 },
-      "별 반짝임": { value: 0.15, min: 0, max: 2, step: 0.01 },
+      "별 반짝임": { value: 0.6, min: 0, max: 2, step: 0.01 },
       "은하수 세기": { value: 1, min: 0, max: 3, step: 0.05 },
       "은하수 방위 (°)": { value: 0, min: -180, max: 180, step: 1 },
       "암흑대 세기": { value: 0.8, min: 0, max: 1.5, step: 0.05 },

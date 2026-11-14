@@ -209,20 +209,61 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       const m = mem && Date.now() - mem.t < 3000 ? mem : null;
       const mb = (b: number) => f(b / 1024 / 1024, 1);
 
-      hud.textContent = [
-        `FPS          ${f(fps, 0)}`,
-        `프레임 간격  ${f(median(intervals))} ms   p95 ${f(pct(intervals, 0.95))}`,
+      // 원인 지표(장면이 GPU에 시키는 일의 양)와 결과 지표(실제로 든 시간·전력)를 나눠 보여 준다.
+      // 결과 중 GPU 시간·GPU 전력·열 상태는 크게 강조한다.
+      const head = (t: string) =>
+        `<span style="display:inline-block;margin-top:6px;font-size:10px;letter-spacing:0.08em;color:#8a93a6">${t}</span>`;
+      const big = (label: string, value: string, color = "#ffffff") =>
+        `<span style="font-size:15px;font-weight:700;color:${color}">${label}${value}</span>`;
+      const dim = (t: string) => `<span style="color:#9aa3b2">${t}</span>`;
+      const thermalColor = (t: string) =>
+        /nominal/i.test(t)
+          ? "#7bd88f"
+          : /fair|moderate/i.test(t)
+            ? "#f0c674"
+            : /serious|heavy/i.test(t)
+              ? "#ff9f5a"
+              : "#ff6b6b";
+      const px = canvas.width * canvas.height;
+
+      hud.innerHTML = [
+        head("결과 지표"),
+        !ext
+          ? big(
+              "GPU 시간   ",
+              gpuTimer ? "미지원" : "끔 (다른 도구가 타이머 사용 중)",
+            )
+          : big("GPU 시간   ", `${f(gpuMed)} ms`) +
+            dim(
+              `  평균 ${f(mean(gpus))}  p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
+            ),
+        p
+          ? big("GPU 전력   ", `${f(p.gpuMw, 0)} mW`, "#ffd479") +
+            dim(
+              `  프레임당 ${f(mjPerFrame)} mJ (${f(mjPerFrame / mp, 2)} mJ/MP)`,
+            )
+          : big("GPU 전력   ", "브리지 연결 안 됨", "#9aa3b2"),
+        p
+          ? big("열 상태    ", p.thermal, thermalColor(p.thermal))
+          : big("열 상태    ", "–", "#9aa3b2"),
+        `FPS          ${f(fps, 0)}   프레임 간격 ${f(median(intervals))} ms  p95 ${f(pct(intervals, 0.95))}`,
         `CPU          ${f(median(cpus))} ms   p95 ${f(pct(cpus, 0.95))}`,
         `  useFrame   ${f(median(useFrames))} ms   렌더 제출 ${f(median(renders))} ms`,
-        !ext
-          ? `GPU          ${gpuTimer ? "미지원" : "끔 (다른 도구가 타이머 사용 중)"}`
-          : `GPU          ${f(gpuMed)} ms   평균 ${f(mean(gpus))}   p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
-        ``,
+        p
+          ? [
+              `GPU 클럭     ${f(p.mhz, 0)} MHz   활성 ${f(p.active * 100, 0)}%`,
+              `GPU 사이클   ${f(cycles)} M/프레임`,
+              `CPU 전력     ${p.cpuMw == null ? "–" : f(p.cpuMw, 0)} mW`,
+            ].join("\n")
+          : dim(`전력 브리지  연결 안 됨 (README의 power-bridge 참고)`),
+        head("원인 지표"),
         `드로우콜     ${info.calls}`,
         `삼각형       ${info.triangles.toLocaleString()}`,
         `프로그램     ${gl.info.programs?.length ?? "–"}`,
         `텍스처       ${gl.info.memory.textures}   지오메트리 ${gl.info.memory.geometries}`,
-        `해상도       ${canvas.width}×${canvas.height} (${f(mp)} MP, DPR ${f(gl.getPixelRatio(), 2)})`,
+        `해상도       ${canvas.width}×${canvas.height}  DPR ${f(gl.getPixelRatio(), 2)}`,
+        `픽셀 수      ${px.toLocaleString()} px  (${f(mp)} MP)`,
+        head("메모리 (제약)"),
         vr
           ? [
               `GPU 메모리   ${mb(vr.textures + vr.renderTargets + vr.buffers + vr.canvas)} MB (추정)${vr.unknownFormat ? "  *모르는 포맷 있음" : ""}`,
@@ -231,19 +272,8 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
             ].join("\n")
           : `GPU 메모리   추적 안 됨 (새로고침 필요)`,
         m
-          ? `  OS 실측    그래픽 ${mb(m.graphics)}   IOSurface ${mb(m.iosurface)}  (Chrome GPU 프로세스 전체)`
-          : `  OS 실측    브리지 연결 안 됨`,
-        ``,
-        p
-          ? [
-              `GPU 클럭     ${f(p.mhz, 0)} MHz   활성 ${f(p.active * 100, 0)}%`,
-              `GPU 전력     ${f(p.gpuMw, 0)} mW`,
-              `CPU 전력     ${p.cpuMw == null ? "–" : f(p.cpuMw, 0)} mW`,
-              `GPU 사이클   ${f(cycles)} M/프레임`,
-              `프레임당     ${f(mjPerFrame)} mJ   (${f(mjPerFrame / mp, 2)} mJ/MP)`,
-              `열 상태      ${p.thermal}`,
-            ].join("\n")
-          : `전력 브리지  연결 안 됨 (README의 power-bridge 참고)`,
+          ? `  OS 실측    그래픽 ${mb(m.graphics)}   IOSurface ${mb(m.iosurface)}`
+          : dim(`  OS 실측    브리지 연결 안 됨`),
       ].join("\n");
     }, 500);
 
