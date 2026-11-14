@@ -15,6 +15,8 @@ const vertexShader = /* glsl */ `
   uniform float uSpeed;
   uniform float uSize;       // 빛 번짐까지 포함한 지름 (m)
   uniform float uViewportH;  // 그리는 버퍼 높이 (px)
+  uniform float uFalloff;    // 거리 감쇠: 1 = 실제 원근, 0 = 거리와 상관없이 같은 크기
+  uniform float uMinPx;      // 최소 크기 (버퍼 px)
   uniform float uBright;
   varying float vGlow;
   varying float vDepth;
@@ -36,8 +38,11 @@ const vertexShader = /* glsl */ `
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     vDepth = -mv.z;
-    // 월드 크기 → 화면 픽셀: 지름 × (버퍼 높이 / 2) × 투영 배율 / 깊이
-    gl_PointSize = uSize * uViewportH * 0.5 * projectionMatrix[1][1] / max(vDepth, 0.05);
+    // 월드 크기 → 화면 픽셀. 기준 거리(8m, 전체 장면에서 들판까지)에서는 실제 크기로 보이고,
+    // 그보다 멀거나 가까우면 (기준 / 깊이)^감쇠 만큼만 변해 멀리 있는 반딧불이가 너무 작아지지 않는다.
+    float refDepth = 8.0;
+    float atRef = uSize * uViewportH * 0.5 * projectionMatrix[1][1] / refDepth;
+    gl_PointSize = max(atRef * pow(refDepth / max(vDepth, 0.05), uFalloff), uMinPx);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -114,6 +119,8 @@ export default function Fireflies() {
           uSpeed: { value: 1 },
           uSize: { value: 0.2 },
           uViewportH: { value: 1 },
+          uFalloff: { value: 0.5 },
+          uMinPx: { value: 3 },
           uBright: { value: 1 },
           uColor: { value: new THREE.Color("#b8f05a") },
           uCore: { value: new THREE.Color("#fff6c8") },
@@ -147,6 +154,8 @@ export default function Fireflies() {
     u.uSize.value = n.fireflySize;
     u.uBright.value = n.fireflyBright;
     u.uViewportH.value = gl.domElement.height;
+    u.uFalloff.value = n.fireflyFalloff;
+    u.uMinPx.value = n.fireflyMinPx * gl.getPixelRatio(); // 패널 값은 CSS px
   });
 
   if (count === 0) return null;

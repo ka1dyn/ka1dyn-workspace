@@ -50,6 +50,8 @@ export default function LabPanel() {
       "반딧불이 크기 (m)": { value: 0.05, min: 0.03, max: 0.4, step: 0.01 },
       "반딧불이 밝기": { value: 1.5, min: 0, max: 3, step: 0.05 },
       "반딧불이 속도": { value: 1.2, min: 0, max: 3, step: 0.05 },
+      "거리 감쇠": { value: 0.4, min: 0, max: 1, step: 0.05 },
+      "최소 크기 (CSS px)": { value: 5, min: 0, max: 10, step: 0.5 },
     }),
     "빗방울 반짝임": folder({
       "빗방울 개수": {
@@ -193,6 +195,8 @@ export default function LabPanel() {
         fireflySize: v["반딧불이 크기 (m)"],
         fireflyBright: v["반딧불이 밝기"],
         fireflySpeed: v["반딧불이 속도"],
+        fireflyFalloff: v["거리 감쇠"],
+        fireflyMinPx: v["최소 크기 (CSS px)"],
         rainCount: v["빗방울 개수"] as number,
         rainSpeed: v["떨어지는 속도 (m/s)"],
         rainSpread: v["비 범위 (m)"],
