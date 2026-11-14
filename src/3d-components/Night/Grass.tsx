@@ -11,7 +11,11 @@ import { useTerrainSampler } from "./terrain";
 // 돌 지형 표면에 심고, 수면보다 낮은 곳(물웅덩이)은 비우며, 지형 알파맵을 따라 가장자리에서 작아진다.
 
 const INNER = 1.75; // 타일 바닥(3.2×3.2)과 퍼걸러를 비우는 정사각형 반폭
-const OUTER = 7.5; // 잔디를 심는 원의 반지름. 지형 알파맵이 약 7.3m에서 0이 된다
+// 잔디를 심는 원의 반지름. 지형(알파맵이 약 7.3m에서 0)보다 멀리까지 심어서,
+// 땅이 먼저 사라지고 잔디는 그 너머에서 어둠 속으로 천천히 묻히게 한다.
+const OUTER = 10.5;
+// 잔디 색이 어두워지기 시작하는 반지름. OUTER까지 넓은 구간에 걸쳐 서서히 어두워진다
+const FADE_START = 4.5;
 const SHORE = 0.015; // 수면보다 이만큼 높은 곳부터 심는다
 
 function createBladeGeometry(segments: number) {
@@ -224,15 +228,11 @@ export default function Grass({
       const x = Math.cos(a) * r;
       const z = Math.sin(a) * r;
       if (Math.abs(x) < INNER && Math.abs(z) < INNER) continue;
-      // 지형 가장자리(알파맵)를 따라 잎을 줄여 지형과 함께 사라지게 한다
-      // 지형 가장자리(알파맵)를 따라 세 가지로 서서히 사라지게 한다:
-      // 바깥일수록 드문드문 심고(밀도), 키를 낮추고(크기), 어두운 색으로 섞는다(셰이더의 aEdge)
-      const alpha = terrain.alphaAt(x, z);
-      if (alpha < 0.02 || rand() > Math.pow(alpha, 0.8)) continue;
-      const fade = THREE.MathUtils.smoothstep(alpha, 0.0, 0.95);
+      // 땅 밖(알파 0)은 지형 높이가 없으므로 가장자리 높이를 그대로 이어 쓴다 (heightAt이 경계로 고정)
+      const onGround = terrain.alphaAt(x, z) > 0.02;
       const y = terrain.heightAt(x, z);
-      // 물웅덩이(수면보다 낮은 곳)와 그 물가는 비운다
-      if (puddles && !onWater && y < waterLevel + SHORE) continue;
+      // 물웅덩이(수면보다 낮은 곳)와 그 물가는 비운다. 수면이 없는 땅 밖은 검사하지 않는다
+      if (onGround && puddles && !onWater && y < waterLevel + SHORE) continue;
       dummy.position.set(x, y - 0.01, z);
       // 잎마다 살짝 기울여 한 방향으로 곧게 선 느낌을 없앤다
       dummy.rotation.set(
@@ -242,10 +242,12 @@ export default function Grass({
       );
       // 키: 짧은 잎이 많고 가끔 긴 잎이 섞이게(거듭제곱 분포), 군락 노이즈로 키 큰 덤불과 낮은 곳을 만든다
       const clump = 0.55 + clumpNoise(x, z) * 0.9;
-      const height = (0.08 + Math.pow(rand(), 1.6) * 0.32) * clump * fade;
-      dummy.scale.set((0.018 + rand() * 0.017) * (0.5 + 0.5 * fade), height, 1);
+      const height = (0.08 + Math.pow(rand(), 1.6) * 0.32) * clump;
+      dummy.scale.set(0.018 + rand() * 0.017, height, 1);
       dummy.updateMatrix();
-      edge[placed] = THREE.MathUtils.smoothstep(alpha, 0.05, 0.85);
+      // 가장자리는 키·밀도를 건드리지 않고 색만 어둡게 한다(셰이더의 aEdge).
+      // 거리 기준으로 FADE_START부터 OUTER까지 부드럽게 1 → 0
+      edge[placed] = 1 - THREE.MathUtils.smoothstep(r, FADE_START, OUTER);
       m.setMatrixAt(placed++, dummy.matrix);
     }
     m.count = placed;
