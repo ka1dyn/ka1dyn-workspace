@@ -48,11 +48,15 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
   // eslint는 훅이 돌려준 값의 수정을 막지만, renderer 설정을 바꾸는 것이 이 컴포넌트의 목적이다.
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
+  const get = useThree((s) => s.get);
 
   useEffect(() => {
     const ctx = gl.getContext() as WebGL2RenderingContext;
     // 콘솔에서 렌더러를 직접 확인할 수 있게 실험실에서만 노출한다 (예: __labGl.getContext().getContextAttributes())
     (window as unknown as { __labGl?: unknown }).__labGl = gl;
+    // 카메라 조작도 노출한다. 움직이는 동안의 비용을 잴 때 자동 회전을 켠다
+    // (예: __labThree().controls.autoRotate = true)
+    (window as unknown as { __labThree?: unknown }).__labThree = get;
     // 다른 도구가 타이머 쿼리를 쓰는 동안에는 충돌을 피하려고 GPU 측정을 끈다.
     const ext = gpuTimer
       ? (ctx.getExtension("EXT_disjoint_timer_query_webgl2") as TimerExt | null)
@@ -288,7 +292,7 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       if (active && ext) ctx.endQuery(ext.TIME_ELAPSED_EXT);
       pending.forEach(({ q }) => ctx.deleteQuery(q));
     };
-  }, [gl, scene, gpuTimer]);
+  }, [gl, scene, gpuTimer, get]);
 
   return null;
 }
