@@ -103,8 +103,9 @@ export default function LabPanel() {
       "은하수 방위 (°)": { value: 0, min: -180, max: 180, step: 1 },
       "암흑대 세기": { value: 0.8, min: 0, max: 1.5, step: 0.05 },
       "별똥별 켜기": true,
-      "별똥별 간격 (초)": { value: 8, min: 2, max: 30, step: 0.5 },
+      "별똥별 간격 (초)": { value: 3, min: 0.5, max: 30, step: 0.5 },
       "별똥별 밝기": { value: 1, min: 0, max: 3, step: 0.05 },
+      "별똥별 길이": { value: 1, min: 0.5, max: 2, step: 0.05 },
       "별똥별 바로 보기": button(() =>
         useLab.setState((s) => ({
           night: { ...s.night, meteorNow: s.night.meteorNow + 1 },
@@ -262,6 +263,7 @@ export default function LabPanel() {
         meteors: v["별똥별 켜기"],
         meteorInterval: v["별똥별 간격 (초)"],
         meteorBright: v["별똥별 밝기"],
+        meteorLength: v["별똥별 길이"],
         // 버튼이 올린 카운터는 패널 값에 없으므로 스토어 값을 그대로 둔다
         meteorNow: useLab.getState().night.meteorNow,
         treeLayers: v["숲 겹 수"] as number,

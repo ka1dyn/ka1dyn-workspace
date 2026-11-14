@@ -41,9 +41,9 @@ const fragmentShader = /* glsl */ `
   uniform float uTreeLayers;  // 숲 겹 수 (1~3)
   uniform float uTreeHeight;  // 숲 높이 배율
   uniform float uReflect;     // 물웅덩이 반사 카메라로 그릴 때 1 (별을 건너뛴다)
-  uniform vec3 uMeteorHead;   // 별똥별 머리 방향
-  uniform vec3 uMeteorTail;   // 별똥별 꼬리 끝 방향
-  uniform float uMeteorAlpha; // 별똥별 밝기 (없을 때 0 → 아래 계산을 통째로 건너뛴다)
+  uniform vec3 uMeteorHead[4]; // 별똥별 머리 방향 (동시에 최대 4개)
+  uniform vec3 uMeteorTail[4]; // 별똥별 꼬리 끝 방향
+  uniform vec4 uMeteorAlpha;   // 별똥별마다 밝기 (모두 0이면 아래 계산을 통째로 건너뛴다)
   varying vec3 vDir;
 
   // ---- 해시 / 노이즈 ----
@@ -172,16 +172,24 @@ const fragmentShader = /* glsl */ `
                + starLayer(d, 90.0, 0.4 * uStarDensity, 1.4, pixAng, 11.7);
     color += stars * 0.55 * uStarBright * skyVis;
 
-    // 별똥별: 꼬리 끝→머리 선분 하나. 별똥별이 없을 때(uniform 0)는 모든 픽셀이 건너뛰므로 비용이 거의 없다
-    if (uMeteorAlpha > 0.0) {
-      vec3 seg = uMeteorHead - uMeteorTail;
-      float t = clamp(dot(d - uMeteorTail, seg) / max(dot(seg, seg), 1e-8), 0.0, 1.0); // 0 꼬리 끝 → 1 머리
-      float dist = length(d - (uMeteorTail + seg * t));
-      float w0 = 0.0011 * (0.35 + 0.65 * t);  // 머리 쪽이 굵고 꼬리 쪽이 가늘다
-      float w = max(w0, pixAng * 0.8);         // 1픽셀보다 가늘면 굵히고 그만큼 밝기를 나눈다
-      float line = exp(-dist * dist / (w * w) * 2.0) * (w0 / w);
-      float headGlow = exp(-pow(length(d - uMeteorHead) / (w * 2.5), 2.0));
-      color += vec3(0.9, 0.95, 1.0) * (line * t * t * 1.6 + headGlow * 0.8) * uMeteorAlpha * skyVis;
+    // 별똥별: 꼬리 끝→머리 선분, 최대 4개. 떠 있는 별똥별이 없을 때(uniform 모두 0)는 모든 픽셀이 건너뛰므로 비용이 거의 없다
+    if (dot(uMeteorAlpha, vec4(1.0)) > 0.0) {
+      for (int i = 0; i < 4; i++) {
+        float a = uMeteorAlpha[i];
+        if (a <= 0.0) continue;
+        vec3 seg = uMeteorHead[i] - uMeteorTail[i];
+        // 선분을 감싸는 구 밖의 픽셀은 바로 건너뛴다 (하늘 대부분이 여기서 끝나 별똥별이 떠 있어도 싸다)
+        vec3 mid = d - (uMeteorHead[i] + uMeteorTail[i]) * 0.5;
+        if (dot(mid, mid) > dot(seg, seg) * 0.25 + 1e-4) continue;
+        float t = clamp(dot(d - uMeteorTail[i], seg) / max(dot(seg, seg), 1e-8), 0.0, 1.0); // 0 꼬리 끝 → 1 머리
+        float dist = length(d - (uMeteorTail[i] + seg * t));
+        // 날카롭게: 머리 쪽도 가늘고(약 1픽셀) 꼬리 끝으로 갈수록 바늘처럼 더 가늘어진다
+        float w0 = 0.0007 * (0.15 + 0.85 * t * t);
+        float w = max(w0, pixAng * 0.7);      // 1픽셀보다 가늘면 굵히고 그만큼 밝기를 나눈다
+        float line = exp(-dist * dist / (w * w) * 3.0) * (w0 / w);
+        float headGlow = exp(-pow(length(d - uMeteorHead[i]) / (w * 1.6), 2.0));
+        color += vec3(0.9, 0.95, 1.0) * (line * pow(t, 1.5) * 2.2 + headGlow * 0.5) * a * skyVis;
+      }
     }
     }
     }
@@ -230,6 +238,55 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
+const METEOR_SLOTS = [0, 1, 2, 3];
+
+type MeteorSlot = {
+  start: number;
+  dur: number;
+  from: THREE.Vector3;
+  to: THREE.Vector3;
+};
+
+/** 빈 칸에 별똥별 하나를 띄운다. 시작점은 지금 화면 위쪽, 방향은 화면 위 바깥의 복사점에서 멀어지는 쪽 */
+function spawnMeteor(
+  slot: MeteorSlot,
+  mt: { radiantX: number; tmp: THREE.Vector3; radiant: THREE.Vector3 },
+  camera: THREE.Camera,
+  lengthMul: number,
+  now: number,
+) {
+  const toSky = (v: THREE.Vector3, x: number, y: number) =>
+    v.set(x, y, 0.5).unproject(camera).sub(camera.position).normalize();
+  // 복사점: 화면 위쪽 바깥 (NDC y 1.6). 모든 별똥별이 여기서 퍼져 나와 같은 유성우처럼 보인다
+  toSky(mt.radiant, mt.radiantX, 1.6);
+  // 시작점: 화면 좌우 85%, 화면 위 가장자리 살짝 바깥 ~ 화면 중간
+  toSky(
+    slot.from,
+    THREE.MathUtils.randFloatSpread(1.7),
+    THREE.MathUtils.randFloat(0.05, 1.05),
+  );
+  if (slot.from.y < Math.sin(THREE.MathUtils.degToRad(6))) {
+    slot.from.y = Math.sin(THREE.MathUtils.degToRad(6)); // 지평선에 너무 붙지 않게
+    slot.from.normalize();
+  }
+  // 방향: 복사점→시작점 대원을 따라 복사점에서 멀어지는 쪽 (시작점에서의 접선)
+  const dir = mt.tmp
+    .copy(slot.from)
+    .multiplyScalar(slot.from.dot(mt.radiant))
+    .sub(mt.radiant)
+    .normalize();
+  const len = THREE.MathUtils.degToRad(
+    THREE.MathUtils.randFloat(20, 40) * lengthMul,
+  );
+  slot.to
+    .copy(slot.from)
+    .multiplyScalar(Math.cos(len))
+    .addScaledVector(dir, Math.sin(len))
+    .normalize();
+  slot.dur = THREE.MathUtils.randFloat(0.6, 1.1);
+  slot.start = now;
+}
+
 export default function Sky() {
   const old = useLab((s) => s.night.skyQuality === "old");
   const gl = useThree((s) => s.gl);
@@ -260,9 +317,13 @@ export default function Sky() {
           uTreeLayers: { value: 3 },
           uTreeHeight: { value: 1 },
           uReflect: { value: 0 },
-          uMeteorHead: { value: new THREE.Vector3(0, 1, 0) },
-          uMeteorTail: { value: new THREE.Vector3(0, 1, 0) },
-          uMeteorAlpha: { value: 0 },
+          uMeteorHead: {
+            value: METEOR_SLOTS.map(() => new THREE.Vector3(0, 1, 0)),
+          },
+          uMeteorTail: {
+            value: METEOR_SLOTS.map(() => new THREE.Vector3(0, 1, 0)),
+          },
+          uMeteorAlpha: { value: new THREE.Vector4() },
         },
       }),
     [old],
@@ -290,16 +351,20 @@ export default function Sky() {
     };
   }, []);
 
-  // 별똥별 스케줄: 평균 간격마다 하나씩, 카메라가 보는 쪽 하늘에서 아래 대각선으로 떨어진다
+  // 별똥별 스케줄: 유성우처럼 화면 위쪽 바깥의 한 점(복사점)에서 퍼져 나오며 화면 쪽으로 떨어진다
   const meteor = useRef({
-    next: 4, // 첫 별똥별 시각 (초)
-    start: -1,
-    dur: 0.7,
-    from: new THREE.Vector3(),
-    to: new THREE.Vector3(),
-    head: new THREE.Vector3(),
-    tail: new THREE.Vector3(),
-    forward: new THREE.Vector3(),
+    next: 3, // 다음 별똥별 시각 (초)
+    radiantX: THREE.MathUtils.randFloatSpread(1.2), // 복사점의 화면 가로 위치 (NDC)
+    slots: METEOR_SLOTS.map(() => ({
+      start: -1,
+      dur: 1,
+      from: new THREE.Vector3(),
+      to: new THREE.Vector3(),
+      head: new THREE.Vector3(0, 1, 0),
+      tail: new THREE.Vector3(0, 1, 0),
+    })),
+    tmp: new THREE.Vector3(),
+    radiant: new THREE.Vector3(),
     trigger: 0,
   });
 
@@ -324,63 +389,39 @@ export default function Sky() {
       mt.trigger = n.meteorNow; // 실험실 "바로 보기" 버튼
       mt.next = now;
     }
-    if (n.meteors && mt.start < 0 && now >= mt.next) {
-      // 시작점: 지금 화면의 위쪽 하늘에서 고른다. 화면 좌우 80%, 위쪽 절반 안의 점을 하늘 방향으로 바꾸고
-      // 지평선에 너무 붙으면(고도 8° 미만) 조금 올린다. 고도를 고정 범위로 고르면 화면 위로 벗어나 안 보이는 일이 많았다
-      mt.forward
-        .set(
-          THREE.MathUtils.randFloatSpread(1.6),
-          THREE.MathUtils.randFloat(0.1, 0.9),
-          0.5,
-        )
-        .unproject(camera)
-        .sub(camera.position)
-        .normalize();
-      const az = Math.atan2(mt.forward.z, mt.forward.x);
-      const el = Math.max(Math.asin(mt.forward.y), THREE.MathUtils.degToRad(8));
-      mt.from.set(
-        Math.cos(el) * Math.cos(az),
-        Math.sin(el),
-        Math.cos(el) * Math.sin(az),
-      );
-      // 방향: 그 지점의 수평(동쪽) 축과 위쪽 축으로 이루는 평면에서 수평 아래 20~60°, 좌우는 랜덤
-      const east = new THREE.Vector3(-Math.sin(az), 0, Math.cos(az));
-      const up = new THREE.Vector3().crossVectors(mt.from, east).normalize();
-      if (up.y < 0) up.negate();
-      const dip = THREE.MathUtils.degToRad(THREE.MathUtils.randFloat(20, 60));
-      const side = Math.random() < 0.5 ? -1 : 1;
-      const dir = east
-        .multiplyScalar(Math.cos(dip) * side)
-        .addScaledVector(up, -Math.sin(dip));
-      const len = THREE.MathUtils.degToRad(THREE.MathUtils.randFloat(10, 22));
-      mt.to
-        .copy(mt.from)
-        .multiplyScalar(Math.cos(len))
-        .addScaledVector(dir, Math.sin(len))
-        .normalize();
-      mt.dur = THREE.MathUtils.randFloat(0.5, 1.0);
-      mt.start = now;
+    if (n.meteors && now >= mt.next) {
+      const slot = mt.slots.find((s) => s.start < 0);
+      if (slot) spawnMeteor(slot, mt, camera, n.meteorLength, now);
+      // 간격을 크게 흔들어 몰려서 떨어질 때와 한동안 조용할 때가 생기게 한다.
+      // 가끔(25%)은 바로 뒤이어 하나 더 떨어진다
+      mt.next =
+        Math.random() < 0.25
+          ? now + THREE.MathUtils.randFloat(0.15, 0.5)
+          : now + n.meteorInterval * THREE.MathUtils.randFloat(0.3, 1.7);
     }
-    let alpha = 0;
-    if (mt.start >= 0) {
-      const p = (now - mt.start) / mt.dur;
-      if (p >= 1) {
-        mt.start = -1;
-        mt.next = now + n.meteorInterval * THREE.MathUtils.randFloat(0.5, 1.5);
-      } else {
-        // 머리는 시작→끝으로 가고, 꼬리는 머리 뒤 45% 길이만 따라온다 (짧은 각도라 선형 보간 후 정규화)
-        mt.head.lerpVectors(mt.from, mt.to, p).normalize();
-        mt.tail.lerpVectors(mt.from, mt.to, Math.max(0, p - 0.45)).normalize();
-        // 빠르게 켜지고 마지막 30%에서 서서히 꺼진다
-        alpha =
-          THREE.MathUtils.smoothstep(p, 0, 0.08 / mt.dur) *
-          (1 - THREE.MathUtils.smoothstep(p, 0.7, 1)) *
-          n.meteorBright;
+    const alpha = u.uMeteorAlpha.value as THREE.Vector4;
+    mt.slots.forEach((sl, i) => {
+      let a = 0;
+      if (sl.start >= 0) {
+        const p = (now - sl.start) / sl.dur;
+        if (p >= 1) sl.start = -1;
+        else {
+          // 머리는 시작→끝으로 가고, 꼬리는 머리 뒤 전체 길이의 75%까지 길게 따라온다
+          sl.head.lerpVectors(sl.from, sl.to, p).normalize();
+          sl.tail
+            .lerpVectors(sl.from, sl.to, Math.max(0, p - 0.75))
+            .normalize();
+          // 빠르게 켜지고 마지막 30%에서 서서히 꺼진다
+          a =
+            THREE.MathUtils.smoothstep(p, 0, 0.06 / sl.dur) *
+            (1 - THREE.MathUtils.smoothstep(p, 0.7, 1)) *
+            n.meteorBright;
+        }
       }
-    }
-    u.uMeteorHead.value.copy(mt.head);
-    u.uMeteorTail.value.copy(mt.tail);
-    u.uMeteorAlpha.value = alpha;
+      u.uMeteorHead.value[i].copy(sl.head);
+      u.uMeteorTail.value[i].copy(sl.tail);
+      alpha.setComponent(i, a);
+    });
   });
 
   return (
