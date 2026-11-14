@@ -65,6 +65,11 @@ function createWindTexture() {
   return tex;
 }
 
+// 잔디 키 군락용 월드 공간 노이즈 [0, 1] (CPU)
+export function clumpNoise(x: number, z: number) {
+  return fbm(x * 0.35 + 100, z * 0.35 + 100, 1e9, 29);
+}
+
 let windTex: THREE.DataTexture | null = null;
 
 export function getWindTexture() {

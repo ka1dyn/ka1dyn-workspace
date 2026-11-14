@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "./constants";
-import { getWindTexture } from "./noise";
+import { clumpNoise, getWindTexture } from "./noise";
 import { useTerrainSampler } from "./terrain";
 
 // 인스턴스 잔디: 위로 갈수록 좁아지는 띠 하나를 InstancedMesh로 수만 번 그린다 (드로우콜 1).
@@ -44,6 +44,7 @@ const vertexShader = /* glsl */ `
   uniform float uTime;
   uniform float uHeightScale;
   uniform float uWidthScale;
+  uniform float uWindStrength;
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -54,9 +55,25 @@ const vertexShader = /* glsl */ `
     vec4 world = modelMatrix * instanceMatrix * vec4(local, 1.0);
     float wind = 0.5;
     #ifdef WIND
-      wind = texture2D(uWind, world.xz * 0.06 + vec2(uTime * 0.035, uTime * 0.02)).r;
-      // 끝으로 갈수록 크게 휘도록 높이의 제곱에 비례시킨다
-      world.xz += (wind - 0.45) * vec2(0.35, 0.22) * uv.y * uv.y;
+      // 잎 뿌리 위치 (인스턴스 행렬의 이동 성분). 잎마다 위상을 다르게 주는 데 쓴다.
+      vec2 root = (modelMatrix * instanceMatrix[3]).xz;
+      vec2 dir = normalize(vec2(1.0, 0.55)); // 주 바람 방향
+      // 1) 돌풍: 큰 노이즈 덩어리가 바람 방향으로 천천히 흘러가며 어떤 곳은 세고 어떤 곳은 약하다
+      float gust = texture2D(uWind, root * 0.025 - dir * uTime * 0.045).g;
+      gust = smoothstep(0.3, 0.75, gust);
+      // 2) 흔들림: 돌풍 세기만큼 앞뒤로 출렁인다. 위상은 뿌리 위치로 흩뜨린다
+      float phase = dot(root, vec2(1.7, 2.3)) + texture2D(uWind, root * 0.3).b * 6.28;
+      float sway = sin(uTime * 2.1 + phase) * 0.5 + 0.5;
+      // 3) 잔떨림: 작은 노이즈를 빠르게 흘려 잎끝이 제각각 떨리게 한다
+      vec2 flutter = texture2D(uWind, root * 0.18 + uTime * vec2(0.35, 0.22)).rg - 0.5;
+      float bend = (0.15 + gust * (0.55 + 0.45 * sway)) * uWindStrength;
+      vec2 offset = dir * bend * 0.32 + flutter * 0.12 * uWindStrength;
+      // 끝으로 갈수록 크게 휘고(높이의 제곱), 휜 만큼 잎끝이 내려앉게 한다
+      float h = uv.y * uv.y;
+      offset *= h * uHeightScale;
+      world.xz += offset;
+      world.y -= dot(offset, offset) * 1.2;
+      wind = gust * (0.6 + 0.4 * sway);
     #endif
     vHeight = uv.y;
     vWind = wind;
@@ -136,6 +153,7 @@ export default function Grass({
           uTime: { value: 0 },
           uHeightScale: { value: 1 },
           uWidthScale: { value: 1 },
+          uWindStrength: { value: 1 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           uLampPos: { value: new THREE.Vector3() },
@@ -170,8 +188,15 @@ export default function Grass({
       // 물웅덩이(수면보다 낮은 곳)와 그 물가는 비운다
       if (puddles && !onWater && y < waterLevel + SHORE) continue;
       dummy.position.set(x, y - 0.01, z);
-      dummy.rotation.set(0, rand() * Math.PI * 2, 0);
-      const height = (0.14 + rand() * 0.22) * fade;
+      // 잎마다 살짝 기울여 한 방향으로 곧게 선 느낌을 없앤다
+      dummy.rotation.set(
+        (rand() - 0.5) * 0.35,
+        rand() * Math.PI * 2,
+        (rand() - 0.5) * 0.35,
+      );
+      // 키: 짧은 잎이 많고 가끔 긴 잎이 섞이게(거듭제곱 분포), 군락 노이즈로 키 큰 덤불과 낮은 곳을 만든다
+      const clump = 0.55 + clumpNoise(x, z) * 0.9;
+      const height = (0.08 + Math.pow(rand(), 1.6) * 0.32) * clump * fade;
       dummy.scale.set((0.018 + rand() * 0.017) * fade, height, 1);
       dummy.updateMatrix();
       m.setMatrixAt(placed++, dummy.matrix);
@@ -191,6 +216,7 @@ export default function Grass({
     u.uTime.value = clock.elapsedTime;
     u.uHeightScale.value = n.grassHeight;
     u.uWidthScale.value = n.grassWidth;
+    u.uWindStrength.value = n.windStrength;
     u.uLampPos.value.fromArray(n.lampPos);
     u.uLampColor.value.set(n.lampColor);
     u.uLampIntensity.value = n.lampIntensity;

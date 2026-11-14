@@ -30,6 +30,7 @@ export interface NightLab {
   grassCount: number;
   grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할)
   wind: boolean;
+  windStrength: number; // 바람 세기 배율
   grassHeight: number; // 잎 높이 배율 (셰이더 uniform이라 다시 심지 않는다)
   grassWidth: number; // 잎 폭 배율
   grassOnWater: boolean; // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
@@ -88,11 +89,12 @@ export const useLab = create<LabState>(() => ({
   night: {
     scene: "night",
     grass: true,
-    grassCount: 25000,
-    grassSegments: 6,
+    grassCount: 100000,
+    grassSegments: 2,
     wind: true,
-    grassHeight: 1,
-    grassWidth: 1,
+    windStrength: 1,
+    grassHeight: 2,
+    grassWidth: 1.3,
     grassOnWater: false,
     puddles: true,
     waterLevel: -0.03,
