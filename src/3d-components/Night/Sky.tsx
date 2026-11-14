@@ -96,7 +96,8 @@ const fragmentShader = /* glsl */ `
     float g = 1.0 - smoothstep(0.0, maxR, dist);
     float glow = g * g * mag * 0.12;
 
-    float tw = 1.0 + uTwinkle * sin(uTime * (1.3 + h.z * 3.0) + h.y * 40.0);
+    // 반짝임이 1을 넘으면 잠깐 완전히 꺼졌다 켜진다 (음수 밝기는 0으로 막는다)
+    float tw = max(0.0, 1.0 + uTwinkle * sin(uTime * (1.3 + h.z * 3.0) + h.y * 40.0));
     vec3 tint = mix(vec3(0.72, 0.82, 1.0), vec3(1.0, 0.9, 0.74), h.z);
     tint = mix(tint, vec3(1.0), 0.4);
     return tint * (core + glow) * (0.35 + 2.2 * mag) * tw;
