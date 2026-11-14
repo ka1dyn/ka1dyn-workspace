@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 // import { Post } from "./components/Post"
 import Lights from "@/3d-components/Lights.tsx";
 import Models from "@/3d-components/Models.tsx";
@@ -11,8 +11,10 @@ import { useOverlay, useReady, useStart, useTweaks } from "@/stores";
 import StartAnimaion from "./StartAnimaion";
 import { Post } from "./Post";
 import { IS_LAB, IS_MSAA, useLab } from "@/lab/store";
-import LabProbe from "@/lab/LabProbe";
-import LabTools from "@/lab/LabTools";
+
+// 실험실 도구(stats-gl, r3f-perf 포함)는 ?lab일 때만 내려받는다
+const LabProbe = lazy(() => import("@/lab/LabProbe"));
+const LabTools = lazy(() => import("@/lab/LabTools"));
 
 export default function Scene() {
   const frameReady = useReady((state) => state.frameReady);
@@ -76,9 +78,11 @@ export default function Scene() {
       </AudioProvider>
       {/* <Helpers /> */}
       {IS_LAB && (
-        <LabProbe gpuTimer={labTool !== "statsgl" && labTool !== "r3fperf"} />
+        <Suspense fallback={null}>
+          <LabProbe gpuTimer={labTool !== "statsgl" && labTool !== "r3fperf"} />
+          <LabTools />
+        </Suspense>
       )}
-      {IS_LAB && <LabTools />}
     </Canvas>
   );
 }
