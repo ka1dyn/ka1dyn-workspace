@@ -251,7 +251,9 @@ export default function Sky() {
   useEffect(() => () => material.dispose(), [material]);
 
   // 은하수는 처음 한 번만 굽는다 (재질이 바뀌어도 같은 텍스처를 쓴다)
-  const milky = useMemo(() => bakeMilkyWay(gl, MILKY_NORMAL), [gl]);
+  // 암흑대 세기를 바꿀 때만 다시 굽는다 (매 프레임 비용 없음)
+  const lane = useLab((s) => s.night.milkyLanes);
+  const milky = useMemo(() => bakeMilkyWay(gl, MILKY_NORMAL, lane), [gl, lane]);
   useEffect(() => () => milky.dispose(), [milky]);
 
   // 그리기 직전에 카메라를 보고 물웅덩이 반사인지 판단한다.

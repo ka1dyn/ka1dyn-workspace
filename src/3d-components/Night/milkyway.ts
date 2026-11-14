@@ -19,6 +19,7 @@ const vertexShader = /* glsl */ `
 
 const fragmentShader = /* glsl */ `
   uniform vec3 uNormal; // 은하수 대원(띠 중심선)이 놓인 평면의 법선
+  uniform float uLane;  // 암흑대(어두운 먼지 줄무늬) 세기
   varying vec2 vUv;
 
   float hash(vec3 p) {
@@ -62,14 +63,24 @@ const fragmentShader = /* glsl */ `
     float band = exp(-b * b / (0.17 * 0.17));  // 넓은 띠
     float core = exp(-b * b / (0.055 * 0.055)); // 밝은 중심부
 
-    // 별구름: 큰 덩어리 + 잔 알갱이
+    // 별구름: 큰 덩어리 + 잔 알갱이 (덩어리 대비를 키워 암흑대와 대비가 나게)
     float clouds = fbm(d * 5.0, 6);
     float grain = fbm(d * 24.0, 4);
-    float intensity = band * (0.25 + 1.1 * clouds * clouds) + core * 0.55 * (0.4 + grain);
+    float intensity = band * (0.2 + 1.4 * pow(clouds, 2.5)) + core * 0.6 * (0.4 + grain);
 
-    // 암흑대: 중심을 따라 길게 흐르는 어두운 줄무늬
-    float lane = smoothstep(0.48, 0.72, fbm(d * vec3(9.0, 4.0, 9.0) + 3.1, 5));
-    intensity *= 1.0 - lane * 0.85 * exp(-b * b / (0.08 * 0.08));
+    // 띠 기준 좌표: 띠를 따라가는 각도(along)와 띠에서 떨어진 정도(b).
+    // 노이즈를 이 좌표로 계산하면 띠를 따라 길게 흐르는 줄무늬가 된다.
+    // (원 위의 cos·sin으로 넣어 각도가 한 바퀴 돌아도 이음매가 없다)
+    vec3 e1 = normalize(cross(uNormal, abs(uNormal.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0)));
+    vec3 e2 = cross(uNormal, e1);
+    float along = atan(dot(d, e2), dot(d, e1));
+    vec3 q = vec3(cos(along) * 5.0, sin(along) * 5.0, b * 38.0);
+
+    // 굵은 암흑대: 띠 중심 근처를 따라 길게 흐르는 어두운 줄기
+    float lane = smoothstep(0.42, 0.64, fbm(q + 3.1, 5)) * exp(-b * b / (0.11 * 0.11));
+    // 가는 먼지 가닥: 더 촘촘한 노이즈로 띠를 가로지르는 가는 어두운 가닥
+    float fil = smoothstep(0.55, 0.74, fbm(q * vec3(2.6, 2.6, 1.7) + 9.4, 4)) * exp(-b * b / (0.15 * 0.15));
+    intensity *= 1.0 - uLane * clamp(lane * 0.92 + fil * 0.3, 0.0, 0.95);
 
     // 색: 바깥은 푸른 회색, 중심부는 아주 약하게 따뜻한 색
     vec3 color = mix(vec3(0.55, 0.63, 0.86), vec3(0.95, 0.86, 0.74), core * 0.55);
@@ -81,6 +92,7 @@ const fragmentShader = /* glsl */ `
 export function bakeMilkyWay(
   renderer: THREE.WebGLRenderer,
   normal: THREE.Vector3,
+  lane = 1,
 ) {
   const target = new THREE.WebGLRenderTarget(WIDTH, HEIGHT, {
     type: THREE.HalfFloatType, // 어두운 그라데이션이 계단지지 않게
@@ -95,7 +107,10 @@ export function bakeMilkyWay(
   const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
-    uniforms: { uNormal: { value: normal.clone().normalize() } },
+    uniforms: {
+      uNormal: { value: normal.clone().normalize() },
+      uLane: { value: lane },
+    },
     depthTest: false,
     depthWrite: false,
   });

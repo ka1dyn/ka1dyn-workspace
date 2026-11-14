@@ -59,6 +59,7 @@ export interface NightLab {
   starTwinkle: number; // 별 반짝임 세기 (밝기 ±)
   milkyWay: number; // 은하수 세기
   milkyRotation: number; // 은하수 방위 회전 (도)
+  milkyLanes: number; // 은하수 암흑대(어두운 먼지 줄무늬) 세기. 바꾸면 은하수를 다시 굽는다
   treeLayers: number; // 숲 겹 수 (1~3)
   treeHeight: number; // 숲 높이 배율
   fireflies: number; // 반딧불이 수 (Night/Fireflies.tsx)
@@ -158,6 +159,7 @@ export const useLab = create<LabState>(() => ({
     starTwinkle: 0.15,
     milkyWay: 1,
     milkyRotation: 0,
+    milkyLanes: 0.5,
     treeLayers: 3,
     treeHeight: 1,
     fireflies: 30,
