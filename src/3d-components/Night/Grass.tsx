@@ -51,6 +51,7 @@ const vertexShader = /* glsl */ `
   uniform sampler2D uPush;   // 눌림 지도 (interaction.ts): rg = 눕는 방향 × 세기
   uniform float uPushExtent; // 눌림 지도가 덮는 월드 한 변 (m)
   uniform float uPushAngle;  // 세기 1일 때 휘는 각도 (라디안)
+  uniform float uPushRecover; // 다시 서는 시간 (초)
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -110,13 +111,16 @@ const vertexShader = /* glsl */ `
 
     #ifdef CURSOR
       // 커서 밀기: 커서가 쓸고 지나간 방향으로 눕고, 눌림 지도가 옅어지는 만큼 천천히 다시 선다.
-      // 세기는 일정한 속도로 줄어드는데(interaction.ts), 휘는 각도는 세기의 제곱을 따른다.
-      // 그래서 손을 떼자마자 빠르게 일어나기 시작하고, 끝으로 갈수록 감속해 회복 시간에 맞춰 똑바로 선다.
-      // (smoothstep은 시작도 평평해서 "누운 채 멈췄다가 서는" 느낌이 났다)
+      // 세기는 일정한 속도로 줄어들므로(interaction.ts) 손을 뗀 뒤 지난 시간 s를 거꾸로 구할 수 있다.
+      // 휘는 정도 = 빠른 부분 70%(시간 상수 0.07초) + 느린 부분 30%(회복 시간 끝까지 감속).
+      // 손을 떼고 0.1초면 약 60% 일어서고, 나머지는 회복 시간에 맞춰 천천히 똑바로 선다.
       vec2 push = texture2D(uPush, root.xz / uPushExtent + 0.5).rg;
       float pushLen = length(push);
       if (pushLen > 1e-4) {
-        b += push / pushLen * (pushLen * pushLen) * uPushAngle;
+        float s = (1.0 - pushLen) * uPushRecover;
+        float slow = pushLen * pushLen; // = (1 - s / 회복 시간)²
+        float lean = 0.7 * exp(-s / 0.07) + 0.3 * slow;
+        b += push / pushLen * lean * uPushAngle;
       }
     #endif
 
@@ -236,6 +240,7 @@ export default function Grass({
           uPush: { value: null },
           uPushExtent: { value: 1 },
           uPushAngle: { value: 1.2 },
+          uPushRecover: { value: 2 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           // 땅 너머로 보이는 하늘 아래쪽(Sky.tsx의 숲 실루엣 색)과 맞춘다
@@ -401,6 +406,7 @@ export default function Grass({
       });
       u.uPush.value = c.map.texture;
       u.uPushExtent.value = extent;
+      u.uPushRecover.value = Math.max(n.cursorRecover, 0.05);
     }
     u.uTime.value = clock.elapsedTime;
     u.uHeightScale.value = n.grassHeight;
