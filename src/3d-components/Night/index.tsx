@@ -52,18 +52,22 @@ function NightRain() {
   const boost = useLab((s) => s.night.rainSparkleBoost);
   const count = useLab((s) => s.night.rainCount);
   const speed = useLab((s) => s.night.rainSpeed);
+  const spread = useLab((s) => s.night.rainSpread);
   return (
     <group>
       <group rotation={[degToRad(-90), 0, 0]}>
-        <Drops
-          // 개수가 바뀌면 인스턴스 버퍼와 위치 배열을 새로 만든다
-          key={count}
-          count={count}
-          speed={speed}
-          rotation={[degToRad(90), 0, 0]}
-          sparkle={on ? sparkle : 0}
-          sparkleBoost={boost}
-        />
+        {count > 0 && (
+          <Drops
+            // 개수가 바뀌면 인스턴스 버퍼와 위치 배열을 새로 만든다
+            key={count}
+            count={count}
+            speed={speed}
+            spread={spread}
+            rotation={[degToRad(90), 0, 0]}
+            sparkle={on ? sparkle : 0}
+            sparkleBoost={boost}
+          />
+        )}
         <Splashes count={200} rotation={[degToRad(90), 0, 0]}>
           <mesh position={[0, 0, 0.01]}>
             <circleGeometry args={[5, 32]} />

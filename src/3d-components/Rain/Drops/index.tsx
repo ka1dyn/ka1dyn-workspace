@@ -13,11 +13,19 @@ type DropsProps = React.JSX.IntrinsicElements["group"] & {
   sparkle?: number; // 빈도 (0~1)
   sparkleBoost?: number; // 반짝일 때 진해지는 배율
   speed?: number; // 떨어지는 속도 (m/s)
+  spread?: number; // 빗방울이 생기는 정사각형 한 변 (m). 가장자리 옅어짐도 이 크기를 따른다 (기존 10)
 };
 
 export const Drops = React.forwardRef<THREE.Group, DropsProps>(
   (
-    { count = 300, sparkle = 0, sparkleBoost = 0, speed = 6, ...props },
+    {
+      count = 300,
+      sparkle = 0,
+      sparkleBoost = 0,
+      speed = 6,
+      spread = 10,
+      ...props
+    },
     fref,
   ) => {
     const dropsRef = React.useRef<THREE.InstancedMesh>(null!);
@@ -28,8 +36,8 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
     React.useEffect(() => {
       const dropsMesh = dropsRef.current;
       for (let i = 0; i < count; i++) {
-        const initX = THREE.MathUtils.randFloatSpread(10);
-        const initZ = THREE.MathUtils.randFloatSpread(10);
+        const initX = THREE.MathUtils.randFloatSpread(spread);
+        const initZ = THREE.MathUtils.randFloatSpread(spread);
 
         let initY = THREE.MathUtils.randFloat(-0.1, 6);
         if (initX < 2.3 || initX > -2.3) {
@@ -72,8 +80,8 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
             _dummy.position.x < 2.3 &&
             _dummy.position.y < 2.7)
         ) {
-          const initX = THREE.MathUtils.randFloatSpread(10);
-          const initZ = THREE.MathUtils.randFloatSpread(10);
+          const initX = THREE.MathUtils.randFloatSpread(spread);
+          const initZ = THREE.MathUtils.randFloatSpread(spread);
 
           let initY = THREE.MathUtils.randFloat(-0.1, 6);
           if (initX < 2.3 || initX > -2.3) {
@@ -100,6 +108,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
       if (u?.uSparkle) {
         u.uTime.value = clock.elapsedTime;
         u.uSparkle.value = sparkle;
+        u.uFadeRadius.value = 8.5 * (spread / 10);
         u.uSparkleBoost.value = sparkleBoost;
       }
     });
@@ -127,6 +136,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         uniform float uTime;
         uniform float uSparkle;
         uniform float uSparkleBoost;
+        uniform float uFadeRadius;
   
         varying vec3 vInstancePosition;
         varying vec2 vUv;
@@ -165,7 +175,8 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           float dropletDistance = blur(5.0);
           float rainProgress = smoothstep(0.0, 0.5, uRainProgress);
           rainProgress = clamp(rainProgress, 0.0, 1.0);
-          float circle = 7.0 - sdCircle(vInstancePosition.xz, 1.5);
+          // 중심에서 멀어질수록 옅게. 기존(범위 10m)은 8.5m에서 0이 되고, 범위에 비례해 늘어난다
+          float circle = uFadeRadius - length(vInstancePosition.xz);
           csm_DiffuseColor.a = dropletDistance * 0.1 * rainProgress * circle;
 
           // 반짝임: 색·모양은 그대로 두고, 빗방울마다 다른 주기로 아주 짧게 더 진해진다
@@ -186,6 +197,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
         uTime: { value: 0 },
         uSparkle: { value: 0 },
         uSparkleBoost: { value: 0 },
+        uFadeRadius: { value: 8.5 },
       }),
       [],
     );

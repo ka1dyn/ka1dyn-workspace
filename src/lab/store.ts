@@ -45,6 +45,7 @@ export interface NightLab {
   grainSize: number; // 그레인 입자 크기 (CSS 픽셀. DPR 1.5에서 0.67 = 실제 픽셀 1개)
   rainCount: number; // 빗방울 개수 (기존 300)
   rainSpeed: number; // 떨어지는 속도 m/s (기존 6)
+  rainSpread: number; // 비가 내리는 정사각형 한 변 m (기존 10)
   rainSparkleOn: boolean; // 빗방울이 가끔 살짝 반짝인다 (기존 빗방울 셰이더 그대로)
   rainSparkle: number; // 반짝임 빈도 (0~1)
   rainSparkleBoost: number; // 반짝일 때 진해지는 배율
@@ -123,6 +124,7 @@ export const useLab = create<LabState>(() => ({
     grainDark: 0.05,
     rainCount: 300,
     rainSpeed: 6,
+    rainSpread: 18,
     rainSparkleOn: true,
     rainSparkle: 0.5,
     rainSparkleBoost: 1.5,
