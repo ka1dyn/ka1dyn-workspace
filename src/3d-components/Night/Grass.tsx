@@ -42,12 +42,16 @@ const vertexShader = /* glsl */ `
   #include <fog_pars_vertex>
   uniform sampler2D uWind;
   uniform float uTime;
+  uniform float uHeightScale;
+  uniform float uWidthScale;
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
 
   void main() {
-    vec4 world = modelMatrix * instanceMatrix * vec4(position, 1.0);
+    // 높이·폭 배율은 잎 로컬 좌표에 곱한다 (배치는 그대로 두고 크기만 바꾼다)
+    vec3 local = position * vec3(uWidthScale, uHeightScale, 1.0);
+    vec4 world = modelMatrix * instanceMatrix * vec4(local, 1.0);
     float wind = 0.5;
     #ifdef WIND
       wind = texture2D(uWind, world.xz * 0.06 + vec2(uTime * 0.035, uTime * 0.02)).r;
@@ -115,6 +119,7 @@ export default function Grass({
   // 수면 높이가 바뀌면 물에 잠기는 자리가 달라지므로 다시 심는다
   const waterLevel = useLab((s) => s.night.waterLevel);
   const puddles = useLab((s) => s.night.puddles);
+  const onWater = useLab((s) => s.night.grassOnWater);
 
   const geometry = useMemo(() => createBladeGeometry(segments), [segments]);
   const material = useMemo(
@@ -129,6 +134,8 @@ export default function Grass({
           ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
           uWind: { value: getWindTexture() },
           uTime: { value: 0 },
+          uHeightScale: { value: 1 },
+          uWidthScale: { value: 1 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           uLampPos: { value: new THREE.Vector3() },
@@ -161,7 +168,7 @@ export default function Grass({
       if (fade < 0.05) continue;
       const y = terrain.heightAt(x, z);
       // 물웅덩이(수면보다 낮은 곳)와 그 물가는 비운다
-      if (puddles && y < waterLevel + SHORE) continue;
+      if (puddles && !onWater && y < waterLevel + SHORE) continue;
       dummy.position.set(x, y - 0.01, z);
       dummy.rotation.set(0, rand() * Math.PI * 2, 0);
       const height = (0.14 + rand() * 0.22) * fade;
@@ -171,7 +178,7 @@ export default function Grass({
     }
     m.count = placed;
     m.instanceMatrix.needsUpdate = true;
-  }, [count, terrain, waterLevel, puddles]);
+  }, [count, terrain, waterLevel, puddles, onWater]);
 
   useLayoutEffect(() => {
     if (inReflection) mesh.current.layers.enable(GRASS_LAYER);
@@ -182,6 +189,8 @@ export default function Grass({
     const n = useLab.getState().night;
     const u = (mesh.current.material as THREE.ShaderMaterial).uniforms;
     u.uTime.value = clock.elapsedTime;
+    u.uHeightScale.value = n.grassHeight;
+    u.uWidthScale.value = n.grassWidth;
     u.uLampPos.value.fromArray(n.lampPos);
     u.uLampColor.value.set(n.lampColor);
     u.uLampIntensity.value = n.lampIntensity;
