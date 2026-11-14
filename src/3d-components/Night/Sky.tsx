@@ -259,11 +259,11 @@ function spawnMeteor(
     v.set(x, y, 0.5).unproject(camera).sub(camera.position).normalize();
   // 복사점: 화면 위쪽 바깥 (NDC y 1.6). 모든 별똥별이 여기서 퍼져 나와 같은 유성우처럼 보인다
   toSky(mt.radiant, mt.radiantX, 1.6);
-  // 시작점: 화면 좌우 85%, 화면 위 가장자리 살짝 바깥 ~ 화면 중간
+  // 시작점: 화면 좌우 85%, 화면 위쪽 1/4 (위 가장자리 살짝 바깥 포함). 낮은 곳에서 시작하면 금방 지평선에 묻혀 잘 안 보인다
   toSky(
     slot.from,
     THREE.MathUtils.randFloatSpread(1.7),
-    THREE.MathUtils.randFloat(0.05, 1.05),
+    THREE.MathUtils.randFloat(0.5, 1.05),
   );
   if (slot.from.y < Math.sin(THREE.MathUtils.degToRad(6))) {
     slot.from.y = Math.sin(THREE.MathUtils.degToRad(6)); // 지평선에 너무 붙지 않게
@@ -283,7 +283,7 @@ function spawnMeteor(
     .multiplyScalar(Math.cos(len))
     .addScaledVector(dir, Math.sin(len))
     .normalize();
-  slot.dur = THREE.MathUtils.randFloat(0.6, 1.1);
+  slot.dur = THREE.MathUtils.randFloat(1.1, 1.8); // 눈으로 따라갈 수 있게 조금 천천히
   slot.start = now;
 }
 
