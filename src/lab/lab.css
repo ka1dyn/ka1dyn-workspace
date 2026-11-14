@@ -2,13 +2,6 @@
  * drei StatsGl은 stats-gl의 인라인 스타일(position: fixed)을 항상 지운다.
  * 그대로 두면 body 끝에 일반 블록으로 쌓여 페이지 스크롤이 생기므로 직접 고정한다.
  */
-/* 실험실: 맥북 화면 안의 backdrop-filter를 끈다 (Tailwind backdrop-blur-*) */
-.lab-noblur,
-.lab-noblur * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
 .lab-statsgl {
   position: fixed;
   left: 0;

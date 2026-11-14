@@ -19,8 +19,10 @@ export default function LabPanel() {
     }),
     "맥북 화면": folder({
       "화면 Html 표시": true,
-      "매 프레임 밝기·투명도 갱신": true,
-      "backdrop-blur": true,
+      "보호필름 효과": true,
+      "보호필름을 DOM filter로 (이전)": false,
+      "멀리서 대체 그림 (LOD)": true,
+      "실제 backdrop-blur (이전)": false,
       "occlude (blending)": true,
       "화면 DOM 해상도": {
         value: 1,
@@ -225,8 +227,10 @@ export default function LabPanel() {
       },
       screen: {
         html: v["화면 Html 표시"],
-        frameStyle: v["매 프레임 밝기·투명도 갱신"],
-        backdrop: v["backdrop-blur"],
+        frameStyle: v["보호필름 효과"],
+        filmDom: v["보호필름을 DOM filter로 (이전)"],
+        lod: v["멀리서 대체 그림 (LOD)"],
+        backdrop: v["실제 backdrop-blur (이전)"],
         occlude: v["occlude (blending)"],
         res: v["화면 DOM 해상도"] as number,
       },

@@ -22,8 +22,10 @@ export type LabTool = "none" | "statsgl" | "r3fperf";
 // 맥북 화면(drei Html로 띄운 DOM) 실험용 스위치. 기본값은 실제 사이트와 같다.
 export interface ScreenLab {
   html: boolean; // Html(DOM) 자체를 띄울지 (맥북 모델은 그대로)
-  frameStyle: boolean; // Screen의 useFrame이 매 프레임 filter·opacity를 쓰는지
-  backdrop: boolean; // 화면 안 backdrop-blur 효과
+  frameStyle: boolean; // 보호필름 효과 (비스듬히 보거나 멀어지면 화면이 어두워짐)
+  filmDom: boolean; // 보호필름을 이전 방식(DOM에 매 프레임 filter·opacity)으로 (비교·측정용)
+  lod: boolean; // 화면이 작게 보이면 DOM을 숨기고 대체 그림을 그린다
+  backdrop: boolean; // 3D 화면 안에서도 실제 backdrop-blur를 쓴다 (이전 방식, 비교·측정용)
   occlude: boolean; // occlude="blending" (캔버스에 구멍을 뚫어 뒤의 DOM을 보여 줌)
   res: number; // 화면 DOM의 CSS 해상도 배율 (월드 크기는 유지)
 }
@@ -131,7 +133,9 @@ export const useLab = create<LabState>(() => ({
   screen: {
     html: true,
     frameStyle: true,
-    backdrop: true,
+    filmDom: false,
+    lod: true,
+    backdrop: false,
     occlude: true,
     res: 1,
   },
