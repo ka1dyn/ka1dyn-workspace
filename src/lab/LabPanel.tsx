@@ -122,7 +122,7 @@ export default function LabPanel() {
       "소품 (things)": true,
       "맥북 + 화면": true,
       "타일 바닥": true,
-      "구름 (반투명)": true,
+      "구름 (반투명)": false,
     }),
     조명: folder({
       "Environment (Lightformer)": true,

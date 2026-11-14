@@ -113,7 +113,7 @@ export const useLab = create<LabState>(() => ({
     things: true,
     mac: true,
     floor: true,
-    clouds: true,
+    clouds: false, // 밤 씬 기본: 구름 없음 (달·은하수를 가리지 않게)
   },
   screen: {
     html: true,
