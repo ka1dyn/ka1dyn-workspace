@@ -22,7 +22,7 @@ const vertexShader = /* glsl */ `
 
 const fragmentShader = /* glsl */ `
   uniform float uAmount;  // 그레인 세기 (밝기 변화 폭)
-  uniform float uSize;    // 입자 크기 (화면 픽셀)
+  uniform float uSize;    // 입자 크기 (실제 화면 픽셀 = CSS 픽셀 × 현재 DPR)
   uniform float uSeed;    // 초당 24번 바뀌는 값
   uniform float uDark;    // 어두운 곳 그레인: 밝기와 무관하게 더하고 빼는 폭
 
@@ -118,7 +118,7 @@ export default function Grain() {
     [geometry, materials],
   );
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, gl }) => {
     if (!enabled) return;
     const n = useLab.getState().night;
     // 초당 24번만 바꿔 필름처럼 보이게 하고 지글거림을 줄인다
@@ -128,7 +128,9 @@ export default function Grain() {
       const u = ((child as THREE.Mesh).material as THREE.ShaderMaterial)
         .uniforms;
       u.uAmount.value = n.grainAmount;
-      u.uSize.value = n.grainSize;
+      // 패널 값은 CSS 픽셀 기준. 현재 DPR을 곱해 어느 화면·모드(맥북 근접 시 DPR 0.6 등)에서도
+      // 입자 크기가 같아 보이게 한다. 다만 실제 픽셀 1개보다 작게는 못 그린다.
+      u.uSize.value = Math.max(n.grainSize * gl.getPixelRatio(), 1);
       u.uSeed.value = seed;
       u.uDark.value = n.grainDark;
     });
