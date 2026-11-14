@@ -1,8 +1,4 @@
-import {
-  useBgImageStore,
-  useOverlay,
-  useTweaks,
-} from "@/stores";
+import { useBgImageStore, useOverlay, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
@@ -13,6 +9,12 @@ import ModalContainer from "./ModalContainer";
 import { LogOut } from "lucide-react";
 import { PUBLIC_IMAGES } from "@/constants/images";
 import usePreloadImage from "@/hooks/usePreloadImage";
+import useBlurredStrip from "@/hooks/useBlurredStrip";
+import { useLab } from "@/lab/store";
+import { SCREEN_PX } from "@/constants/camera";
+
+const BAR_HEIGHT = 64; // 상단 바 높이 (h-16)
+const BAR_TINT = "color-mix(in oklab, var(--color-gray-500) 60%, transparent)"; // bg-gray-500/60
 
 export default function Home() {
   const { audioPrev, setDive, setAudioActive } = useTweaks(
@@ -25,6 +27,15 @@ export default function Home() {
   const setActive = useOverlay((state) => state.setActive);
   const dive = useTweaks((state) => state.dive);
   usePreloadImage([PUBLIC_IMAGES.BIKE, PUBLIC_IMAGES.CITY]);
+  // 3D 화면에서는 실제 backdrop-blur 대신 미리 흐려 둔 배경 조각을 상단 바에 깐다 (index.css의 .screen-noblur 참고)
+  const realBlur = useLab((state) => state.screen.backdrop) || dive;
+  const strip = useBlurredStrip(realBlur ? null : path, {
+    width: SCREEN_PX.w,
+    height: SCREEN_PX.h,
+    stripHeight: BAR_HEIGHT,
+    blur: 40, // backdrop-blur-2xl
+    opacity: 0.6, // 배경 이미지의 opacity-60 (검은 바탕 위)
+  });
 
   const exitClick = () => {
     setActive(true);
@@ -63,6 +74,16 @@ export default function Home() {
                 bg-gray-500/60 backdrop-blur-2xl
                 border-b border-black/20
                 shadow-md"
+        style={
+          strip
+            ? {
+                // 흐린 배경 조각 위에 바의 반투명 회색(gray-500/60)을 한 겹 덮는다
+                backgroundImage: `linear-gradient(${BAR_TINT}, ${BAR_TINT}), url(${strip})`,
+                backgroundSize: "100% 100%",
+                backgroundColor: "transparent",
+              }
+            : undefined
+        }
       >
         <img src={PUBLIC_IMAGES.LOGO} className="h-full" />
         {dive && (

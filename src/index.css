@@ -21,6 +21,18 @@
   z-index: 10000000;
 }
 
+/*
+ * 3D로 겹친 맥북 화면 안에서는 backdrop-filter를 쓰지 않는다 (Screen.tsx가 붙인다).
+ * 뒤의 WebGL 캔버스가 매 프레임 바뀌어 브라우저가 흐림을 매 프레임 다시 계산하므로,
+ * 화면이 작게 보여도 GPU 전력이 약 2.5W 늘었다. 상단 바는 미리 흐려 둔 배경 이미지로 대신한다
+ * (useBlurredStrip). dive(전체 화면 DOM)에서는 뒤가 멈춰 있어 실제 blur를 그대로 쓴다.
+ */
+.screen-noblur,
+.screen-noblur * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 @theme {
   --font-roboto: "Roboto Mono", sans-serif;
   --font-pretendard: "Pretendard", sans-serif;
