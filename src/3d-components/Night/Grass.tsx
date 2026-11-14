@@ -61,29 +61,38 @@ const vertexShader = /* glsl */ `
       float len = length(instanceMatrix[1].xyz) * uHeightScale;
       float time = uTime * uWindSpeed; // 바람 속도 배율
 
-      // 1) 바람 방향 자체가 공간과 시간에 따라 천천히 돌아서 한쪽으로만 눕지 않는다
-      float ang = 0.6 + (texture2D(uWind, root.xz * 0.02 + time * 0.008).a - 0.5) * 4.0;
+      // 들판 전체가 파도치듯 움직이게 한다: 잎마다 따로 흔들리지 않고,
+      // 바람 방향 위치로 위상을 정해 "눕는 띠"가 들판을 가로질러 흘러가게 한다.
+
+      // 1) 바람 방향: 들판 전체가 함께 천천히 바뀐다 (장소마다 흩뜨리지 않음)
+      float ang = 0.6 + (texture2D(uWind, vec2(time * 0.004, 0.37)).a - 0.5) * 1.6
+                      + (texture2D(uWind, root.xz * 0.006).a - 0.5) * 0.4;
       vec2 dir = vec2(cos(ang), sin(ang));
       vec2 perp = vec2(-dir.y, dir.x);
 
-      // 2) 돌풍: 큰 노이즈 덩어리가 흘러가며 어떤 곳은 세고 어떤 곳은 거의 잔잔하다
-      float gust = texture2D(uWind, root.xz * 0.025 - dir * time * 0.03).g;
-      gust = smoothstep(0.25, 0.8, gust);
+      // 2) 파도: 바람 방향 좌표를 따라 흘러가는 두 개의 물결을 겹친다.
+      //    파장이 다르고 방향이 조금 어긋나서 마루가 직선으로 늘어서지 않는다.
+      float along = dot(root.xz, dir);
+      float across = dot(root.xz, perp);
+      float w1 = sin(along * 1.4 - time * 2.0 + sin(across * 0.45) * 1.2);
+      float w2 = sin(dot(root.xz, vec2(cos(ang + 0.5), sin(ang + 0.5))) * 2.3 - time * 3.0);
+      float wave = clamp(0.5 + 0.38 * w1 + 0.2 * w2, 0.0, 1.0);
+      wave = wave * wave; // 마루는 좁고 뚜렷하게, 골은 넓게
 
-      // 3) 출렁임: 똑바로 선 자세를 가운데 두고 앞뒤로 흔들린다(바람 쪽으로 조금 더).
-      //    잎끝이 뿌리보다 늦게 따라오도록 높이만큼 위상을 늦춰 낭창하게 휘게 한다.
-      float seed = texture2D(uWind, root.xz * 0.5).b; // 잎마다 다른 값
-      float stiff = 0.6 + seed * 0.8;                 // 잎마다 다른 뻣뻣함
-      float phase = dot(root.xz, vec2(1.7, 2.3)) + seed * 6.28;
-      float sway = sin(time * (0.8 + seed * 0.5) + phase - uv.y * 1.0);
-      float idle = sin(time * 0.5 + phase * 1.3) * 0.06; // 바람이 없어도 살랑임
+      // 3) 돌풍: 큰 덩어리가 바람 방향으로 흘러가며 파도의 세기를 키우고 줄인다
+      float gust = texture2D(uWind, root.xz * 0.02 - dir * time * 0.04).g;
+      gust = 0.35 + 0.65 * smoothstep(0.25, 0.75, gust);
 
-      // 4) 잔떨림: 옆 방향으로 살짝 흔들린다 (너무 빠르면 진동처럼 보여서 느리고 작게)
-      float flutter = texture2D(uWind, root.xz * 0.2 + time * vec2(0.06, 0.04)).r - 0.5;
+      // 4) 잎마다 차이는 작게만: 뻣뻣함과 아주 작은 위상 어긋남
+      float seed = texture2D(uWind, root.xz * 0.5).b;
+      float stiff = 0.8 + seed * 0.4;
+      float jitter = sin(time * 0.7 + seed * 6.28) * 0.04;
+      // 잎끝이 뿌리보다 살짝 늦게 따라와 낭창하게 휜다
+      float lag = sin(along * 1.4 - time * 2.0 - uv.y * 0.6) * 0.05;
 
-      // 잎끝의 휘는 각도(라디안). 방향 성분과 옆 성분을 합친다.
-      float lean = (gust * (0.35 + 0.65 * sway) * 0.95 + idle) * uWindStrength / stiff;
-      vec2 b = dir * lean + perp * flutter * 0.15 * uWindStrength;
+      // 잎끝의 휘는 각도(라디안): 마루가 지나갈 때 바람 쪽으로 눕고 골에서는 다시 선다
+      float lean = (0.08 + gust * wave * 0.95 + jitter + lag) * uWindStrength / stiff;
+      vec2 b = dir * lean;
       float theta = clamp(length(b), 0.0, 1.35);
       vec2 bdir = theta > 1e-4 ? b / length(b) : dir;
 
@@ -95,7 +104,7 @@ const vertexShader = /* glsl */ `
       vec3 rel = world.xyz - root; // 잎 폭과 기울기 성분
       world.xyz = root + vec3(rel.x, 0.0, rel.z) + vec3(bdir.x * horiz, vert, bdir.y * horiz);
 
-      wind = gust * (0.6 + 0.4 * (sway * 0.5 + 0.5));
+      wind = gust * wave; // 마루가 지나가는 곳이 밝아져 파도가 눈에 보인다
     #endif
     vHeight = uv.y;
     vWind = wind;
