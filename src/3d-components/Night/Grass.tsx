@@ -49,8 +49,11 @@ const vertexShader = /* glsl */ `
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
+  attribute float aEdge; // 지형 가장자리 정도 (1: 안쪽, 0: 땅이 사라지는 끝)
+  varying float vEdge;
 
   void main() {
+    vEdge = aEdge;
     // 높이·폭 배율은 잎 로컬 좌표에 곱한다 (배치는 그대로 두고 크기만 바꾼다)
     vec3 local = position * vec3(uWidthScale, uHeightScale, 1.0);
     vec4 world = modelMatrix * instanceMatrix * vec4(local, 1.0);
@@ -125,6 +128,8 @@ const fragmentShader = /* glsl */ `
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
+  varying float vEdge;
+  uniform vec3 uEdgeColor;
 
   void main() {
     vec3 color = mix(uBase, uTip, vHeight * vHeight);
@@ -132,6 +137,8 @@ const fragmentShader = /* glsl */ `
     // 퍼걸러 아래 등의 빛: 수평 거리 제곱으로 줄어드는 따뜻한 색을 잎 끝에 더한다
     vec2 d = vWorld.xz - uLampPos.xz;
     color += uLampColor * uLampIntensity * 0.05 * vHeight / (1.0 + dot(d, d) * 0.6);
+    // 땅이 투명해지며 뒤의 어두운 하늘에 녹아드는 것처럼, 가장자리 잎은 같은 어두운 색으로 섞는다
+    color = mix(uEdgeColor, color, vEdge);
     gl_FragColor = vec4(color, 1.0);
     #include <colorspace_fragment>
     #include <fog_fragment>
@@ -188,6 +195,8 @@ export default function Grass({
           uWindSpeed: { value: 1 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
+          // 땅 너머로 보이는 하늘 아래쪽(Sky.tsx의 숲 실루엣 색)과 맞춘다
+          uEdgeColor: { value: new THREE.Color("#03050a") },
           uLampPos: { value: new THREE.Vector3() },
           uLampColor: { value: new THREE.Color() },
           uLampIntensity: { value: 0 },
@@ -205,6 +214,8 @@ export default function Grass({
     const rand = rng(7);
     const dummy = new THREE.Object3D();
     let placed = 0;
+    // 잎마다 가장자리 정도를 넣는 인스턴스 속성. 개수가 바뀔 때마다 새로 만든다
+    const edge = new Float32Array(count);
     let guard = 0;
     while (placed < count && guard++ < count * 20) {
       // 원 안에 균일하게 뽑는다
@@ -214,8 +225,11 @@ export default function Grass({
       const z = Math.sin(a) * r;
       if (Math.abs(x) < INNER && Math.abs(z) < INNER) continue;
       // 지형 가장자리(알파맵)를 따라 잎을 줄여 지형과 함께 사라지게 한다
-      const fade = THREE.MathUtils.smoothstep(terrain.alphaAt(x, z), 0.05, 0.6);
-      if (fade < 0.05) continue;
+      // 지형 가장자리(알파맵)를 따라 세 가지로 서서히 사라지게 한다:
+      // 바깥일수록 드문드문 심고(밀도), 키를 낮추고(크기), 어두운 색으로 섞는다(셰이더의 aEdge)
+      const alpha = terrain.alphaAt(x, z);
+      if (alpha < 0.02 || rand() > Math.pow(alpha, 0.8)) continue;
+      const fade = THREE.MathUtils.smoothstep(alpha, 0.0, 0.95);
       const y = terrain.heightAt(x, z);
       // 물웅덩이(수면보다 낮은 곳)와 그 물가는 비운다
       if (puddles && !onWater && y < waterLevel + SHORE) continue;
@@ -229,13 +243,18 @@ export default function Grass({
       // 키: 짧은 잎이 많고 가끔 긴 잎이 섞이게(거듭제곱 분포), 군락 노이즈로 키 큰 덤불과 낮은 곳을 만든다
       const clump = 0.55 + clumpNoise(x, z) * 0.9;
       const height = (0.08 + Math.pow(rand(), 1.6) * 0.32) * clump * fade;
-      dummy.scale.set((0.018 + rand() * 0.017) * fade, height, 1);
+      dummy.scale.set((0.018 + rand() * 0.017) * (0.5 + 0.5 * fade), height, 1);
       dummy.updateMatrix();
+      edge[placed] = THREE.MathUtils.smoothstep(alpha, 0.05, 0.85);
       m.setMatrixAt(placed++, dummy.matrix);
     }
     m.count = placed;
+    m.geometry.setAttribute(
+      "aEdge",
+      new THREE.InstancedBufferAttribute(edge, 1),
+    );
     m.instanceMatrix.needsUpdate = true;
-  }, [count, terrain, waterLevel, puddles, onWater]);
+  }, [count, geometry, terrain, waterLevel, puddles, onWater]);
 
   useLayoutEffect(() => {
     if (inReflection) mesh.current.layers.enable(GRASS_LAYER);
