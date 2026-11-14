@@ -110,11 +110,13 @@ const vertexShader = /* glsl */ `
 
     #ifdef CURSOR
       // 커서 밀기: 커서가 쓸고 지나간 방향으로 눕고, 눌림 지도가 옅어지는 만큼 천천히 다시 선다.
-      // 세기는 끝부분에서 감속하도록 smoothstep을 거쳐 "툭" 서지 않고 부드럽게 일어나게 한다.
+      // 세기는 일정한 속도로 줄어드는데(interaction.ts), 휘는 각도는 세기의 제곱을 따른다.
+      // 그래서 손을 떼자마자 빠르게 일어나기 시작하고, 끝으로 갈수록 감속해 회복 시간에 맞춰 똑바로 선다.
+      // (smoothstep은 시작도 평평해서 "누운 채 멈췄다가 서는" 느낌이 났다)
       vec2 push = texture2D(uPush, root.xz / uPushExtent + 0.5).rg;
       float pushLen = length(push);
       if (pushLen > 1e-4) {
-        b += push / pushLen * smoothstep(0.0, 1.0, pushLen) * uPushAngle;
+        b += push / pushLen * (pushLen * pushLen) * uPushAngle;
       }
     #endif
 
