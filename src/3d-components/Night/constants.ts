@@ -15,7 +15,7 @@ export function setMoonDir(azDeg: number, elDeg: number) {
   );
   return MOON_DIR;
 }
-setMoonDir(-145, 21);
+setMoonDir(-143, 18);
 
 export const FOG_COLOR = "#0a1020";
 export const FOG_NEAR = 6;
