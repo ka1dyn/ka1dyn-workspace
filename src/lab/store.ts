@@ -147,7 +147,7 @@ export const useLab = create<LabState>(() => ({
     starBright: 1,
     starTwinkle: 0.15,
     milkyWay: 1,
-    milkyRotation: -40,
+    milkyRotation: 0,
     treeLayers: 3,
     treeHeight: 1,
     fireflies: 30,
