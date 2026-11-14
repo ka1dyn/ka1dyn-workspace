@@ -8,11 +8,12 @@ import { BASE_FOV } from "@/constants/camera";
 import { overviewFov } from "@/utils/cameraFit";
 import { useLab } from "@/lab/store";
 
-// 전체 장면(overview) 카메라 위치. 밤 씬은 기존 위치에서 퍼걸러를 중심으로 30° 돌려,
-// 달이 화면 왼쪽 위(왼쪽 약 29°, 위 약 22°)에 오고 은하수가 오른쪽 끝에 걸리게 했다.
+// 전체 장면(overview) 카메라 위치. 밤 씬은 기존 위치에서 퍼걸러를 중심으로 36° 돌리고
+// 높이를 1.4m로 낮춰(더 수평으로 바라봄), 달이 화면 왼쪽 위(왼쪽 약 34°, 위 약 18°)에 오고
+// 은하수가 오른쪽 끝에 절반쯤 걸리게 했다.
 const overviewPosition = () =>
   useLab.getState().night.scene === "night"
-    ? { x: 3.5, y: 2, z: 8.95 }
+    ? { x: 2.54, y: 1.4, z: 9.26 }
     : { x: 7.5, y: 2, z: 6 };
 
 export default function useCameraAnim() {
