@@ -50,10 +50,16 @@ function NightRain() {
   const on = useLab((s) => s.night.rainSparkleOn);
   const sparkle = useLab((s) => s.night.rainSparkle);
   const boost = useLab((s) => s.night.rainSparkleBoost);
+  const count = useLab((s) => s.night.rainCount);
+  const speed = useLab((s) => s.night.rainSpeed);
   return (
     <group>
       <group rotation={[degToRad(-90), 0, 0]}>
         <Drops
+          // 개수가 바뀌면 인스턴스 버퍼와 위치 배열을 새로 만든다
+          key={count}
+          count={count}
+          speed={speed}
           rotation={[degToRad(90), 0, 0]}
           sparkle={on ? sparkle : 0}
           sparkleBoost={boost}

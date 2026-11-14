@@ -43,6 +43,17 @@ export default function LabPanel() {
       },
     }),
     "빗방울 반짝임": folder({
+      "빗방울 개수": {
+        value: 300,
+        options: {
+          "150": 150,
+          "300 (기존)": 300,
+          "600": 600,
+          "1000": 1000,
+          "2000": 2000,
+        },
+      },
+      "떨어지는 속도 (m/s)": { value: 6, min: 1, max: 20, step: 0.5 },
       "반짝이는 빗방울": true,
       "반짝임 빈도": { value: 0.5, min: 0, max: 1, step: 0.05 },
       "반짝임 세기": { value: 1.5, min: 0, max: 4, step: 0.1 },
@@ -155,6 +166,8 @@ export default function LabPanel() {
         grainAmount: v["그레인 세기"],
         grainSize: v["입자 크기 (CSS px)"],
         grainDark: v["어두운 곳 그레인"],
+        rainCount: v["빗방울 개수"] as number,
+        rainSpeed: v["떨어지는 속도 (m/s)"],
         rainSparkleOn: v["반짝이는 빗방울"],
         rainSparkle: v["반짝임 빈도"],
         rainSparkleBoost: v["반짝임 세기"],

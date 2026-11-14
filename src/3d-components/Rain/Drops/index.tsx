@@ -12,10 +12,14 @@ type DropsProps = React.JSX.IntrinsicElements["group"] & {
   // 반짝임: 빗방울마다 다른 주기로 가끔 짧게 더 진해진다. 0이면 기존 빗방울과 똑같다
   sparkle?: number; // 빈도 (0~1)
   sparkleBoost?: number; // 반짝일 때 진해지는 배율
+  speed?: number; // 떨어지는 속도 (m/s)
 };
 
 export const Drops = React.forwardRef<THREE.Group, DropsProps>(
-  ({ count = 300, sparkle = 0, sparkleBoost = 0, ...props }, fref) => {
+  (
+    { count = 300, sparkle = 0, sparkleBoost = 0, speed = 6, ...props },
+    fref,
+  ) => {
     const dropsRef = React.useRef<THREE.InstancedMesh>(null!);
     const _dummy = React.useMemo(() => new THREE.Object3D(), []);
     const initialY = React.useMemo(() => new Float32Array(count).fill(0), []);
@@ -58,7 +62,7 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           camera.position.z - _dummy.position.z,
         );
         _dummy.rotation.x = angles[i];
-        _dummy.position.y -= dt * 6;
+        _dummy.position.y -= dt * speed;
 
         if (
           _dummy.position.y <= 0 ||
