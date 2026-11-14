@@ -43,6 +43,10 @@ export interface NightLab {
   grain: boolean; // 필름 그레인 (Night/Grain.tsx)
   grainAmount: number; // 그레인 세기 (밝기 변화 폭)
   grainSize: number; // 그레인 입자 크기 (CSS 픽셀. DPR 1.5에서 0.67 = 실제 픽셀 1개)
+  fireflies: number; // 반딧불이 수 (Night/Fireflies.tsx)
+  fireflySize: number; // 빛 번짐까지 포함한 지름 (m)
+  fireflyBright: number;
+  fireflySpeed: number; // 떠다니는 속도 배율
   rainCount: number; // 빗방울 개수 (기존 300)
   rainSpeed: number; // 떨어지는 속도 m/s (기존 6)
   rainSpread: number; // 비가 내리는 정사각형 한 변 m (기존 10)
@@ -122,6 +126,10 @@ export const useLab = create<LabState>(() => ({
     grainAmount: 0.08,
     grainSize: 0.67,
     grainDark: 0.05,
+    fireflies: 60,
+    fireflySize: 0.2,
+    fireflyBright: 1,
+    fireflySpeed: 1,
     rainCount: 300,
     rainSpeed: 7.5,
     rainSpread: 12,
