@@ -41,6 +41,9 @@ const fragmentShader = /* glsl */ `
   uniform float uTreeLayers;  // 숲 겹 수 (1~3)
   uniform float uTreeHeight;  // 숲 높이 배율
   uniform float uReflect;     // 물웅덩이 반사 카메라로 그릴 때 1 (별을 건너뛴다)
+  uniform vec3 uMeteorHead;   // 별똥별 머리 방향
+  uniform vec3 uMeteorTail;   // 별똥별 꼬리 끝 방향
+  uniform float uMeteorAlpha; // 별똥별 밝기 (없을 때 0 → 아래 계산을 통째로 건너뛴다)
   varying vec3 vDir;
 
   // ---- 해시 / 노이즈 ----
@@ -168,6 +171,18 @@ const fragmentShader = /* glsl */ `
     vec3 stars = starLayer(d, 260.0, (0.2 + 0.6 * milky.a * uMilky) * uStarDensity, 0.6, pixAng, 3.1)
                + starLayer(d, 90.0, 0.4 * uStarDensity, 1.4, pixAng, 11.7);
     color += stars * 0.55 * uStarBright * skyVis;
+
+    // 별똥별: 꼬리 끝→머리 선분 하나. 별똥별이 없을 때(uniform 0)는 모든 픽셀이 건너뛰므로 비용이 거의 없다
+    if (uMeteorAlpha > 0.0) {
+      vec3 seg = uMeteorHead - uMeteorTail;
+      float t = clamp(dot(d - uMeteorTail, seg) / max(dot(seg, seg), 1e-8), 0.0, 1.0); // 0 꼬리 끝 → 1 머리
+      float dist = length(d - (uMeteorTail + seg * t));
+      float w0 = 0.0011 * (0.35 + 0.65 * t);  // 머리 쪽이 굵고 꼬리 쪽이 가늘다
+      float w = max(w0, pixAng * 0.8);         // 1픽셀보다 가늘면 굵히고 그만큼 밝기를 나눈다
+      float line = exp(-dist * dist / (w * w) * 2.0) * (w0 / w);
+      float headGlow = exp(-pow(length(d - uMeteorHead) / (w * 2.5), 2.0));
+      color += vec3(0.9, 0.95, 1.0) * (line * t * t * 1.6 + headGlow * 0.8) * uMeteorAlpha * skyVis;
+    }
     }
     }
 
@@ -245,6 +260,9 @@ export default function Sky() {
           uTreeLayers: { value: 3 },
           uTreeHeight: { value: 1 },
           uReflect: { value: 0 },
+          uMeteorHead: { value: new THREE.Vector3(0, 1, 0) },
+          uMeteorTail: { value: new THREE.Vector3(0, 1, 0) },
+          uMeteorAlpha: { value: 0 },
         },
       }),
     [old],
@@ -272,7 +290,20 @@ export default function Sky() {
     };
   }, []);
 
-  useFrame(({ clock }) => {
+  // 별똥별 스케줄: 평균 간격마다 하나씩, 카메라가 보는 쪽 하늘에서 아래 대각선으로 떨어진다
+  const meteor = useRef({
+    next: 4, // 첫 별똥별 시각 (초)
+    start: -1,
+    dur: 0.7,
+    from: new THREE.Vector3(),
+    to: new THREE.Vector3(),
+    head: new THREE.Vector3(),
+    tail: new THREE.Vector3(),
+    forward: new THREE.Vector3(),
+    trigger: 0,
+  });
+
+  useFrame(({ clock, camera }) => {
     const n = useLab.getState().night;
     // 재질은 메시에서 꺼내 쓴다 (useMemo 값을 직접 고치면 React 컴파일러 규칙에 걸린다)
     const u = (mesh.current.material as THREE.ShaderMaterial).uniforms;
@@ -286,6 +317,70 @@ export default function Sky() {
     u.uTwinkle.value = n.starTwinkle;
     u.uTreeLayers.value = n.treeLayers;
     u.uTreeHeight.value = n.treeHeight;
+
+    const mt = meteor.current;
+    const now = clock.elapsedTime;
+    if (n.meteorNow !== mt.trigger) {
+      mt.trigger = n.meteorNow; // 실험실 "바로 보기" 버튼
+      mt.next = now;
+    }
+    if (n.meteors && mt.start < 0 && now >= mt.next) {
+      // 시작점: 지금 화면의 위쪽 하늘에서 고른다. 화면 좌우 80%, 위쪽 절반 안의 점을 하늘 방향으로 바꾸고
+      // 지평선에 너무 붙으면(고도 8° 미만) 조금 올린다. 고도를 고정 범위로 고르면 화면 위로 벗어나 안 보이는 일이 많았다
+      mt.forward
+        .set(
+          THREE.MathUtils.randFloatSpread(1.6),
+          THREE.MathUtils.randFloat(0.1, 0.9),
+          0.5,
+        )
+        .unproject(camera)
+        .sub(camera.position)
+        .normalize();
+      const az = Math.atan2(mt.forward.z, mt.forward.x);
+      const el = Math.max(Math.asin(mt.forward.y), THREE.MathUtils.degToRad(8));
+      mt.from.set(
+        Math.cos(el) * Math.cos(az),
+        Math.sin(el),
+        Math.cos(el) * Math.sin(az),
+      );
+      // 방향: 그 지점의 수평(동쪽) 축과 위쪽 축으로 이루는 평면에서 수평 아래 20~60°, 좌우는 랜덤
+      const east = new THREE.Vector3(-Math.sin(az), 0, Math.cos(az));
+      const up = new THREE.Vector3().crossVectors(mt.from, east).normalize();
+      if (up.y < 0) up.negate();
+      const dip = THREE.MathUtils.degToRad(THREE.MathUtils.randFloat(20, 60));
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const dir = east
+        .multiplyScalar(Math.cos(dip) * side)
+        .addScaledVector(up, -Math.sin(dip));
+      const len = THREE.MathUtils.degToRad(THREE.MathUtils.randFloat(10, 22));
+      mt.to
+        .copy(mt.from)
+        .multiplyScalar(Math.cos(len))
+        .addScaledVector(dir, Math.sin(len))
+        .normalize();
+      mt.dur = THREE.MathUtils.randFloat(0.5, 1.0);
+      mt.start = now;
+    }
+    let alpha = 0;
+    if (mt.start >= 0) {
+      const p = (now - mt.start) / mt.dur;
+      if (p >= 1) {
+        mt.start = -1;
+        mt.next = now + n.meteorInterval * THREE.MathUtils.randFloat(0.5, 1.5);
+      } else {
+        // 머리는 시작→끝으로 가고, 꼬리는 머리 뒤 45% 길이만 따라온다 (짧은 각도라 선형 보간 후 정규화)
+        mt.head.lerpVectors(mt.from, mt.to, p).normalize();
+        mt.tail.lerpVectors(mt.from, mt.to, Math.max(0, p - 0.45)).normalize();
+        // 빠르게 켜지고 마지막 30%에서 서서히 꺼진다
+        alpha =
+          THREE.MathUtils.smoothstep(p, 0, 0.08 / mt.dur) *
+          (1 - THREE.MathUtils.smoothstep(p, 0.7, 1)) *
+          n.meteorBright;
+      }
+    }
+    u.uMeteorHead.value.copy(mt.head);
+    u.uMeteorTail.value.copy(mt.tail);
+    u.uMeteorAlpha.value = alpha;
   });
 
   return (
