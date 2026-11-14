@@ -334,6 +334,7 @@ export default function Grass({
     speed: 0,
     inside: false,
     ready: false,
+    idle: 0, // 커서가 잔디를 누르지 않은 채 지난 시간 (초)
     map: null as InteractionMap | null,
   });
   useEffect(() => {
@@ -399,15 +400,21 @@ export default function Grass({
       }
       // 들판 전체(잔디를 심는 원)를 덮는 크기
       const extent = outer * 2;
-      c.map.update(gl, {
-        extent,
-        from: c.prev,
-        to: c.pos,
-        dir: c.dir,
-        stamp,
-        radius: n.cursorRadius,
-        recover: dt / Math.max(n.cursorRecover, 0.05),
-      });
+      // 눌림은 커서가 움직일 때만 생기고 회복 시간이 지나면 지도가 전부 0이 된다.
+      // 그 뒤로는 갱신해도 결과가 같으므로 건너뛴다 (매 프레임 256² 패스 1번과 렌더 타깃 전환 2번).
+      const pressing = stamp > 0 && c.prev.distanceToSquared(c.pos) > 1e-10;
+      c.idle = pressing ? 0 : c.idle + dt;
+      const settled = c.idle > Math.max(n.cursorRecover, 0.05) + 0.1;
+      if (!settled)
+        c.map.update(gl, {
+          extent,
+          from: c.prev,
+          to: c.pos,
+          dir: c.dir,
+          stamp,
+          radius: n.cursorRadius,
+          recover: dt / Math.max(n.cursorRecover, 0.05),
+        });
       u.uPush.value = c.map.texture;
       u.uPushExtent.value = extent;
     }

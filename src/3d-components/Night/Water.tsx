@@ -155,6 +155,13 @@ export default function Water({
   const layout = useMemo(() => terrainLayout(groundSize), [groundSize]);
 
   const planar = useMemo(() => new PlanarReflection(0), []);
+  // 반사 갱신 주기를 세는 값 (렌더와 무관해서 ref)
+  const pacing = useRef({
+    wait: 0, // 다음 갱신까지 남은 프레임
+    view: new THREE.Matrix4(), // 마지막으로 반사를 그렸을 때의 카메라
+    projection: new THREE.Matrix4(),
+    level: NaN,
+  });
 
   // 반사 타깃: 어두운 밤 색이 계단지지 않도록 HalfFloat. 흐림은 하드웨어 밉맵으로 만든다.
   const target = useMemo(() => {
@@ -210,6 +217,10 @@ export default function Water({
     });
   }, [reflection, blur, rippleRadius, planar, disp, alpha, layout]);
   useEffect(() => () => material.dispose(), [material]);
+  // 타깃이나 재질이 바뀌면 바로 다시 그린다
+  useEffect(() => {
+    pacing.current.wait = 0;
+  }, [target, material]);
 
   useFrame(({ gl, scene, camera, clock }) => {
     const n = useLab.getState().night;
@@ -223,6 +234,27 @@ export default function Water({
     mesh.current.position.y = n.waterLevel;
 
     if (!target) return;
+
+    // 반사는 장면을 한 번 더 그리는 일이라 매 프레임 하지 않는다.
+    // 반사에 비치는 것(하늘·퍼걸러)은 거의 움직이지 않고 수면은 잔물결·파문으로 늘 흔들리므로,
+    // 몇 프레임 늦은 반사는 눈에 띄지 않는다. 카메라가 움직이는 동안은 n프레임에 한 번,
+    // 멈춰 있으면 그 2배 간격으로 그린다 (별똥별이 비치는 정도만 따라가면 된다).
+    // 건너뛴 프레임에는 텍스처와 텍스처 행렬을 함께 그대로 두므로, 수면의 각 점은 계속 같은 반사를 읽는다.
+    const p = pacing.current;
+    const moved =
+      !p.view.equals(camera.matrixWorld) ||
+      !p.projection.equals(camera.projectionMatrix) ||
+      p.level !== n.waterLevel;
+    const every = Math.max(1, Math.round(n.reflectionEvery));
+    if (u.uReflection.value === target.texture && p.wait > 0) {
+      p.wait = Math.min(p.wait, moved ? every : every * 2) - 1;
+      return;
+    }
+    p.wait = (moved ? every : every * 2) - 1;
+    p.view.copy(camera.matrixWorld);
+    p.projection.copy(camera.projectionMatrix);
+    p.level = n.waterLevel;
+
     planar.setHeight(n.waterLevel);
     if (!planar.update(camera as THREE.PerspectiveCamera)) return;
 

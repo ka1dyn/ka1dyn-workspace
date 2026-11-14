@@ -19,6 +19,10 @@ export default function LabPanel() {
     }),
     최적화: folder({
       "가려진 동안 렌더 멈춤": true,
+      "반사 갱신 간격 (프레임)": {
+        value: 2,
+        options: { "매 프레임": 1, "2": 2, "3": 3, "4": 4 },
+      },
       "돌 지형 불투명 처리": true,
       "하늘을 마지막에 그리기": true,
     }),
@@ -302,6 +306,7 @@ export default function LabPanel() {
         blur: v["반사 흐림 (밉맵)"],
         grassInReflection: v["반사에 잔디 포함"],
         rippleRadius: v["파문 반경 R"] as number,
+        reflectionEvery: v["반사 갱신 간격 (프레임)"] as number,
         terrainOpaque: v["돌 지형 불투명 처리"],
         skyLast: v["하늘을 마지막에 그리기"],
         moonIntensity: v["달빛"],
