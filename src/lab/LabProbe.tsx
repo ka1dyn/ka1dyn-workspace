@@ -51,6 +51,8 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
 
   useEffect(() => {
     const ctx = gl.getContext() as WebGL2RenderingContext;
+    // 콘솔에서 렌더러를 직접 확인할 수 있게 실험실에서만 노출한다 (예: __labGl.getContext().getContextAttributes())
+    (window as unknown as { __labGl?: unknown }).__labGl = gl;
     // 다른 도구가 타이머 쿼리를 쓰는 동안에는 충돌을 피하려고 GPU 측정을 끈다.
     const ext = gpuTimer
       ? (ctx.getExtension("EXT_disjoint_timer_query_webgl2") as TimerExt | null)

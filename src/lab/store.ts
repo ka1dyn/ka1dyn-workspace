@@ -3,6 +3,11 @@ import { create } from "zustand";
 // `?lab`이 붙었을 때만 실험실 패널과 HUD를 켠다. 없으면 실제 사이트와 똑같이 동작한다.
 export const IS_LAB = new URLSearchParams(window.location.search).has("lab");
 
+// 캔버스 MSAA. WebGL 컨텍스트 설정은 만들 때 한 번만 정해지므로 URL(?lab&msaa)로 받고,
+// 패널에서 바꾸면 URL을 고쳐 페이지를 다시 연다.
+export const IS_MSAA =
+  IS_LAB && new URLSearchParams(window.location.search).has("msaa");
+
 export type ModelKey =
   | "rainGround"
   | "pergola"

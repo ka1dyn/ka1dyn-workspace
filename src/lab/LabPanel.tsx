@@ -1,6 +1,6 @@
 import { Leva, folder, useControls } from "leva";
 import { useEffect } from "react";
-import { useLab, type LabTool } from "./store";
+import { IS_MSAA, useLab, type LabTool } from "./store";
 
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {
@@ -117,6 +117,7 @@ export default function LabPanel() {
       "ambient + hemisphere": true,
     }),
     "후처리 (Bloom + 대비)": false,
+    "MSAA (페이지 다시 열림)": IS_MSAA,
     "맥북 화면 (DOM)": folder({
       "화면 Html 표시": true,
       "매 프레임 밝기·투명도 갱신": true,
@@ -132,6 +133,16 @@ export default function LabPanel() {
       },
     }),
   });
+
+  // MSAA는 컨텍스트를 새로 만들어야 하므로 URL을 바꿔 다시 연다
+  const msaa = v["MSAA (페이지 다시 열림)"];
+  useEffect(() => {
+    if (msaa === IS_MSAA) return;
+    const url = new URL(window.location.href);
+    if (msaa) url.searchParams.set("msaa", "");
+    else url.searchParams.delete("msaa");
+    window.location.replace(url.toString());
+  }, [msaa]);
 
   const key = JSON.stringify(v);
   useEffect(() => {

@@ -10,7 +10,7 @@ import FrameDetector from "./FrameDetector";
 import { useOverlay, useReady } from "@/stores";
 import StartAnimaion from "./StartAnimaion";
 import { Post } from "./Post";
-import { IS_LAB, useLab } from "@/lab/store";
+import { IS_LAB, IS_MSAA, useLab } from "@/lab/store";
 import LabProbe from "@/lab/LabProbe";
 import LabTools from "@/lab/LabTools";
 
@@ -40,7 +40,8 @@ export default function Scene() {
       gl={{
         powerPreference: "high-performance",
         alpha: false,
-        antialias: false,
+        // 실험실에서 ?msaa를 붙이면 켠다 (기본은 끔)
+        antialias: IS_MSAA,
         stencil: false,
         // depth: false,
       }}
