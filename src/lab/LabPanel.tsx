@@ -47,12 +47,12 @@ export default function LabPanel() {
         value: 30,
         options: { 없음: 0, "30": 30, "60": 60, "120": 120, "250": 250 },
       },
-      "반딧불이 크기 (m)": { value: 0.05, min: 0.03, max: 0.4, step: 0.01 },
+      "반딧불이 크기 (m)": { value: 0.07, min: 0.03, max: 0.4, step: 0.01 },
       "반딧불이 밝기": { value: 1.5, min: 0, max: 3, step: 0.05 },
       "반딧불이 속도": { value: 1.2, min: 0, max: 3, step: 0.05 },
       "거리 감쇠": { value: 0.4, min: 0, max: 1, step: 0.05 },
       "최소 크기 (CSS px)": { value: 5, min: 0, max: 10, step: 0.5 },
-      "최대 높이 (m)": { value: 1.1, min: 0.4, max: 2.5, step: 0.05 },
+      "최대 높이 (m)": { value: 1.3, min: 0.4, max: 2.5, step: 0.05 },
     }),
     "빗방울 반짝임": folder({
       "빗방울 개수": {
