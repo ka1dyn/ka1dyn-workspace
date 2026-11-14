@@ -4,18 +4,13 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "./constants";
 import { clumpNoise, getWindTexture } from "./noise";
-import { useTerrainSampler } from "./terrain";
+import { terrainLayout, useTerrainSampler } from "./terrain";
 
 // 인스턴스 잔디: 위로 갈수록 좁아지는 띠 하나를 InstancedMesh로 수만 번 그린다 (드로우콜 1).
 // 조명 계산 없이 높이 그라데이션 + 바람 밝기 + 퍼걸러 등의 따뜻한 빛을 셰이더에서 흉내 낸다.
 // 돌 지형 표면에 심고, 수면보다 낮은 곳(물웅덩이)은 비우며, 지형 알파맵을 따라 가장자리에서 작아진다.
 
 const INNER = 1.75; // 타일 바닥(3.2×3.2)과 퍼걸러를 비우는 정사각형 반폭
-// 잔디를 심는 원의 반지름. 지형(알파맵이 약 7.3m에서 0)보다 멀리까지 심어서,
-// 땅이 먼저 사라지고 잔디는 그 너머에서 어둠 속으로 천천히 묻히게 한다.
-const OUTER = 10.5;
-// 잔디 색이 어두워지기 시작하는 반지름. OUTER까지 넓은 구간에 걸쳐 서서히 어두워진다
-const FADE_START = 4.5;
 const SHORE = 0.015; // 수면보다 이만큼 높은 곳부터 심는다
 
 function createBladeGeometry(segments: number) {
@@ -174,7 +169,14 @@ export default function Grass({
   inReflection,
 }: GrassProps) {
   const mesh = useRef<THREE.InstancedMesh>(null!);
-  const terrain = useTerrainSampler();
+  const groundSize = useLab((s) => s.night.groundSize);
+  const layout = useMemo(() => terrainLayout(groundSize), [groundSize]);
+  const terrain = useTerrainSampler(layout);
+  // 잔디를 심는 원의 반지름: 지형(알파맵이 한 변의 약 0.49배 거리에서 0)보다 3m 더 멀리 심어서,
+  // 땅이 먼저 사라지고 잔디는 그 너머에서 어둠 속으로 천천히 묻히게 한다.
+  const outer = groundSize * 0.5 + 3;
+  // 잔디 색이 어두워지기 시작하는 반지름 (15m 땅에서 4.5m). outer까지 넓은 구간에 걸쳐 서서히 어두워진다
+  const fadeStart = groundSize * 0.3;
   // 수면 높이가 바뀌면 물에 잠기는 자리가 달라지므로 다시 심는다
   const waterLevel = useLab((s) => s.night.waterLevel);
   const puddles = useLab((s) => s.night.puddles);
@@ -223,7 +225,7 @@ export default function Grass({
     let guard = 0;
     while (placed < count && guard++ < count * 20) {
       // 원 안에 균일하게 뽑는다
-      const r = Math.sqrt(rand()) * OUTER;
+      const r = Math.sqrt(rand()) * outer;
       const a = rand() * Math.PI * 2;
       const x = Math.cos(a) * r;
       const z = Math.sin(a) * r;
@@ -246,8 +248,8 @@ export default function Grass({
       dummy.scale.set(0.018 + rand() * 0.017, height, 1);
       dummy.updateMatrix();
       // 가장자리는 키·밀도를 건드리지 않고 색만 어둡게 한다(셰이더의 aEdge).
-      // 거리 기준으로 FADE_START부터 OUTER까지 부드럽게 1 → 0
-      edge[placed] = 1 - THREE.MathUtils.smoothstep(r, FADE_START, OUTER);
+      // 거리 기준으로 fadeStart부터 outer까지 부드럽게 1 → 0
+      edge[placed] = 1 - THREE.MathUtils.smoothstep(r, fadeStart, outer);
       m.setMatrixAt(placed++, dummy.matrix);
     }
     m.count = placed;
@@ -256,7 +258,16 @@ export default function Grass({
       new THREE.InstancedBufferAttribute(edge, 1),
     );
     m.instanceMatrix.needsUpdate = true;
-  }, [count, geometry, terrain, waterLevel, puddles, onWater]);
+  }, [
+    count,
+    geometry,
+    terrain,
+    outer,
+    fadeStart,
+    waterLevel,
+    puddles,
+    onWater,
+  ]);
 
   useLayoutEffect(() => {
     if (inReflection) mesh.current.layers.enable(GRASS_LAYER);
