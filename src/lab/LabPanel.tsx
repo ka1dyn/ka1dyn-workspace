@@ -47,10 +47,10 @@ export default function LabPanel() {
     }),
     "카메라·달": folder({
       "카메라 방위 (°)": { value: 65.7, min: 0, max: 120, step: 0.5 },
-      "카메라 높이 (m)": { value: 1.9, min: 0.6, max: 4, step: 0.05 },
+      "카메라 높이 (m)": { value: 1.55, min: 0.6, max: 4, step: 0.05 },
       "카메라 거리 (m)": { value: 9.9, min: 4, max: 10, step: 0.05 },
       "달 방위 (°)": { value: -143, min: -180, max: 180, step: 0.5 },
-      "달 고도 (°)": { value: 18, min: 5, max: 70, step: 0.5 },
+      "달 고도 (°)": { value: 18.5, min: 5, max: 70, step: 0.5 },
     }),
     밤하늘: folder({
       "하늘 품질": { value: "new", options: { 새로: "new", 기존: "old" } },
