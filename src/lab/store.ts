@@ -64,6 +64,8 @@ export interface NightLab {
   meteorInterval: number; // 별똥별 평균 간격 (초)
   meteorBright: number; // 별똥별 밝기
   meteorLength: number; // 별똥별 길이 배율
+  meteorMin: number; // 차례마다 함께 떨어지는 최소 개수
+  meteorMax: number; // 차례마다 함께 떨어지는 최대 개수 (1~4, 셰이더 칸 수가 4)
   meteorNow: number; // 실험실 "바로 보기" 버튼이 올리는 카운터
   treeLayers: number; // 숲 겹 수 (1~3)
   treeHeight: number; // 숲 높이 배율
@@ -166,9 +168,11 @@ export const useLab = create<LabState>(() => ({
     milkyRotation: 0,
     milkyLanes: 0.8,
     meteors: true,
-    meteorInterval: 3,
-    meteorBright: 1,
-    meteorLength: 1,
+    meteorInterval: 6,
+    meteorBright: 0.35,
+    meteorLength: 0.5,
+    meteorMin: 2,
+    meteorMax: 4,
     meteorNow: 0,
     treeLayers: 3,
     treeHeight: 1,

@@ -181,8 +181,16 @@ const fragmentShader = /* glsl */ `
         // 선분을 감싸는 구 밖의 픽셀은 바로 건너뛴다 (하늘 대부분이 여기서 끝나 별똥별이 떠 있어도 싸다)
         vec3 mid = d - (uMeteorHead[i] + uMeteorTail[i]) * 0.5;
         if (dot(mid, mid) > dot(seg, seg) * 0.25 + 1e-4) continue;
-        float t = clamp(dot(d - uMeteorTail[i], seg) / max(dot(seg, seg), 1e-8), 0.0, 1.0); // 0 꼬리 끝 → 1 머리
-        float dist = length(d - (uMeteorTail[i] + seg * t));
+        // 하늘 표면을 따라 휜 호(대원)까지의 거리. 직선(현)으로 재면 가운데가 구 안쪽으로 떨어져 머리·꼬리 끝만 보인다
+        vec3 hd = uMeteorHead[i], tl = uMeteorTail[i];
+        vec3 nrm = cross(tl, hd);
+        float nl = length(nrm);
+        if (nl < 1e-6) continue; // 막 생겨 꼬리 길이가 0인 순간
+        nrm /= nl;
+        float total = atan(nl, dot(tl, hd));                             // 호 전체 각도
+        float t = atan(dot(cross(tl, d), nrm), dot(tl, d)) / total;      // 0 꼬리 끝 → 1 머리
+        float dist = t < 0.0 ? length(d - tl) : t > 1.0 ? length(d - hd) : abs(dot(d, nrm));
+        t = clamp(t, 0.0, 1.0);
         // 날카롭게: 머리 쪽도 가늘고(약 1픽셀) 꼬리 끝으로 갈수록 바늘처럼 더 가늘어진다
         float w0 = 0.0007 * (0.15 + 0.85 * t * t);
         float w = max(w0, pixAng * 0.7);      // 1픽셀보다 가늘면 굵히고 그만큼 밝기를 나눈다
@@ -259,11 +267,20 @@ function spawnMeteor(
     v.set(x, y, 0.5).unproject(camera).sub(camera.position).normalize();
   // 복사점: 화면 위쪽 바깥 (NDC y 1.6). 모든 별똥별이 여기서 퍼져 나와 같은 유성우처럼 보인다
   toSky(mt.radiant, mt.radiantX, 1.6);
-  // 시작점: 화면 좌우 85%, 화면 위쪽 1/4 (위 가장자리 살짝 바깥 포함). 낮은 곳에서 시작하면 금방 지평선에 묻혀 잘 안 보인다
+  // 시작점: 화면에 보이는 하늘의 맨 위쪽. 땅이 화면 아래쪽을 덮어 하늘은 지평선 위로만 보이므로,
+  // 지금 카메라에서 지평선이 놓인 화면 높이를 구하고 그 위 하늘 구간의 위쪽 15% ~ 화면 위 바깥 조금에서 시작한다
+  // (바깥에서 시작하면 위에서 들어온다). 카메라 높이·각도가 바뀌어도 늘 보이는 하늘 꼭대기에서 떨어진다
+  camera.getWorldDirection(mt.tmp);
+  mt.tmp.y = 0;
+  const horizonY = THREE.MathUtils.clamp(
+    mt.tmp.normalize().add(camera.position).project(camera).y,
+    -1,
+    0.9,
+  );
   toSky(
     slot.from,
     THREE.MathUtils.randFloatSpread(1.7),
-    THREE.MathUtils.randFloat(0.5, 1.05),
+    horizonY + (1 - horizonY) * THREE.MathUtils.randFloat(0.85, 1.1),
   );
   if (slot.from.y < Math.sin(THREE.MathUtils.degToRad(6))) {
     slot.from.y = Math.sin(THREE.MathUtils.degToRad(6)); // 지평선에 너무 붙지 않게
@@ -283,7 +300,7 @@ function spawnMeteor(
     .multiplyScalar(Math.cos(len))
     .addScaledVector(dir, Math.sin(len))
     .normalize();
-  slot.dur = THREE.MathUtils.randFloat(1.1, 1.8); // 눈으로 따라갈 수 있게 조금 천천히
+  slot.dur = THREE.MathUtils.randFloat(0.3, 0.6); // 순식간에 긋고 사라지게
   slot.start = now;
 }
 
@@ -365,6 +382,7 @@ export default function Sky() {
     })),
     tmp: new THREE.Vector3(),
     radiant: new THREE.Vector3(),
+    pending: [] as number[], // 이번 차례에 띄울 별똥별들의 시각
     trigger: 0,
   });
 
@@ -390,15 +408,24 @@ export default function Sky() {
       mt.next = now;
     }
     if (n.meteors && now >= mt.next) {
-      const slot = mt.slots.find((s) => s.start < 0);
-      if (slot) spawnMeteor(slot, mt, camera, n.meteorLength, now);
-      // 간격을 크게 흔들어 몰려서 떨어질 때와 한동안 조용할 때가 생기게 한다.
-      // 가끔(25%)은 바로 뒤이어 하나 더 떨어진다
-      mt.next =
-        Math.random() < 0.25
-          ? now + THREE.MathUtils.randFloat(0.15, 0.5)
-          : now + n.meteorInterval * THREE.MathUtils.randFloat(0.3, 1.7);
+      // 차례마다 최소~최대 개수 사이를 골라 0~0.3초 사이에 거의 함께 띄운다
+      const count = THREE.MathUtils.randInt(
+        Math.min(n.meteorMin, n.meteorMax),
+        n.meteorMax,
+      );
+      mt.pending.push(now);
+      for (let k = 1; k < count; k++)
+        mt.pending.push(now + THREE.MathUtils.randFloat(0.03, 0.3));
+      // 간격을 크게 흔들어 몰려서 떨어질 때와 한동안 조용할 때가 생기게 한다
+      mt.next = now + n.meteorInterval * THREE.MathUtils.randFloat(0.3, 1.7);
     }
+    // 시각이 된 별똥별을 빈 칸에 띄운다. 최대 개수만큼의 칸만 쓰고, 다 차 있으면 버린다
+    mt.pending = mt.pending.filter((at) => {
+      if (at > now) return true;
+      const slot = mt.slots.slice(0, n.meteorMax).find((s) => s.start < 0);
+      if (slot) spawnMeteor(slot, mt, camera, n.meteorLength, now);
+      return false;
+    });
     const alpha = u.uMeteorAlpha.value as THREE.Vector4;
     mt.slots.forEach((sl, i) => {
       let a = 0;
