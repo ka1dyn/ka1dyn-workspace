@@ -95,6 +95,7 @@ export interface NightLab {
   reflectionEvery: number; // 반사를 몇 프레임에 한 번 다시 그릴지 (카메라가 멈춰 있으면 그 2배)
   terrainOpaque: boolean; // 돌 지형을 불투명으로 그리고 가장자리는 어두운 색으로 섞는다
   skyLast: boolean; // 하늘을 불투명 물체 중 마지막에 그려 가려진 픽셀을 건너뛴다
+  grainSingle: boolean; // 그레인을 블렌딩 한 번으로 그리는 근사 방식 (Night/Grain.tsx)
   // 조명 (밤 씬 전용)
   moonIntensity: number;
   lampIntensity: number;
@@ -208,6 +209,7 @@ export const useLab = create<LabState>(() => ({
     reflectionEvery: 2,
     terrainOpaque: true,
     skyLast: true,
+    grainSingle: false,
     moonIntensity: 1.6,
     lampIntensity: 4,
     lampColor: "#ffb36b",

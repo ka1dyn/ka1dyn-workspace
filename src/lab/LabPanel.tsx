@@ -25,6 +25,7 @@ export default function LabPanel() {
       },
       "돌 지형 불투명 처리": true,
       "하늘을 마지막에 그리기": true,
+      "그레인 한 번에 그리기 (근사)": false,
     }),
     "맥북 화면": folder({
       "화면 Html 표시": true,
@@ -309,6 +310,7 @@ export default function LabPanel() {
         reflectionEvery: v["반사 갱신 간격 (프레임)"] as number,
         terrainOpaque: v["돌 지형 불투명 처리"],
         skyLast: v["하늘을 마지막에 그리기"],
+        grainSingle: v["그레인 한 번에 그리기 (근사)"],
         moonIntensity: v["달빛"],
         lampIntensity: v["등 세기"],
         lampColor: v["등 색"],

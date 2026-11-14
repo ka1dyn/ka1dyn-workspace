@@ -11,6 +11,13 @@ import * as THREE from "three";
 //   - 어두운 곳 그레인: 곱하기는 어두운 곳에서 거의 안 보이므로, 같은 노이즈를 밝기와 무관한
 //     고정 폭으로 더하고 뺀다. 블렌딩 값은 음수가 될 수 없어서 음수 쪽은 빼기, 양수 쪽은 더하기로
 //     한 번씩 더 그린다 (삼각형 3번, 렌더 타깃·텍스처 없음).
+//   - 한 번에 그리기(grainSingle): 위 방식은 화면 전체를 덮는 삼각형을 세 번 그린다. 셰이더는 가볍지만
+//     전체 장면에서 GPU 전력의 약 20%(0.24W)였고, 블렌딩되는 픽셀을 줄여도(discard) 그대로였다.
+//     즉 비용은 "화면 전체를 한 번 더 그리는 횟수"를 따른다. 그래서 블렌딩 한 번(src + dst × src알파)으로
+//     표현되는 근사식으로 바꾼 방식을 둔다:
+//       결과 = 화면색 × (1 + 2·세기·n) / (1 + 세기) + 폭·max(n, 0)·2
+//     곱하기 쪽은 1을 넘는 배율을 쓸 수 없어 전체를 (1 + 세기)로 나누고(전체가 그만큼 어두워진다),
+//     어두운 곳 그레인은 더하기만 남긴다 (검은 픽셀에서는 빼기가 어차피 0에서 잘려 결과가 같다).
 //   - 메시는 레이어 0에만 있어 물웅덩이 반사(레이어 1)에는 그려지지 않는다.
 
 const vertexShader = /* glsl */ `
@@ -42,9 +49,15 @@ const fragmentShader = /* glsl */ `
     #elif MODE == 1
       // 빼기 (노이즈가 음수인 곳): 화면색 - 폭·|n|·2
       gl_FragColor = vec4(vec3(max(-n, 0.0) * 2.0 * uDark), 0.0);
-    #else
+    #elif MODE == 2
       // 더하기 (노이즈가 양수인 곳): 화면색 + 폭·n·2
       gl_FragColor = vec4(vec3(max(n, 0.0) * 2.0 * uDark), 0.0);
+    #else
+      // 한 번에: src + dst × src알파
+      gl_FragColor = vec4(
+        vec3(max(n, 0.0) * 2.0 * uDark),
+        (1.0 + 2.0 * uAmount * n) / (1.0 + uAmount)
+      );
     #endif
   }
 `;
@@ -53,6 +66,7 @@ export default function Grain() {
   const enabled = useLab((s) => s.night.grain);
   const group = useRef<THREE.Group>(null!);
   const dark = useLab((s) => s.night.grainDark > 0);
+  const single = useLab((s) => s.night.grainSingle);
 
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry();
@@ -108,6 +122,13 @@ export default function Grain() {
         blendSrcAlpha: THREE.ZeroFactor,
         blendDstAlpha: THREE.OneFactor,
       }),
+      // 한 번에: src + dst × src알파 (알파 채널은 dst 그대로)
+      make(3, {
+        blendSrc: THREE.OneFactor,
+        blendDst: THREE.SrcAlphaFactor,
+        blendSrcAlpha: THREE.ZeroFactor,
+        blendDstAlpha: THREE.OneFactor,
+      }),
     ];
   }, []);
   useEffect(
@@ -137,6 +158,17 @@ export default function Grain() {
   });
 
   if (!enabled) return null;
+  if (single)
+    return (
+      <group ref={group}>
+        <mesh
+          geometry={geometry}
+          material={materials[3]}
+          frustumCulled={false}
+          renderOrder={1e6}
+        />
+      </group>
+    );
   // 투명 물체 중 맨 마지막에 그려서 장면 전체 위에 섞인다 (곱하기 → 빼기 → 더하기 순)
   return (
     <group ref={group}>
