@@ -7,30 +7,80 @@ import { overviewPosition } from "@/hooks/useCameraAnim";
 
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {
+  // 밤 씬 기준으로 주제별로 묶었다. 기존 씬 전용 항목(씬 전환, 이전 하늘, 빗물 바닥,
+  // rectArea·ambient 조명)은 패널에서 뺐다. 스토어와 코드는 남아 있어 콘솔(__lab.setState)로는 바꿀 수 있다.
   const v = useControls({
-    "밤 씬": folder({
-      씬: {
-        value: "night",
-        options: { "밤 잔디밭 (새)": "night", "기존 (돌 지형)": "old" },
+    모델: folder({
+      "퍼걸러 (+물튀김)": true,
+      "소품 (things)": true,
+      "맥북 + 화면": true,
+      "타일 바닥": true,
+      "구름 (반투명)": false,
+    }),
+    "맥북 화면": folder({
+      "화면 Html 표시": true,
+      "매 프레임 밝기·투명도 갱신": true,
+      "backdrop-blur": true,
+      "occlude (blending)": true,
+      "화면 DOM 해상도": {
+        value: 1,
+        options: {
+          "2560×1700 (기본)": 1,
+          "1280×850": 0.5,
+          "640×425": 0.25,
+        },
       },
+    }),
+    조명: folder({
+      달빛: { value: 1.6, min: 0, max: 3, step: 0.05 },
+      "등 세기": { value: 4, min: 0, max: 20, step: 0.1 },
+      "등 색": "#ffb36b",
+      "등 위치": { value: [0, 2.3, 0], step: 0.05 },
+      하늘빛: { value: 0.35, min: 0, max: 2, step: 0.05 },
+      "환경맵 켜기": true,
+      "환경맵 세기": { value: 0.12, min: 0, max: 1, step: 0.01 },
+    }),
+    "노이즈 효과": folder({
+      "그레인 켜기": true,
+      "그레인 세기": { value: 0.08, min: 0, max: 0.6, step: 0.01 },
+      "입자 크기 (CSS px)": { value: 0.67, min: 0.4, max: 3, step: 0.01 },
+      "어두운 곳 그레인": { value: 0.05, min: 0, max: 0.1, step: 0.005 },
+    }),
+    "카메라·달 위치": folder({
+      "카메라 방위 (°)": { value: 65.7, min: 0, max: 120, step: 0.5 },
+      "카메라 높이 (m)": { value: 1.55, min: 0.6, max: 4, step: 0.05 },
+      "카메라 거리 (m)": { value: 9.9, min: 4, max: 10, step: 0.05 },
+      "달 방위 (°)": { value: -143, min: -180, max: 180, step: 0.5 },
+      "달 고도 (°)": { value: 18.5, min: 5, max: 70, step: 0.5 },
+    }),
+    땅: folder({
       "땅 크기 (m)": { value: 17, min: 15, max: 40, step: 1 },
-      잔디: true,
+      "돌 지형 (128×128 변위)": true,
+    }),
+    잔디: folder({
+      "잔디 켜기": true,
       "잔디 개수": {
         value: 100000,
         options: { "10k": 10000, "25k": 25000, "50k": 50000, "100k": 100000 },
       },
       "잎 분할": { value: 4, options: { "2": 2, "4": 4, "6": 6, "10": 10 } },
-      바람: true,
-      "바람 세기": { value: 1, min: 0, max: 3, step: 0.05 },
-      "바람 속도": { value: 1, min: 0.1, max: 3, step: 0.05 },
       "잔디 높이 배율": { value: 2.1, min: 0.5, max: 4, step: 0.1 },
       "잔디 폭 배율": { value: 1.2, min: 0.5, max: 3, step: 0.1 },
       "물웅덩이에도 심기": false,
-      "커서로 잔디 밀기": true,
-      "커서 반경 (m)": { value: 1.2, min: 0.2, max: 3, step: 0.05 },
-      "커서 세기": { value: 1.5, min: 0, max: 2, step: 0.05 },
-      "다시 서는 시간 (초)": { value: 0.5, min: 0.3, max: 6, step: 0.1 },
-      물웅덩이: true,
+      바람: folder({
+        "바람 켜기": true,
+        "바람 세기": { value: 1, min: 0, max: 3, step: 0.05 },
+        "바람 속도": { value: 1, min: 0.1, max: 3, step: 0.05 },
+      }),
+      "마우스 효과": folder({
+        "마우스 효과 켜기": true,
+        "커서 반경 (m)": { value: 1.2, min: 0.2, max: 3, step: 0.05 },
+        "커서 세기": { value: 1.5, min: 0, max: 2, step: 0.05 },
+        "다시 서는 시간 (초)": { value: 0.5, min: 0.3, max: 6, step: 0.1 },
+      }),
+    }),
+    물웅덩이: folder({
+      "물웅덩이 켜기": true,
       // 패널 칸이 좁아 m 단위 소수(-0.030)가 "-0.0"으로 잘려 보이므로 cm로 표시한다
       "수면 높이 (cm)": { value: -3, min: -12, max: 8, step: 0.5 },
       "평면 반사": true,
@@ -45,15 +95,7 @@ export default function LabPanel() {
         options: { 끔: 0, "1 (9회)": 1, "2 (25회)": 2, "3 (49회)": 3 },
       },
     }),
-    "카메라·달": folder({
-      "카메라 방위 (°)": { value: 65.7, min: 0, max: 120, step: 0.5 },
-      "카메라 높이 (m)": { value: 1.55, min: 0.6, max: 4, step: 0.05 },
-      "카메라 거리 (m)": { value: 9.9, min: 4, max: 10, step: 0.05 },
-      "달 방위 (°)": { value: -143, min: -180, max: 180, step: 0.5 },
-      "달 고도 (°)": { value: 18.5, min: 5, max: 70, step: 0.5 },
-    }),
     밤하늘: folder({
-      "하늘 품질": { value: "new", options: { 새로: "new", 기존: "old" } },
       "별 밀도": { value: 1, min: 0, max: 3, step: 0.05 },
       "별 밝기": { value: 1, min: 0, max: 3, step: 0.05 },
       "별 반짝임": { value: 0.15, min: 0, max: 0.6, step: 0.01 },
@@ -75,13 +117,13 @@ export default function LabPanel() {
       "최소 크기 (CSS px)": { value: 5, min: 0, max: 10, step: 0.5 },
       "최대 높이 (m)": { value: 1.3, min: 0.4, max: 2.5, step: 0.05 },
     }),
-    "빗방울 반짝임": folder({
+    빗방울: folder({
       "빗방울 개수": {
         value: 300,
         options: {
           없음: 0,
           "150": 150,
-          "300 (기존)": 300,
+          "300": 300,
           "500": 500,
           "800": 800,
           "1000": 1000,
@@ -94,67 +136,27 @@ export default function LabPanel() {
       "반짝임 빈도": { value: 0.4, min: 0, max: 1, step: 0.05 },
       "반짝임 세기": { value: 0.6, min: 0, max: 4, step: 0.1 },
     }),
-    "필름 그레인": folder({
-      "그레인 켜기": true,
-      "그레인 세기": { value: 0.08, min: 0, max: 0.6, step: 0.01 },
-      "입자 크기 (CSS px)": { value: 0.67, min: 0.4, max: 3, step: 0.01 },
-      "어두운 곳 그레인": { value: 0.05, min: 0, max: 0.1, step: 0.005 },
-    }),
-    "밤 조명": folder({
-      달빛: { value: 1.6, min: 0, max: 3, step: 0.05 },
-      "등 세기": { value: 4, min: 0, max: 20, step: 0.1 },
-      "등 색": "#ffb36b",
-      "등 위치": { value: [0, 2.3, 0], step: 0.05 },
-      하늘빛: { value: 0.35, min: 0, max: 2, step: 0.05 },
-      환경맵: { value: 0.12, min: 0, max: 1, step: 0.01 },
-    }),
-    "측정 도구": {
-      value: "none",
-      options: {
-        "실험실 HUD만": "none",
-        "stats-gl": "statsgl",
-        "r3f-perf": "r3fperf",
-      },
-    },
-    DPR: {
-      value: "default",
-      options: {
-        "기본 (1~1.5)": "default",
-        "0.5": 0.5,
-        "1": 1,
-        "1.5": 1.5,
-        "2": 2,
-      },
-    },
-    모델: folder({
-      "빗물 바닥 (빗방울·물튀김 포함)": true,
-      "퍼걸러 (+물튀김)": true,
-      "돌 지형 (128×128 변위)": true,
-      "소품 (things)": true,
-      "맥북 + 화면": true,
-      "타일 바닥": true,
-      "구름 (반투명)": false,
-    }),
-    조명: folder({
-      "Environment (Lightformer)": true,
-      rectAreaLight: true,
-      "ambient + hemisphere": true,
-    }),
-    "후처리 (Bloom + 대비)": false,
-    "MSAA (페이지 다시 열림)": IS_MSAA,
-    "맥북 화면 (DOM)": folder({
-      "화면 Html 표시": true,
-      "매 프레임 밝기·투명도 갱신": true,
-      "backdrop-blur": true,
-      "occlude (blending)": true,
-      "화면 DOM 해상도": {
-        value: 1,
+    "렌더링·측정": folder({
+      "측정 도구": {
+        value: "none",
         options: {
-          "2560×1700 (기본)": 1,
-          "1280×850": 0.5,
-          "640×425": 0.25,
+          "실험실 HUD만": "none",
+          "stats-gl": "statsgl",
+          "r3f-perf": "r3fperf",
         },
       },
+      DPR: {
+        value: "default",
+        options: {
+          "기본 (1~1.5)": "default",
+          "0.5": 0.5,
+          "1": 1,
+          "1.5": 1.5,
+          "2": 2,
+        },
+      },
+      "MSAA (페이지 다시 열림)": IS_MSAA,
+      "후처리 (Bloom + 대비)": false,
     }),
   });
 
@@ -197,11 +199,12 @@ export default function LabPanel() {
       tool: v["측정 도구"] as LabTool,
       dpr: v.DPR as "default" | number,
       post: v["후처리 (Bloom + 대비)"],
-      environment: v["Environment (Lightformer)"],
-      rectArea: v.rectAreaLight,
-      ambient: v["ambient + hemisphere"],
+      environment: v["환경맵 켜기"],
+      // 기존 씬 전용 조명. 밤 씬에서는 쓰이지 않는다
+      rectArea: true,
+      ambient: true,
       models: {
-        rainGround: v["빗물 바닥 (빗방울·물튀김 포함)"],
+        rainGround: true, // 기존 씬 전용. 밤 씬에서는 렌더되지 않는다
         pergola: v["퍼걸러 (+물튀김)"],
         groundBase: v["돌 지형 (128×128 변위)"],
         things: v["소품 (things)"],
@@ -217,18 +220,18 @@ export default function LabPanel() {
         res: v["화면 DOM 해상도"] as number,
       },
       night: {
-        scene: v["씬"] as "old" | "night",
-        grass: v["잔디"],
+        scene: "night", // 기존 씬 전환은 패널에서 뺐다
+        grass: v["잔디 켜기"],
         groundSize: v["땅 크기 (m)"],
         grassCount: v["잔디 개수"] as number,
         grassSegments: v["잎 분할"] as number,
-        wind: v["바람"],
+        wind: v["바람 켜기"],
         windStrength: v["바람 세기"],
         windSpeed: v["바람 속도"],
         grassHeight: v["잔디 높이 배율"],
         grassWidth: v["잔디 폭 배율"],
         grassOnWater: v["물웅덩이에도 심기"],
-        cursorPush: v["커서로 잔디 밀기"],
+        cursorPush: v["마우스 효과 켜기"],
         cursorRadius: v["커서 반경 (m)"],
         cursorStrength: v["커서 세기"],
         cursorRecover: v["다시 서는 시간 (초)"],
@@ -241,7 +244,7 @@ export default function LabPanel() {
         camDistance: v["카메라 거리 (m)"],
         moonAz: v["달 방위 (°)"],
         moonEl: v["달 고도 (°)"],
-        skyQuality: v["하늘 품질"] as "new" | "old",
+        skyQuality: "new", // 이전 하늘 비교는 패널에서 뺐다
         starDensity: v["별 밀도"],
         starBright: v["별 밝기"],
         starTwinkle: v["별 반짝임"],
@@ -263,7 +266,7 @@ export default function LabPanel() {
         rainSparkleOn: v["반짝이는 빗방울"],
         rainSparkle: v["반짝임 빈도"],
         rainSparkleBoost: v["반짝임 세기"],
-        puddles: v["물웅덩이"],
+        puddles: v["물웅덩이 켜기"],
         waterLevel: v["수면 높이 (cm)"] / 100,
         reflection: v["평면 반사"],
         reflectionRes: v["반사 해상도"] as number,
@@ -275,7 +278,7 @@ export default function LabPanel() {
         lampColor: v["등 색"],
         lampPos: v["등 위치"] as [number, number, number],
         hemiIntensity: v["하늘빛"],
-        envIntensity: v["환경맵"],
+        envIntensity: v["환경맵 세기"],
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
