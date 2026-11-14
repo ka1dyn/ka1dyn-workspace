@@ -9,10 +9,12 @@ import CSM from "three-custom-shader-material";
 
 type DropsProps = React.JSX.IntrinsicElements["group"] & {
   count?: number;
+  // 기본(CSM 반투명) 대신 쓸 재질. 밤 씬은 반짝이는 재질(Night/RainGlow.ts)을 넘긴다
+  material?: THREE.Material;
 };
 
 export const Drops = React.forwardRef<THREE.Group, DropsProps>(
-  ({ count = 300, ...props }, fref) => {
+  ({ count = 300, material, ...props }, fref) => {
     const dropsRef = React.useRef<THREE.InstancedMesh>(null!);
     const _dummy = React.useMemo(() => new THREE.Object3D(), []);
     const initialY = React.useMemo(() => new Float32Array(count).fill(0), []);
@@ -167,14 +169,18 @@ export const Drops = React.forwardRef<THREE.Group, DropsProps>(
           renderOrder={2}
         >
           <planeGeometry args={[0.5, 1]} />
-          <CSM
-            key={vertexShader + fragmentShader}
-            baseMaterial={THREE.MeshBasicMaterial}
-            vertexShader={vertexShader}
-            fragmentShader={fragmentShader}
-            uniforms={uniforms}
-            transparent
-          />
+          {material ? (
+            <primitive object={material} attach="material" />
+          ) : (
+            <CSM
+              key={vertexShader + fragmentShader}
+              baseMaterial={THREE.MeshBasicMaterial}
+              vertexShader={vertexShader}
+              fragmentShader={fragmentShader}
+              uniforms={uniforms}
+              transparent
+            />
+          )}
         </instancedMesh>
       </group>
     );
