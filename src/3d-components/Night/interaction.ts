@@ -5,7 +5,9 @@ import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 // 들판을 위에서 내려다본 작은 텍스처(rg = 잎이 눕는 방향 × 세기, 월드 xz 기준)를
 // 두 장 번갈아 쓰며 매 프레임 갱신한다.
 //   1) 지난 값의 세기를 일정한 속도로 줄인다 → 잎이 천천히 다시 선다
-//   2) 커서가 이번 프레임에 지나간 선분 주변에 커서의 이동 방향을 더한다 → 움직인 쪽으로 눕는다
+//   2) 커서가 "다가오는 만큼만" 커서의 이동 방향을 더한다 → 움직인 쪽으로 눕는다.
+//      한 지점은 커서가 가장 가까이 지나가는 순간까지만 눌리고, 그 뒤로는 커서가 근처에
+//      머물러도 더 눌리지 않아 바로 회복이 시작된다. 커서가 멈추면 다가오지 않으니 누르지 않는다.
 // 잔디 셰이더는 잎 뿌리 위치에서 이 값을 읽어 휘는 각도에 더한다.
 
 const SIZE = 256;
@@ -16,7 +18,7 @@ const fragmentShader = /* glsl */ `
   uniform vec2 uFrom;      // 지난 프레임 커서 (월드 xz)
   uniform vec2 uTo;        // 이번 프레임 커서
   uniform vec2 uDir;       // 커서 이동 방향 (단위 벡터)
-  uniform float uStamp;    // 이번 프레임에 더할 세기 (움직이지 않으면 0)
+  uniform float uStamp;    // 누름 세기 배율 (커서가 땅 밖이면 0)
   uniform float uRadius;   // 커서 반경 (m)
   uniform float uRecover;  // 이번 프레임에 줄일 세기 (dt / 회복 시간)
   varying vec2 vUv;
@@ -29,12 +31,15 @@ const fragmentShader = /* glsl */ `
     float len = length(v);
     v = len > 1e-5 ? v * max(len - uRecover, 0.0) / len : vec2(0.0);
 
-    // 2) 커서가 지나간 선분까지의 거리로 반경 안에 이동 방향을 더한다
+    // 2) 이번 프레임에 커서가 지나간 선분에서 가장 가까웠던 정도 - 지난 프레임 위치에서의 가까운 정도.
+    //    커서가 다가올 때만 양수라서, 가장 가까이 지나간 순간까지만 누른다.
+    //    (선분을 쓰므로 한 프레임에 지점을 통과해 버려도 누름이 빠지지 않는다)
     vec2 ab = uTo - uFrom;
     float t = clamp(dot(p - uFrom, ab) / max(dot(ab, ab), 1e-6), 0.0, 1.0);
     float d = length(p - (uFrom + ab * t));
-    float near = 1.0 - smoothstep(uRadius * 0.25, uRadius, d);
-    v += uDir * near * uStamp;
+    float nearSeg = 1.0 - smoothstep(uRadius * 0.25, uRadius, d);
+    float nearFrom = 1.0 - smoothstep(uRadius * 0.25, uRadius, length(p - uFrom));
+    v += uDir * max(nearSeg - nearFrom, 0.0) * uStamp;
 
     // 세기는 1을 넘지 않게
     float l = length(v);

@@ -51,7 +51,6 @@ const vertexShader = /* glsl */ `
   uniform sampler2D uPush;   // 눌림 지도 (interaction.ts): rg = 눕는 방향 × 세기
   uniform float uPushExtent; // 눌림 지도가 덮는 월드 한 변 (m)
   uniform float uPushAngle;  // 세기 1일 때 휘는 각도 (라디안)
-  uniform float uPushRecover; // 다시 서는 시간 (초)
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -111,19 +110,17 @@ const vertexShader = /* glsl */ `
 
     #ifdef CURSOR
       // 커서 밀기: 커서가 쓸고 지나간 방향으로 눕고, 눌림 지도가 옅어지는 만큼 천천히 다시 선다.
-      // 세기는 일정한 속도로 줄어들므로(interaction.ts) 손을 뗀 뒤 지난 시간 s를 거꾸로 구할 수 있다.
-      // 휘는 정도 = 빠른 부분 70% + 느린 부분 30%(회복 시간 끝까지 감속).
-      // 손을 떼고 0.1초면 약 60% 회복하고, 나머지는 회복 시간에 맞춰 감속하며 똑바로 선다.
+      // 세기는 일정한 속도로 줄어들고(interaction.ts), 휘는 정도는 세기의 제곱을 따른다:
+      // 눌린 순간부터 바로 일어나기 시작해 끝으로 갈수록 감속하며 회복 시간에 맞춰 똑바로 선다.
       // 잎마다 뻣뻣함과 복원 속도를 달리해 한 덩어리로 움직이지 않게 한다.
       vec2 push = texture2D(uPush, root.xz / uPushExtent + 0.5).rg;
       float pushLen = length(push);
       if (pushLen > 1e-4) {
         float pseed = texture2D(uWind, root.xz * 0.5 + 0.31).b;
         float pstiff = 0.75 + pseed * 0.5;
-        float s = (1.0 - pushLen) * uPushRecover * (0.8 + 0.4 * pseed);
-        float fast = exp(-s / 0.08);
-        float slow = pushLen * pushLen; // = (1 - s / 회복 시간)²
-        float lean = 0.7 * fast + 0.3 * slow;
+        // 잎마다 회복 속도를 ±20% 다르게: 남은 세기를 그만큼 앞당기거나 늦춘다
+        float k = clamp(1.0 - (1.0 - pushLen) * (0.8 + 0.4 * pseed), 0.0, 1.0);
+        float lean = k * k;
         b += push / pushLen * lean * uPushAngle / pstiff;
       }
     #endif
@@ -246,7 +243,6 @@ export default function Grass({
           uPush: { value: null },
           uPushExtent: { value: 1 },
           uPushAngle: { value: 1.0 },
-          uPushRecover: { value: 2 },
           uBase: { value: new THREE.Color("#050c08") },
           uTip: { value: new THREE.Color("#3f6a62") },
           // 땅 너머로 보이는 하늘 아래쪽(Sky.tsx의 숲 실루엣 색)과 맞춘다
@@ -373,11 +369,13 @@ export default function Grass({
       c.raycaster.setFromCamera(pointer, camera);
       const onGround =
         c.inside && c.raycaster.ray.intersectPlane(c.plane, c.hit) !== null;
+      // 처음 들어오거나 캔버스 밖에서 다시 들어오면 그 자리로 바로 옮긴다
+      // (안 그러면 이전 위치에서 새 위치까지 쓸고 지나간 것처럼 잔디가 눌린다)
       if (onGround && !c.ready) {
         c.pos.set(c.hit.x, c.hit.z);
         c.prev.copy(c.pos);
-        c.ready = true;
       }
+      c.ready = onGround;
       c.prev.copy(c.pos);
       let stamp = 0;
       if (onGround) {
@@ -393,10 +391,9 @@ export default function Grass({
           c.move.divideScalar(dist);
           c.dir.lerp(c.move, 1 - Math.exp(-dt * 12)).normalize();
         }
-        // 빠를수록 세게 (초당 2m 이상이면 최대). 거의 멈추면(초당 0.1m 미만) 누르지 않아서,
-        // 커서를 세우면 곧바로 회복이 시작된다. 프레임 길이에 비례해 쌓여 프레임 속도와 무관하다
-        const fast = THREE.MathUtils.clamp((c.speed - 0.1) / 1.9, 0, 1);
-        stamp = n.cursorStrength * fast * Math.min(dt * 10, 1);
+        // 누름은 커서가 다가온 거리만큼만 생기므로(interaction.ts) 여기서는 세기 배율만 정한다.
+        // 빠르게 쓸수록 조금 더 세게 (초당 2m 이상이면 최대)
+        stamp = n.cursorStrength * (0.7 + 0.3 * Math.min(c.speed / 2, 1));
       } else {
         c.speed = 0;
       }
@@ -413,7 +410,6 @@ export default function Grass({
       });
       u.uPush.value = c.map.texture;
       u.uPushExtent.value = extent;
-      u.uPushRecover.value = Math.max(n.cursorRecover, 0.05);
     }
     u.uTime.value = clock.elapsedTime;
     u.uHeightScale.value = n.grassHeight;
