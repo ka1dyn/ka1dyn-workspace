@@ -10,6 +10,7 @@ export default function LabPanel() {
         value: "night",
         options: { "밤 잔디밭 (새)": "night", "기존 (돌 지형)": "old" },
       },
+      "땅 크기 (m)": { value: 24, min: 15, max: 40, step: 1 },
       잔디: true,
       "잔디 개수": {
         value: 100000,
@@ -121,6 +122,7 @@ export default function LabPanel() {
       night: {
         scene: v["씬"] as "old" | "night",
         grass: v["잔디"],
+        groundSize: v["땅 크기 (m)"],
         grassCount: v["잔디 개수"] as number,
         grassSegments: v["잎 분할"] as number,
         wind: v["바람"],

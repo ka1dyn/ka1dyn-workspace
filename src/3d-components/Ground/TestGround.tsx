@@ -4,8 +4,11 @@ import * as THREE from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Drops } from "../Rain/Drops";
 import { Splashes } from "../Rain/Splashes";
+import { terrainLayout } from "../Night/terrain";
 
-export function GroundBase(props: any) {
+// size: 한 변 길이(m). 기존 씬은 15. 넓혀도 질감 밀도와 격자 간격은 terrainLayout이 유지한다.
+export function GroundBase({ size = 15, ...props }: any) {
+  const { segments, repeat } = terrainLayout(size);
   const maps = useTexture([
     "textures/aerial_rocks_01_1k/aerial_rocks_01_diff_1k.jpg",
     "textures/aerial_rocks_01_1k/aerial_rocks_01_rough_1k.png",
@@ -21,10 +24,10 @@ export function GroundBase(props: any) {
 
     [...maps].forEach((texture) => {
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(2, 2);
+      texture.repeat.set(repeat, repeat);
       texture.needsUpdate = true;
     });
-  }, [maps, alphaMap]);
+  }, [maps, alphaMap, repeat]);
 
   const rockMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -46,7 +49,7 @@ export function GroundBase(props: any) {
   return (
     <group {...props}>
       <mesh rotation={[degToRad(-90), 0, 0]} material={rockMaterial}>
-        <planeGeometry args={[15, 15, 128, 128]} />
+        <planeGeometry args={[size, size, segments, segments]} />
       </mesh>
     </group>
   );
