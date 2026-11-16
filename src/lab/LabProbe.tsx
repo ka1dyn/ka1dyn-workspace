@@ -284,8 +284,8 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
           ? big("GPU 예산 점유율 ", `${f(budgetPct, 0)}%`, "#ffd479") +
             dim(
               p.maxMhz
-                ? `  최대 ${f(p.maxMhz, 0)} MHz 기준 ${f(needMs)} / ${f(targetMs)} ms · 사이클 ${f(cycles)} M (활성 ${f(p.active * 100, 0)}% × ${f(p.mhz, 0)} MHz ÷ ${fpsP} fps)`
-                : `  최대 클럭 모름 (브리지 재시작 필요) · 사이클 ${f(cycles)} M`,
+                ? `  최대 ${f(p.maxMhz, 0)} MHz 기준 ${f(needMs)} / ${f(targetMs)} ms`
+                : `  최대 클럭 모름 (브리지 재시작 필요)`,
             )
           : big("GPU 예산 점유율 ", "–", "#9aa3b2") + "  " + noBridge,
         big(
