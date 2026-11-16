@@ -75,7 +75,7 @@ export default function LabPanel() {
         value: 100000,
         options: { "10k": 10000, "25k": 25000, "50k": 50000, "100k": 100000 },
       },
-      "잎 분할": { value: 4, options: { "2": 2, "4": 4, "6": 6, "10": 10 } },
+      "잎 분할": { value: 6, options: { "2": 2, "4": 4, "6": 6, "10": 10 } },
       "잔디 높이 배율": { value: 2.1, min: 0.5, max: 4, step: 0.1 },
       "잔디 폭 배율": { value: 1.2, min: 0.5, max: 3, step: 0.1 },
       "물웅덩이에도 심기": false,
