@@ -159,6 +159,15 @@ export default function LabPanel() {
       "반짝임 빈도": { value: 0.4, min: 0, max: 1, step: 0.05 },
       "반짝임 세기": { value: 0.6, min: 0, max: 4, step: 0.1 },
     }),
+    번개: folder({
+      "번개 켜기": true,
+      "번개 세기": { value: 1, min: 0, max: 3, step: 0.05 },
+      "번개 바로 보기": button(() =>
+        useLab.setState((s) => ({
+          night: { ...s.night, lightningNow: s.night.lightningNow + 1 },
+        })),
+      ),
+    }),
     "렌더링·측정": folder({
       "측정 도구": {
         value: "none",
@@ -300,6 +309,9 @@ export default function LabPanel() {
         rainSparkleOn: v["반짝이는 빗방울"],
         rainSparkle: v["반짝임 빈도"],
         rainSparkleBoost: v["반짝임 세기"],
+        lightning: v["번개 켜기"],
+        lightningStrength: v["번개 세기"],
+        lightningNow: useLab.getState().night.lightningNow,
         puddles: v["물웅덩이 켜기"],
         waterLevel: v["수면 높이 (cm)"] / 100,
         reflection: v["평면 반사"],

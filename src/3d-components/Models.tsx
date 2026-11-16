@@ -8,12 +8,14 @@ import Mac from "./Mac";
 import { useLab } from "@/lab/store";
 import NightScene from "./Night";
 import ReflectLayer from "./Night/ReflectLayer";
+import Lightning from "./Lightning";
 
 export default function Models() {
   const m = useLab((state) => state.models);
   const night = useLab((state) => state.night.scene === "night");
   const groundSize = useLab((state) => state.night.groundSize);
   const terrainOpaque = useLab((state) => state.night.terrainOpaque);
+  const lightning = useLab((state) => state.night.lightning);
 
   return (
     <>
@@ -51,6 +53,13 @@ export default function Models() {
       {m.mac && <Mac />}
 
       {m.clouds && <RainClouds />}
+
+      {/* 번개는 구름과 따로 켠다. 반사 레이어에 올려 물웅덩이 속 퍼걸러도 같이 번쩍이게 한다 */}
+      {lightning && (
+        <ReflectLayer>
+          <Lightning />
+        </ReflectLayer>
+      )}
     </>
   );
 }

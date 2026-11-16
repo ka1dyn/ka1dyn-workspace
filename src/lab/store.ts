@@ -84,6 +84,9 @@ export interface NightLab {
   rainSparkleOn: boolean; // 빗방울이 가끔 살짝 반짝인다 (기존 빗방울 셰이더 그대로)
   rainSparkle: number; // 반짝임 빈도 (0~1)
   rainSparkleBoost: number; // 반짝일 때 진해지는 배율
+  lightning: boolean; // 번개 섬광 + 천둥 (Lightning.tsx). 구름과 따로 켠다
+  lightningStrength: number; // 섬광 세기 배율 (씬 라이트·잔디·수면·하늘 모두)
+  lightningNow: number; // 실험실 "번개 바로 보기" 버튼이 올리는 카운터
   grainDark: number; // 어두운 곳 그레인: 밝기와 무관하게 더하고 빼는 폭 (0이면 끔) // 물웅덩이 자리에도 심어 지형을 더 많이 덮는다
   puddles: boolean; // 수면 평면 (돌 지형의 낮은 곳에만 물이 보인다)
   waterLevel: number; // 수면 월드 높이 (m)
@@ -150,7 +153,7 @@ export const useLab = create<LabState>(() => ({
     grass: true,
     grassCount: 100000,
     groundSize: 17,
-    grassSegments: 4,
+    grassSegments: 6,
     wind: true,
     windStrength: 1,
     windSpeed: 1,
@@ -199,6 +202,9 @@ export const useLab = create<LabState>(() => ({
     rainSparkleOn: true,
     rainSparkle: 0.4,
     rainSparkleBoost: 0.6,
+    lightning: true,
+    lightningStrength: 1,
+    lightningNow: 0,
     puddles: true,
     waterLevel: -0.03,
     reflection: true,

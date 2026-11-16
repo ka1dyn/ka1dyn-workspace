@@ -1,4 +1,5 @@
 import { useLab } from "@/lab/store";
+import { lightningUniforms } from "./lightning";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -44,6 +45,8 @@ const fragmentShader = /* glsl */ `
   uniform vec3 uMeteorHead[4]; // 별똥별 머리 방향 (동시에 최대 4개)
   uniform vec3 uMeteorTail[4]; // 별똥별 꼬리 끝 방향
   uniform vec4 uMeteorAlpha;   // 별똥별마다 밝기 (모두 0이면 아래 계산을 통째로 건너뛴다)
+  uniform float uFlash;        // 번개 섬광 세기 (Night/lightning.ts)
+  uniform vec3 uFlashColor;
   varying vec3 vDir;
 
   // ---- 해시 / 노이즈 ----
@@ -132,6 +135,9 @@ const fragmentShader = /* glsl */ `
     vec3 d = normalize(vDir);
     float h = d.y;
     vec3 color = mix(uHorizon, uZenith, smoothstep(-0.05, 0.6, h));
+    // 번개: 구름 낀 지평선 쪽이 더 환하게 번쩍인다. 숲은 아래에서 숲 색으로 덮으므로
+    // 밝아진 하늘 앞에 실루엣으로 또렷하게 드러난다
+    color += uFlashColor * uFlash * (0.08 + 0.22 * (1.0 - smoothstep(0.0, 0.8, h)));
 
   #ifdef SKY_OLD
     // 이전 하늘: 칸 전체를 칠하는 별 + 값 노이즈 숲
@@ -346,6 +352,7 @@ export default function Sky() {
             value: METEOR_SLOTS.map(() => new THREE.Vector3(0, 1, 0)),
           },
           uMeteorAlpha: { value: new THREE.Vector4() },
+          ...lightningUniforms(),
         },
       }),
     [old],

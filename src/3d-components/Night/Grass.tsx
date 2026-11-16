@@ -6,6 +6,7 @@ import { GRASS_LAYER } from "./constants";
 import { clumpNoise, getWindTexture } from "./noise";
 import { InteractionMap } from "./interaction";
 import { terrainLayout, useTerrainSampler } from "./terrain";
+import { lightningUniforms } from "./lightning";
 
 // 인스턴스 잔디: 위로 갈수록 좁아지는 띠 하나를 InstancedMesh로 수만 번 그린다 (드로우콜 1).
 // 조명 계산 없이 높이 그라데이션 + 바람 밝기 + 퍼걸러 등의 따뜻한 빛을 셰이더에서 흉내 낸다.
@@ -154,6 +155,8 @@ const fragmentShader = /* glsl */ `
   uniform vec3 uLampPos;
   uniform vec3 uLampColor;
   uniform float uLampIntensity;
+  uniform float uFlash;      // 번개 섬광 세기 (Night/lightning.ts, 모든 셰이더가 공유)
+  uniform vec3 uFlashColor;
   varying float vHeight;
   varying float vWind;
   varying vec3 vWorld;
@@ -166,6 +169,8 @@ const fragmentShader = /* glsl */ `
     // 퍼걸러 아래 등의 빛: 수평 거리 제곱으로 줄어드는 따뜻한 색을 잎 끝에 더한다
     vec2 d = vWorld.xz - uLampPos.xz;
     color += uLampColor * uLampIntensity * 0.05 * vHeight / (1.0 + dot(d, d) * 0.6);
+    // 번개: 하늘에서 오는 빛이라 위를 향한 잎끝이 더 밝고, 바람 마루도 살짝 더 번쩍인다
+    color += uFlashColor * uFlash * (0.04 + 0.22 * vHeight * vHeight) * (0.8 + vWind * 0.4);
     // 땅이 투명해지며 뒤의 어두운 하늘에 녹아드는 것처럼, 가장자리 잎은 같은 어두운 색으로 섞는다
     color = mix(uEdgeColor, color, vEdge);
     gl_FragColor = vec4(color, 1.0);
@@ -250,6 +255,7 @@ export default function Grass({
           uLampPos: { value: new THREE.Vector3() },
           uLampColor: { value: new THREE.Color() },
           uLampIntensity: { value: 0 },
+          ...lightningUniforms(),
         },
       }),
     [wind, cursorPush],

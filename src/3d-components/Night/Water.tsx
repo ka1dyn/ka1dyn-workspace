@@ -6,6 +6,7 @@ import { GRASS_LAYER, REFLECT_LAYER } from "./constants";
 import { getWindTexture } from "./noise";
 import { PlanarReflection } from "./PlanarReflection";
 import { TERRAIN, terrainLayout, useTerrainTextures } from "./terrain";
+import { LIGHTNING, lightningUniforms } from "./lightning";
 
 // 돌 지형 위에 까는 수면 평면. 지형보다 낮은 곳에서만 보여서 그 자리가 곧 물웅덩이가 된다
 // (높은 바위는 깊이 테스트로 수면을 가린다). 지형과 같은 그룹·크기·회전이라 UV가 같으므로
@@ -47,6 +48,8 @@ const fragmentShader = /* glsl */ `
   uniform vec3 uLampPos;
   uniform vec3 uLampColor;
   uniform float uLampIntensity;
+  uniform float uFlash;      // 번개 섬광 세기 (Night/lightning.ts)
+  uniform vec3 uFlashColor;
   varying vec2 vUv;
   varying vec3 vWorld;
   varying vec4 vReflection;
@@ -124,6 +127,9 @@ const fragmentShader = /* glsl */ `
     // 등 아래 수면에 번지는 따뜻한 빛
     vec3 l = uLampPos - vWorld;
     color += uLampColor * uLampIntensity * 0.02 / (1.0 + dot(l.xz, l.xz) * 0.8);
+    // 번개: 수면이 번쩍이는 하늘을 비춘다. 반사 텍스처는 몇 프레임에 한 번만 갱신되고
+    // 섬광은 수십 ms라서, 반사에 기대지 않고 프레넬로 직접 더한다 (비스듬히 볼수록 밝다)
+    color += uFlashColor * uFlash * (0.06 + 0.3 * fresnel);
 
     // 얕은 물가는 투명하게 해서 젖은 돌이 비쳐 보이게 한다
     float alpha = edge * mix(0.6, 0.95, deep);
@@ -161,6 +167,7 @@ export default function Water({
     view: new THREE.Matrix4(), // 마지막으로 반사를 그렸을 때의 카메라
     projection: new THREE.Matrix4(),
     level: NaN,
+    flash: 0, // 마지막으로 반사를 그렸을 때의 번개 세기
   });
 
   // 반사 타깃: 어두운 밤 색이 계단지지 않도록 HalfFloat. 흐림은 하드웨어 밉맵으로 만든다.
@@ -213,6 +220,7 @@ export default function Water({
         uLampPos: { value: new THREE.Vector3() },
         uLampColor: { value: new THREE.Color() },
         uLampIntensity: { value: 0 },
+        ...lightningUniforms(),
       },
     });
   }, [reflection, blur, rippleRadius, planar, disp, alpha, layout]);
@@ -245,6 +253,9 @@ export default function Water({
       !p.view.equals(camera.matrixWorld) ||
       !p.projection.equals(camera.projectionMatrix) ||
       p.level !== n.waterLevel;
+    // 번개 섬광이 바뀌는 동안은 반사 속 퍼걸러·하늘도 같이 번쩍이도록 기다리지 않고 바로 다시 그린다
+    // (섬광은 수십 ms라 몇 프레임씩 건너뛰면 반사에 아예 안 잡힌다. 번개가 없을 때는 비용 없음)
+    if (Math.abs(LIGHTNING.value - p.flash) > 0.02) p.wait = 0;
     const every = Math.max(1, Math.round(n.reflectionEvery));
     if (u.uReflection.value === target.texture && p.wait > 0) {
       p.wait = Math.min(p.wait, moved ? every : every * 2) - 1;
@@ -254,6 +265,7 @@ export default function Water({
     p.view.copy(camera.matrixWorld);
     p.projection.copy(camera.projectionMatrix);
     p.level = n.waterLevel;
+    p.flash = LIGHTNING.value;
 
     planar.setHeight(n.waterLevel);
     if (!planar.update(camera as THREE.PerspectiveCamera)) return;
