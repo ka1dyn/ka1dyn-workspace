@@ -223,14 +223,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
         targetMs = Math.min(targetMs, snapped);
       }
       const targetFps = Number.isFinite(targetMs) ? 1000 / targetMs : NaN;
-      // 드랍 = vsync를 한 번 이상 놓친 프레임 (간격이 목표의 1.5배를 넘음)
-      const drops = Number.isFinite(targetMs)
-        ? samples.filter((s) => s.interval > targetMs * 1.5).length
-        : 0;
-      // 분모는 기준 FPS로 10초 동안 그렸어야 할 장수 (60fps면 600장)
-      const expected = Number.isFinite(targetMs)
-        ? Math.round(GATE_MS / targetMs)
-        : NaN;
+      // 드랍 = 기준 FPS로 그렸어야 할 장수 중 못 그린 장수.
+      // 그렸어야 할 장수는 기록된 프레임 간격의 합 ÷ 프레임 예산 (10초 동안 계속 그렸다면 60fps 기준 600장).
+      // 간격이 1.5배를 넘은 프레임만 세면, 매 프레임이 조금씩 늦는 경우(예: 20ms씩, 49fps)를 놓친다.
+      // 멈췄다 다시 시작한 첫 프레임은 기록에서 빠지므로 그 공백은 세지 않는다.
+      const covered = samples.reduce((a, s) => a + s.interval, 0);
+      const expected = Number.isFinite(targetMs) ? Math.round(covered / targetMs) : NaN;
+      const drops = Number.isFinite(expected) ? Math.max(0, expected - samples.length) : 0;
       const dropPct = expected > 0 ? (drops / expected) * 100 : NaN;
 
       const powerAge = power ? (Date.now() - power.t) / 1000 : Infinity;
