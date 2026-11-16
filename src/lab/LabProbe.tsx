@@ -242,6 +242,9 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       // GPU 사이클/프레임 = 활성 비율 × 클럭 ÷ 그린 프레임 수 (M). 클럭 변화를 지운 GPU 작업량.
       // 활성 비율은 GPU 전체 값이라 브라우저 합성처럼 WebGL 밖의 일도 들어간다
       const cycles = p && fpsP > 0 ? (p.active * p.mhz) / fpsP : NaN;
+      // GPU 필요 시간 = 사이클 ÷ 최대 클럭 × 1000 (ms). 이 장면을 GPU가 최대 속도로 그리면 걸릴 시간.
+      // FPS가 방어될 때는 마감까지의 여유를, GPU 한계일 때는(클럭이 최대) 실제 일한 시간과 같은 값을 보여 준다
+      const needMs = p?.maxMhz && Number.isFinite(cycles) ? (cycles / p.maxMhz) * 1000 : NaN;
       // GPU가 실제로 일한 시간/프레임. WebGL 타이머는 렌더 타깃을 여러 번 쓰면 대기가 섞여 부풀려진다
       const busyMs = p && fpsP > 0 ? (p.active * 1000) / fpsP : NaN;
       const total = p ? (p.gpuMw ?? 0) + (p.cpuMw ?? 0) : NaN;
@@ -276,9 +279,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       hud.innerHTML = [
         head("성능"),
         p
-          ? big("GPU 사이클  ", `${f(cycles)} M/프레임`, "#ffd479") +
-            dim(`  활성 ${f(p.active * 100, 0)}% × ${f(p.mhz, 0)} MHz ÷ ${fpsP} fps`)
-          : big("GPU 사이클  ", "–", "#9aa3b2") + "  " + noBridge,
+          ? big("GPU 필요 시간 ", `${f(needMs)} / ${f(targetMs)} ms`, "#ffd479") +
+            dim(
+              p.maxMhz
+                ? `  최대 ${f(p.maxMhz, 0)} MHz 기준 · 사이클 ${f(cycles)} M (활성 ${f(p.active * 100, 0)}% × ${f(p.mhz, 0)} MHz ÷ ${fpsP} fps)`
+                : `  최대 클럭 모름 (브리지 재시작 필요) · 사이클 ${f(cycles)} M`,
+            )
+          : big("GPU 필요 시간 ", "–", "#9aa3b2") + "  " + noBridge,
         big(
           "프레임 드랍률 ",
           `${f(dropPct, 1)}%`,
