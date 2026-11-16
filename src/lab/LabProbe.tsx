@@ -227,7 +227,11 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
       const drops = Number.isFinite(targetMs)
         ? samples.filter((s) => s.interval > targetMs * 1.5).length
         : 0;
-      const dropPct = samples.length ? (drops / samples.length) * 100 : NaN;
+      // 분모는 기준 FPS로 10초 동안 그렸어야 할 장수 (60fps면 600장)
+      const expected = Number.isFinite(targetMs)
+        ? Math.round(GATE_MS / targetMs)
+        : NaN;
+      const dropPct = expected > 0 ? (drops / expected) * 100 : NaN;
 
       const powerAge = power ? (Date.now() - power.t) / 1000 : Infinity;
       const p = powerAge < 3 ? power : null;
@@ -276,10 +280,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
             dim(`  활성 ${f(p.active * 100, 0)}% × ${f(p.mhz, 0)} MHz ÷ ${fpsP} fps`)
           : big("GPU 사이클  ", "–", "#9aa3b2") + "  " + noBridge,
         big(
-          "프레임 드랍 ",
-          `${f(dropPct, 1)}% / ${DROP_GOAL}%`,
+          "프레임 드랍률 ",
+          `${f(dropPct, 1)}%`,
           Number.isNaN(dropPct) ? "#9aa3b2" : ok(dropPct < DROP_GOAL),
-        ) + dim(`  ${drops}/${samples.length}장 (최근 ${GATE_MS / 1000}초)`),
+        ) +
+          dim(
+            `  ${drops}/${f(expected, 0)}장 (${f(targetFps, 0)}fps 기준 ${GATE_MS / 1000}초)`,
+          ),
         "",
         `FPS         ${f(fps, 0)} / ${f(targetFps, 0)}` +
           dim(`   프레임 간격 p95 ${f(pct(intervals, 0.95))} ms`),
