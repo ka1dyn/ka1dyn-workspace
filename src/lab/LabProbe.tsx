@@ -11,6 +11,7 @@ const WINDOW_MS = 1000;
 
 interface Power {
   mhz: number; // GPU 활성 시간 가중 평균 클럭
+  maxMhz?: number; // GPU 최대 클럭 (브리지가 클럭 단계 목록에서 구함. 이전 브리지는 보내지 않음)
   gpuMw: number;
   cpuMw: number | null;
   active: number; // GPU 활성 비율 0~1
@@ -42,7 +43,7 @@ const pct = (xs: number[], p: number) => {
   return s[Math.min(s.length - 1, Math.floor(p * s.length))];
 };
 const f = (x: number | null | undefined, d = 2) =>
-  x == null || Number.isNaN(x) ? "–" : x.toFixed(d);
+  x == null || !Number.isFinite(x) ? "–" : x.toFixed(d);
 
 export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
   // eslint는 훅이 돌려준 값의 수정을 막지만, renderer 설정을 바꾸는 것이 이 컴포넌트의 목적이다.
@@ -69,11 +70,13 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
     // ---- 프레임 단위 기록 (최근 1초) ----
     type Sample = {
       t: number;
+      wall: number; // Date.now(). 브리지 샘플(1초 구간)과 같은 시계로 프레임 수를 세기 위함
       interval: number;
       cpu: number;
       render: number;
     };
     let samples: Sample[] = [];
+    let cur: Sample | null = null; // 이번 프레임의 기록 (판정에서 뺀 프레임이면 null)
     let gpu: { t: number; ms: number }[] = [];
     let lastStart = 0;
     let frameStart = 0;
@@ -109,13 +112,18 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
     const unsubBefore = addEffect((now) => {
       frameStart = performance.now();
       renderStart = 0;
-      if (lastStart) {
-        samples.push({
+      // 렌더를 멈췄다 다시 시작한 첫 프레임(기준선 측정, 가려진 동안 멈춤, 탭 전환)은
+      // 끊김이 아니므로 판정에서 뺀다
+      cur = null;
+      if (lastStart && now - lastStart < 1000) {
+        cur = {
           t: now,
+          wall: Date.now(),
           interval: now - lastStart,
           cpu: NaN,
           render: NaN,
-        });
+        };
+        samples.push(cur);
       }
       lastStart = now;
       gl.info.reset();
@@ -138,7 +146,7 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
         pending.push({ q: active, t: now });
         active = null;
       }
-      const last = samples[samples.length - 1];
+      const last = cur;
       if (last) {
         const end = performance.now();
         last.cpu = end - frameStart;
@@ -182,44 +190,74 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
     ].join(";");
     document.body.appendChild(hud);
 
-    const timer = window.setInterval(() => {
-      const cut = performance.now() - WINDOW_MS;
-      samples = samples.filter((s) => s.t >= cut);
-      gpu = gpu.filter((s) => s.t >= cut);
+    // ---- 판정 기준: 목표 프레임 시간 (화면 주사율). 지금까지 본 가장 짧은 간격에 맞춘다 ----
+    const RATES = [60, 75, 90, 100, 120, 144, 165, 240];
+    let targetMs = Infinity;
+    const DROP_GOAL = 1; // 목표 드랍률 (%)
+    const GATE_MS = 10_000; // 드랍률은 10초 동안 본다 (1초에 60장이라 1%를 보려면 길어야 한다)
+    let peakVram = 0;
 
-      const intervals = samples.map((s) => s.interval);
-      const cpus = samples.map((s) => s.cpu).filter((x) => !Number.isNaN(x));
-      const renders = samples
+    const timer = window.setInterval(() => {
+      const nowPerf = performance.now();
+      samples = samples.filter((s) => s.t >= nowPerf - GATE_MS);
+      gpu = gpu.filter((s) => s.t >= nowPerf - WINDOW_MS);
+      const recent = samples.filter((s) => s.t >= nowPerf - WINDOW_MS);
+
+      const intervals = recent.map((s) => s.interval);
+      const cpus = recent.map((s) => s.cpu).filter((x) => !Number.isNaN(x));
+      const renders = recent
         .map((s) => s.render)
         .filter((x) => !Number.isNaN(x));
-      const useFrames = samples
+      const useFrames = recent
         .filter((s) => !Number.isNaN(s.cpu) && !Number.isNaN(s.render))
         .map((s) => s.cpu - s.render);
-      const gpus = gpu.map((s) => s.ms);
-      const mean = (xs: number[]) =>
-        xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN;
-      const fps = samples.length / (WINDOW_MS / 1000);
-      const gpuMed = median(gpus);
+      const fps = recent.length / (WINDOW_MS / 1000);
+      const gpuMed = median(gpu.map((s) => s.ms));
+
+      // 목표 프레임 시간: 1초 중앙값을 가까운 주사율로 맞추고, 가장 짧았던 값을 유지한다
+      if (recent.length >= 30) {
+        const med = median(intervals);
+        const snapped = RATES.map((r) => 1000 / r).reduce((a, b) =>
+          Math.abs(b - med) < Math.abs(a - med) ? b : a,
+        );
+        targetMs = Math.min(targetMs, snapped);
+      }
+      const targetFps = Number.isFinite(targetMs) ? 1000 / targetMs : NaN;
+      // 드랍 = vsync를 한 번 이상 놓친 프레임 (간격이 목표의 1.5배를 넘음)
+      const drops = Number.isFinite(targetMs)
+        ? samples.filter((s) => s.interval > targetMs * 1.5).length
+        : 0;
+      const dropPct = samples.length ? (drops / samples.length) * 100 : NaN;
+
+      const powerAge = power ? (Date.now() - power.t) / 1000 : Infinity;
+      const p = powerAge < 3 ? power : null;
+      // 브리지 샘플(직전 1초)과 같은 구간에 실제로 그린 프레임 수
+      const fpsP = p
+        ? samples.filter((s) => s.wall > p.t - 1000 && s.wall <= p.t).length
+        : NaN;
+      // GPU 사이클/프레임 = 활성 비율 × 클럭 ÷ 그린 프레임 수 (M). 클럭 변화를 지운 GPU 작업량.
+      // 활성 비율은 GPU 전체 값이라 브라우저 합성처럼 WebGL 밖의 일도 들어간다
+      const cycles = p && fpsP > 0 ? (p.active * p.mhz) / fpsP : NaN;
+      // GPU가 실제로 일한 시간/프레임. WebGL 타이머는 렌더 타깃을 여러 번 쓰면 대기가 섞여 부풀려진다
+      const busyMs = p && fpsP > 0 ? (p.active * 1000) / fpsP : NaN;
+      const total = p ? (p.gpuMw ?? 0) + (p.cpuMw ?? 0) : NaN;
 
       const canvas = gl.domElement;
       const mp = (canvas.width * canvas.height) / 1e6;
-      const powerAge = power ? (Date.now() - power.t) / 1000 : Infinity;
-      const p = powerAge < 3 ? power : null;
-      const cycles = p && !Number.isNaN(gpuMed) ? (gpuMed * p.mhz) / 1000 : NaN;
-      // 프레임당 에너지: 전력(mW = mJ/s) ÷ 초당 프레임. FPS가 다른 상황끼리 비교할 수 있다.
-      // GPU 전력은 시스템 전체 값이라 브라우저 합성 등도 포함되고, 기준선을 빼지 않은 값이다.
-      const mjPerFrame = p && p.gpuMw != null && fps > 0 ? p.gpuMw / fps : NaN;
       const vr = getVram(ctx);
+      const vrTotal = vr
+        ? vr.textures + vr.renderTargets + vr.buffers + vr.canvas
+        : 0;
+      peakVram = Math.max(peakVram, vrTotal);
       const m = mem && Date.now() - mem.t < 3000 ? mem : null;
       const mb = (b: number) => f(b / 1024 / 1024, 1);
 
-      // 원인 지표(장면이 GPU에 시키는 일의 양)와 결과 지표(실제로 든 시간·전력)를 나눠 보여 준다.
-      // 결과 중 GPU 시간·GPU 전력·열 상태는 크게 강조한다.
       const head = (t: string) =>
         `<span style="display:inline-block;margin-top:6px;font-size:10px;letter-spacing:0.08em;color:#8a93a6">${t}</span>`;
       const big = (label: string, value: string, color = "#ffffff") =>
         `<span style="font-size:15px;font-weight:700;color:${color}">${label}${value}</span>`;
       const dim = (t: string) => `<span style="color:#9aa3b2">${t}</span>`;
+      const ok = (good: boolean) => (good ? "#7bd88f" : "#ff6b6b");
       const thermalColor = (t: string) =>
         /nominal/i.test(t)
           ? "#7bd88f"
@@ -228,57 +266,64 @@ export default function LabProbe({ gpuTimer = true }: { gpuTimer?: boolean }) {
             : /serious|heavy/i.test(t)
               ? "#ff9f5a"
               : "#ff6b6b";
-      const px = canvas.width * canvas.height;
+      const noBridge = dim("브리지 연결 안 됨");
+      const cpuMed = median(cpus);
 
       hud.innerHTML = [
-        head("결과 지표"),
+        head("성능"),
+        p
+          ? big("GPU 사이클  ", `${f(cycles)} M/프레임`, "#ffd479") +
+            dim(`  활성 ${f(p.active * 100, 0)}% × ${f(p.mhz, 0)} MHz ÷ ${fpsP} fps`)
+          : big("GPU 사이클  ", "–", "#9aa3b2") + "  " + noBridge,
+        big(
+          "프레임 드랍 ",
+          `${f(dropPct, 1)}% / ${DROP_GOAL}%`,
+          Number.isNaN(dropPct) ? "#9aa3b2" : ok(dropPct < DROP_GOAL),
+        ) + dim(`  ${drops}/${samples.length}장 (최근 ${GATE_MS / 1000}초)`),
+        "",
+        `FPS         ${f(fps, 0)} / ${f(targetFps, 0)}` +
+          dim(`   프레임 간격 p95 ${f(pct(intervals, 0.95))} ms`),
         !ext
-          ? big(
-              "GPU 시간   ",
-              gpuTimer ? "미지원" : "끔 (다른 도구가 타이머 사용 중)",
-            )
-          : big("GPU 시간   ", `${f(gpuMed)} ms`) +
+          ? `GPU time    ${gpuTimer ? "미지원" : "끔 (다른 도구가 타이머 사용 중)"}`
+          : `GPU time    ${f(gpuMed)} / ${f(targetMs)} ms` +
             dim(
-              `  평균 ${f(mean(gpus))}  p95 ${f(pct(gpus, 0.95))}${queryError ? "  (쿼리 충돌)" : ""}`,
-            ),
+              p
+                ? `   실제 일한 시간 ${f(busyMs)} ms · 클럭 ${f(p.mhz, 0)} / ${p.maxMhz ? f(p.maxMhz, 0) : "–"} MHz`
+                : "",
+            ) +
+            dim(queryError ? "  (쿼리 충돌)" : ""),
+        `CPU time    ${f(cpuMed)} / ${f(targetMs)} ms`,
+        `  useFrame  ${f(median(useFrames))} ms`,
+        `  렌더 제출 ${f(median(renders))} ms`,
+        head("발열 · 메모리"),
         p
-          ? big("GPU 전력   ", `${f(p.gpuMw, 0)} mW`, "#ffd479") +
-            dim(
-              `  프레임당 ${f(mjPerFrame)} mJ (${f(mjPerFrame / mp, 2)} mJ/MP)`,
-            )
-          : big("GPU 전력   ", "브리지 연결 안 됨", "#9aa3b2"),
+          ? `열 상태     <span style="color:${thermalColor(p.thermal)}">${p.thermal}</span>`
+          : `열 상태     ${noBridge}`,
         p
-          ? big("열 상태    ", p.thermal, thermalColor(p.thermal))
-          : big("열 상태    ", "–", "#9aa3b2"),
-        `FPS          ${f(fps, 0)}   프레임 간격 ${f(median(intervals))} ms  p95 ${f(pct(intervals, 0.95))}`,
-        `CPU          ${f(median(cpus))} ms   p95 ${f(pct(cpus, 0.95))}`,
-        `  useFrame   ${f(median(useFrames))} ms   렌더 제출 ${f(median(renders))} ms`,
-        p
-          ? [
-              `GPU 클럭     ${f(p.mhz, 0)} MHz   활성 ${f(p.active * 100, 0)}%`,
-              `GPU 사이클   ${f(cycles)} M/프레임`,
-              `CPU 전력     ${p.cpuMw == null ? "–" : f(p.cpuMw, 0)} mW`,
-            ].join("\n")
-          : dim(`전력 브리지  연결 안 됨 (README의 power-bridge 참고)`),
-        head("원인 지표"),
-        `드로우콜     ${info.calls}`,
-        `삼각형       ${info.triangles.toLocaleString()}`,
-        `프로그램     ${gl.info.programs?.length ?? "–"}`,
-        `텍스처       ${gl.info.memory.textures}   지오메트리 ${gl.info.memory.geometries}`,
-        `해상도       ${canvas.width}×${canvas.height}  DPR ${f(gl.getPixelRatio(), 2)}`,
-        `픽셀 수      ${px.toLocaleString()} px  (${f(mp)} MP)`,
-        head("메모리 (제약)"),
+          ? `총 전력     ${f(total, 0)} mW` + dim(`  (CPU + GPU)`)
+          : `총 전력     ${noBridge}`,
+        p ? `  GPU 전력  ${f(p.gpuMw, 0)} mW` : "",
+        p ? `  CPU 전력  ${p.cpuMw == null ? "–" : f(p.cpuMw, 0)} mW` : "",
         vr
-          ? [
-              `GPU 메모리   ${mb(vr.textures + vr.renderTargets + vr.buffers + vr.canvas)} MB (추정)${vr.unknownFormat ? "  *모르는 포맷 있음" : ""}`,
-              `  텍스처     ${mb(vr.textures)}   렌더 타깃 ${mb(vr.renderTargets)}`,
-              `  버퍼       ${mb(vr.buffers)}   캔버스 ${mb(vr.canvas)}`,
-            ].join("\n")
-          : `GPU 메모리   추적 안 됨 (새로고침 필요)`,
+          ? `GPU 메모리  ${mb(vrTotal)} MB (추정)` +
+            dim(`  최대 ${mb(peakVram)}${vr.unknownFormat ? "  *모르는 포맷 있음" : ""}`)
+          : `GPU 메모리  추적 안 됨 (새로고침 필요)`,
+        vr
+          ? `  렌더 타깃 ${mb(vr.renderTargets)}  텍스처 ${mb(vr.textures)}  버퍼 ${mb(vr.buffers)}  캔버스 ${mb(vr.canvas)}`
+          : "",
         m
-          ? `  OS 실측    그래픽 ${mb(m.graphics)}   IOSurface ${mb(m.iosurface)}`
-          : dim(`  OS 실측    브리지 연결 안 됨`),
-      ].join("\n");
+          ? dim(`  OS 실측   그래픽 ${mb(m.graphics)}  IOSurface ${mb(m.iosurface)}`)
+          : "",
+        head("원인 지표"),
+        `해상도      ${canvas.width}×${canvas.height}  DPR ${f(gl.getPixelRatio(), 2)}  ${f(mp)} MP`,
+        `드로우콜    ${info.calls}`,
+        `삼각형      ${info.triangles.toLocaleString()}`,
+        `프로그램    ${gl.info.programs?.length ?? "–"}`,
+        `텍스처      ${gl.info.memory.textures}`,
+        `지오메트리  ${gl.info.memory.geometries}`,
+      ]
+        .filter((line, i, all) => line !== "" || all[i - 1]?.includes("프레임 드랍"))
+        .join("\n");
     }, 500);
 
     return () => {

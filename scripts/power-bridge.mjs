@@ -82,9 +82,12 @@ function summarize(s) {
       : typeof p.cpu_energy === "number"
         ? p.cpu_energy / el
         : null;
+  // 이 GPU가 낼 수 있는 최대 클럭 (클럭 단계 목록 중 가장 높은 값). 한계에 가까운지 판단할 때 쓴다
+  const maxMhz = Math.max(0, ...(g.dvfm_states ?? []).map((d) => d.freq));
   return {
     type: "power",
     mhz,
+    maxMhz,
     gpuMw: typeof g.gpu_energy === "number" ? g.gpu_energy / el : null,
     cpuMw,
     active: 1 - (g.idle_ratio ?? 1),
