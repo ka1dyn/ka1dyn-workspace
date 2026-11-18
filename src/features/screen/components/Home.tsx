@@ -12,7 +12,7 @@ import { PUBLIC_IMAGES } from "@/shared/constants/images";
 import usePreloadImage from "@/shared/hooks/usePreloadImage";
 import useBlurredStrip from "../hooks/useBlurredStrip";
 import { useLab } from "@/features/lab/store";
-import { SCREEN_PX } from "@/shared/constants/camera";
+import { SCREEN_PX } from "../constants";
 
 const BAR_HEIGHT = 64; // 상단 바 높이 (h-16)
 const BAR_TINT = "color-mix(in oklab, var(--color-gray-500) 60%, transparent)"; // bg-gray-500/60

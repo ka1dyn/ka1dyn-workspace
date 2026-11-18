@@ -9,8 +9,8 @@ import {
   SCREEN_DISTANCE_FACTOR,
   SCREEN_PX,
   SCREEN_WORLD,
-} from "@/shared/constants/camera";
-import { fitDistance } from "@/shared/utils/cameraFit";
+} from "./constants";
+import { fitDistance } from "./utils/fitDistance";
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
 import { useLab } from "@/features/lab/store";

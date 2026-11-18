@@ -10,7 +10,7 @@ import { useModalStore, useModalViewStore } from "../stores";
 import { useShallow } from "zustand/shallow";
 import NavContent from "./NavContent";
 import MDContent from "./MDContent";
-import type { ModalPos } from "../types";
+import type { ModalPos } from "../stores";
 
 interface InfoModalProps {
   className?: string;

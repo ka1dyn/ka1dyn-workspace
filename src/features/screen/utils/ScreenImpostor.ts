@@ -1,5 +1,5 @@
 import { PUBLIC_IMAGES } from "@/shared/constants/images";
-import { SCREEN_PX } from "@/shared/constants/camera";
+import { SCREEN_PX } from "../constants";
 import { useReady } from "@/shared/stores";
 import { useBgImageStore, useModalStore, useModalViewStore } from "../stores";
 import * as THREE from "three";
