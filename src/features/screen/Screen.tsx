@@ -1,7 +1,7 @@
 import Booting from "./components/Booting";
 import Home from "./components/Home";
-import { useCameraInit, useOverlay, useReady, useTweaks } from "@/stores";
-import { OverlayTypes } from "@/types/enums";
+import { useCameraInit, useOverlay, useReady, useTweaks } from "@/shared/stores";
+import { OverlayTypes } from "@/shared/types/enums";
 import { Html } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
@@ -10,8 +10,8 @@ import {
   SCREEN_DISTANCE_FACTOR,
   SCREEN_PX,
   SCREEN_WORLD,
-} from "@/constants/camera";
-import { fitDistance } from "@/utils/cameraFit";
+} from "@/shared/constants/camera";
+import { fitDistance } from "@/shared/utils/cameraFit";
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
 import { useLab } from "@/features/lab/store";

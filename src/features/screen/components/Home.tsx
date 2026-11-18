@@ -1,17 +1,17 @@
-import { useBgImageStore, useOverlay, useTweaks } from "@/stores";
+import { useBgImageStore, useOverlay, useTweaks } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "@/icons/arrow_down.svg?react";
 import Dock from "./Dock";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import Folder from "./Folder";
 import ModalContainer from "./ModalContainer";
 import { LogOut } from "lucide-react";
-import { PUBLIC_IMAGES } from "@/constants/images";
-import usePreloadImage from "@/hooks/usePreloadImage";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
+import usePreloadImage from "@/shared/hooks/usePreloadImage";
 import useBlurredStrip from "@/hooks/useBlurredStrip";
 import { useLab } from "@/features/lab/store";
-import { SCREEN_PX } from "@/constants/camera";
+import { SCREEN_PX } from "@/shared/constants/camera";
 
 const BAR_HEIGHT = 64; // 상단 바 높이 (h-16)
 const BAR_TINT = "color-mix(in oklab, var(--color-gray-500) 60%, transparent)"; // bg-gray-500/60

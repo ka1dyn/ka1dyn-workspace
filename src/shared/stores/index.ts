@@ -11,11 +11,11 @@ import {
   type ModalStore,
   type ModalViewStore,
   type BgImageStore,
-} from "@/types/types";
-import { OverlayTypes } from "@/types/enums";
+} from "../types/types";
+import { OverlayTypes } from "../types/enums";
 import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { PUBLIC_IMAGES } from "@/constants/images";
+import { PUBLIC_IMAGES } from "../constants/images";
 
 export const useStart = create<StartType>((set) => ({
   start: false,

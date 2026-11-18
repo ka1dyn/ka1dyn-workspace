@@ -1,4 +1,4 @@
-import { useReady } from "@/stores";
+import { useReady } from "@/shared/stores";
 import { useFrame } from "@react-three/fiber";
 import { useShallow } from "zustand/shallow";
 

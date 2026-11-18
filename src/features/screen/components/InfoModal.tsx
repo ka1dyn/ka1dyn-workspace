@@ -1,15 +1,15 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import ResizeIcon from "@/icons/resize.svg?react";
 import CloseIcon from "@/icons/close.svg?react";
 import RemoveIcon from "@/icons/remove.svg?react";
 import ExpandIcon from "@/icons/expand.svg?react";
 import CollapseIcon from "@/icons/collapse.svg?react";
-import { useModalStore, useModalViewStore, useTweaks } from "@/stores";
+import { useModalStore, useModalViewStore, useTweaks } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
 import NavContent from "./NavContent";
 import MDContent from "./MDContent";
-import type { ModalPos } from "@/types/types";
+import type { ModalPos } from "@/shared/types/types";
 
 interface InfoModalProps {
   className?: string;

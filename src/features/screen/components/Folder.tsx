@@ -1,5 +1,5 @@
-import { PUBLIC_IMAGES } from "@/constants/images";
-import { useModalStore } from "@/stores";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
+import { useModalStore } from "@/shared/stores";
 import { useRef } from "react";
 import { useShallow } from "zustand/shallow";
 

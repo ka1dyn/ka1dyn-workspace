@@ -1,6 +1,6 @@
-import { useOverlay, useSoundVol, useStart, useTweaks } from "@/stores";
+import { useOverlay, useSoundVol, useStart, useTweaks } from "@/shared/stores";
 import { useThree } from "@react-three/fiber";
-import { OverlayTypes } from "@/types/enums";
+import { OverlayTypes } from "@/shared/types/enums";
 import {
   createContext,
   useContext,

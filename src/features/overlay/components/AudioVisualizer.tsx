@@ -1,4 +1,4 @@
-import { useTweaks } from "@/stores";
+import { useTweaks } from "@/shared/stores";
 import { useEffect, useRef } from "react";
 
 export default function AudioVisualizer({ className }: { className?: string }) {

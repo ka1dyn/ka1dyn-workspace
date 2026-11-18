@@ -1,11 +1,11 @@
-import { useCameraInit, useOverlay, useTweaks } from "@/stores";
-import { GsapEase, OverlayTypes } from "@/types/enums";
+import { useCameraInit, useOverlay, useTweaks } from "../stores";
+import { GsapEase, OverlayTypes } from "../types/enums";
 import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 import gsap from "gsap";
 import type * as THREE from "three";
-import { BASE_FOV } from "@/constants/camera";
-import { overviewFov } from "@/utils/cameraFit";
+import { BASE_FOV } from "../constants/camera";
+import { overviewFov } from "../utils/cameraFit";
 import { useLab } from "@/features/lab/store";
 
 // 전체 장면(overview) 카메라 위치. 밤 씬은 실험실 "카메라" 값(퍼걸러 중심 방위·높이·거리)으로 정한다.

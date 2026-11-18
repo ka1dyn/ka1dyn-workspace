@@ -7,7 +7,7 @@ import { AudioProvider, BackgroundBGM } from "@/features/sounds/components/Sound
 import CameraControl from "./CameraControl";
 import Helpers from "./utils/Helpers";
 import FrameDetector from "./utils/FrameDetector";
-import { useOverlay, useReady, useStart, useTweaks } from "@/stores";
+import { useOverlay, useReady, useStart, useTweaks } from "@/shared/stores";
 import StartAnimaion from "@/features/intro/StartAnimaion";
 import { Post } from "./effects/Post";
 import { IS_LAB, IS_MSAA, useLab } from "@/features/lab/store";

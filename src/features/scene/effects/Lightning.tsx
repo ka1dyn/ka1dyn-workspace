@@ -3,7 +3,7 @@ import { random } from "maath";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useSound } from "@/features/sounds/components/Sound";
-import { useSoundVol, useStart, useTweaks } from "@/stores";
+import { useSoundVol, useStart, useTweaks } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
 import { fadeInAndPlay, fadeOutAndPause } from "@/utils/soundEffect";
 import { LIGHTNING, LIGHTNING_HEX } from "./lightningUniforms";

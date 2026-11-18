@@ -1,4 +1,4 @@
-import { useTweaks } from "@/stores";
+import { useTweaks } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
 import { Environment, Lightformer, useHelper } from "@react-three/drei";
 import { memo, useRef } from "react";

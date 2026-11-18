@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { BASE_ASPECT, BASE_FOV, MAX_FOV, SCREEN_FILL } from "@/constants/camera";
+import { BASE_ASPECT, BASE_FOV, MAX_FOV, SCREEN_FILL } from "../constants/camera";
 
 /**
  * Distance at which a halfW x halfH plane, facing the camera, fills `fill` of

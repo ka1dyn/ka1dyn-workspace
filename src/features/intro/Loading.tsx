@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { scramble, TextScramble } from "./textScramble";
-import { useReady, useStart } from "@/stores";
-import usePreloadImage from "@/hooks/usePreloadImage";
-import { PUBLIC_IMAGES } from "@/constants/images";
+import { useReady, useStart } from "@/shared/stores";
+import usePreloadImage from "@/shared/hooks/usePreloadImage";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
 
 export default function Loading() {
   const textRef1 = useRef<HTMLDivElement>(null!);

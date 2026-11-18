@@ -1,5 +1,5 @@
 import AnimButton from "./AnimButton";
-import { RadioBtnTypes } from "@/types/enums";
+import { RadioBtnTypes } from "@/shared/types/enums";
 import { useState } from "react";
 import PaletteIcon from "@/icons/palette.svg?react";
 import PopupMenu from "./PopupMenu";

@@ -1,4 +1,4 @@
-import { preloadImage } from "@/lib/utils";
+import { preloadImage } from "../utils";
 import { useEffect, useRef, useState } from "react";
 
 export default function usePreloadImage(imagePaths: string[]) {

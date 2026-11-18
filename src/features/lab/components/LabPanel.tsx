@@ -1,9 +1,9 @@
 import { Leva, button, folder, useControls } from "leva";
 import { useEffect } from "react";
 import { IS_MSAA, useLab, type LabTool } from "../store";
-import { useCameraInit, useOverlay } from "@/stores";
-import { OverlayTypes } from "@/types/enums";
-import { overviewPosition } from "@/hooks/useCameraAnim";
+import { useCameraInit, useOverlay } from "@/shared/stores";
+import { OverlayTypes } from "@/shared/types/enums";
+import { overviewPosition } from "@/shared/hooks/useCameraAnim";
 
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {

@@ -1,8 +1,8 @@
-import { useCameraInit, useOverlay, useTweaks } from "@/stores";
-import { GsapEase, OverlayTypes } from "@/types/enums";
+import { useCameraInit, useOverlay, useTweaks } from "@/shared/stores";
+import { GsapEase, OverlayTypes } from "@/shared/types/enums";
 import gsap from "gsap";
-import { BASE_FOV } from "@/constants/camera";
-import { overviewFov } from "@/utils/cameraFit";
+import { BASE_FOV } from "@/shared/constants/camera";
+import { overviewFov } from "@/shared/utils/cameraFit";
 import { useShallow } from "zustand/shallow";
 import { useEffect, useRef } from "react";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";

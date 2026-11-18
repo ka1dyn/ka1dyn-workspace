@@ -1,5 +1,5 @@
-import useCameraAnim from "@/hooks/useCameraAnim";
-import { useStart } from "@/stores";
+import useCameraAnim from "@/shared/hooks/useCameraAnim";
+import { useStart } from "@/shared/stores";
 import { useEffect } from "react";
 
 export default function StartAnimation() {

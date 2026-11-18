@@ -1,5 +1,5 @@
-import { PUBLIC_IMAGES } from "@/constants/images";
-import { useReady, useStart } from "@/stores";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
+import { useReady, useStart } from "@/shared/stores";
 import { useEffect, useState } from "react";
 
 export default function Booting() {

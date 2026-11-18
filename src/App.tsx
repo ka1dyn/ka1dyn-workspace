@@ -1,5 +1,5 @@
 import Scene from "@/features/scene/Scene";
-import { useFullscreen, useStart } from "./stores";
+import { useFullscreen, useStart } from "@/shared/stores";
 import Loading from "@/features/intro/Loading";
 import { Route } from "wouter";
 import Overlay from "@/features/overlay/components/Overlay";

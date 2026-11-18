@@ -1,10 +1,10 @@
-import { useOverlay, useTweaks } from "@/stores";
-import { OverlayTypes } from "@/types/enums";
+import { useOverlay, useTweaks } from "@/shared/stores";
+import { OverlayTypes } from "@/shared/types/enums";
 import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
 import RightNav from "./RightNav";
 import RadioNav from "./RadioNav";
-import useCameraAnim from "@/hooks/useCameraAnim";
+import useCameraAnim from "@/shared/hooks/useCameraAnim";
 
 interface DefaultOverlayProps {
   screenClick: () => void;

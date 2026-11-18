@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import ProjectContentHome from "./ProjectContentHome";
 import MDViewer from "./MDViewer";
-import { useModalStore, useModalViewStore } from "@/stores";
+import { useModalStore, useModalViewStore } from "@/shared/stores";
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 export default function MDContent({ name }: { name: string }) {

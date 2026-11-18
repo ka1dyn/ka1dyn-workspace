@@ -1,6 +1,6 @@
-import { useModalStore } from "@/stores";
+import { useModalStore } from "@/shared/stores";
 import Card from "./Card";
-import { PUBLIC_IMAGES } from "@/constants/images";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
 import { useEffect, type RefObject } from "react";
 
 export default function ProjectContentHome({ name }: { name: string }) {

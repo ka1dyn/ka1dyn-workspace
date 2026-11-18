@@ -1,10 +1,10 @@
-import { cn } from "@/lib/utils";
-import { useBgImageStore, useModalStore } from "@/stores";
+import { cn } from "@/shared/utils";
+import { useBgImageStore, useModalStore } from "@/shared/stores";
 import { useLayoutEffect, useRef, useState } from "react";
 import ModalDockItem from "./ModalDockItem";
 import React from "react";
 import { useShallow } from "zustand/shallow";
-import { PUBLIC_IMAGES } from "@/constants/images";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
 
 export default function Dock({ className }: { className?: string }) {
   const thumnailRefs = useRef<(HTMLDivElement | null)[]>([]);

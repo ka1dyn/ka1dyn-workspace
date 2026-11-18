@@ -1,4 +1,4 @@
-import { PUBLIC_IMAGES } from "@/constants/images";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
 
 interface CardProps {
   name: string;

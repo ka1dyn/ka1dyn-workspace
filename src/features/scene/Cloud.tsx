@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Cloud, Clouds } from "@react-three/drei";
-import { PUBLIC_IMAGES } from "@/constants/images";
+import { PUBLIC_IMAGES } from "@/shared/constants/images";
 // import { isDesktop } from "react-device-detect";
 
 // 구름 모델만 그린다. 번개(섬광·천둥)는 Lightning.tsx로 옮겨 구름과 따로 켜고 끈다.

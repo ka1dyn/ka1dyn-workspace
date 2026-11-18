@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { useModalStore } from "@/stores";
+import { cn } from "@/shared/utils";
+import { useModalStore } from "@/shared/stores";
 
 export default function NavItem({
   name,
