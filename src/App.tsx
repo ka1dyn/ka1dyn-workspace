@@ -1,11 +1,11 @@
 import Scene from "@/features/scene/Scene";
 import { useFullscreen, useStart } from "./stores";
-import Loading from "./features/intro/Loading";
+import Loading from "@/features/intro/Loading";
 import { Route } from "wouter";
-import Overlay from "./features/overlay/components/Overlay";
+import Overlay from "@/features/overlay/components/Overlay";
 import { lazy, Suspense, useEffect } from "react";
 import Home from "@/features/screen/components/Home"; // 노트북 화면 디버깅용
-import { IS_LAB } from "./features/lab/store";
+import { IS_LAB } from "@/features/lab/store";
 
 // 실험실 패널(leva)은 ?lab일 때만 내려받는다
 const LabPanel = lazy(() => import("@/features/lab/components/LabPanel"));

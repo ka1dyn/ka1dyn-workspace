@@ -1,7 +1,7 @@
 import usePopup from "@/hooks/usePopup";
 import { useSoundVol, useTweaks } from "@/stores";
 import { useShallow } from "zustand/shallow";
-import { Slider } from "@/components/ui/slider";
+import { Slider } from "../ui/slider";
 import { SketchPicker } from "react-color";
 import VolumeupIcon from "@/icons/volumeup.svg?react";
 import VolumeoffIcon from "@/icons/volumeoff.svg?react";

@@ -1,14 +1,14 @@
 import { Canvas } from "@react-three/fiber";
 import { lazy, Suspense, useEffect } from "react";
 // import { Post } from "./components/Post"
-import Lights from "@/features/scene/light/Lights";
-import Models from "@/features/scene/Models";
+import Lights from "./light/Lights";
+import Models from "./Models";
 import { AudioProvider, BackgroundBGM } from "@/features/sounds/components/Sound";
 import CameraControl from "./CameraControl";
 import Helpers from "./utils/Helpers";
 import FrameDetector from "./utils/FrameDetector";
 import { useOverlay, useReady, useStart, useTweaks } from "@/stores";
-import StartAnimaion from "../intro/StartAnimaion";
+import StartAnimaion from "@/features/intro/StartAnimaion";
 import { Post } from "./effects/Post";
 import { IS_LAB, IS_MSAA, useLab } from "@/features/lab/store";
 

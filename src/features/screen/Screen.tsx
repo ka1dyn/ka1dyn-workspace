@@ -1,4 +1,4 @@
-import Booting from "@/features/screen/components/Booting";
+import Booting from "./components/Booting";
 import Home from "./components/Home";
 import { useCameraInit, useOverlay, useReady, useTweaks } from "@/stores";
 import { OverlayTypes } from "@/types/enums";

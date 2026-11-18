@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { scramble, TextScramble } from "./textScramble";
-import { useReady, useStart } from "../../stores";
+import { useReady, useStart } from "@/stores";
 import usePreloadImage from "@/hooks/usePreloadImage";
 import { PUBLIC_IMAGES } from "@/constants/images";
 
