@@ -17,10 +17,6 @@ export function setMoonDir(azDeg: number, elDeg: number) {
 }
 setMoonDir(-143, 18.5);
 
-export const FOG_COLOR = "#0a1020";
-export const FOG_NEAR = 6;
-export const FOG_FAR = 24;
-
 // 반사 카메라가 그리는 레이어. 하늘·달·퍼걸러·맥북 몸체·조명을 여기에 둔다.
 export const REFLECT_LAYER = 1;
 // 반사에 잔디를 넣을지는 토글로 정하므로 따로 둔다.

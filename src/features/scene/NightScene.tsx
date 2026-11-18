@@ -1,7 +1,6 @@
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Drops } from "./rain/Drops";
 import { Splashes } from "./rain/Splashes";
-import { FOG_COLOR, FOG_FAR, FOG_NEAR } from "./constants";
 import Sky from "./sky/Sky";
 import Grass from "./grass/Grass";
 import Water from "./water/Water";
@@ -9,6 +8,10 @@ import ReflectLayer from "./components/ReflectLayer";
 import Grain from "./effects/Grain";
 import Fireflies from "./grass/Fireflies";
 import { useLab } from "@/features/lab/store";
+
+const FOG_COLOR = "#0a1020";
+const FOG_NEAR = 6;
+const FOG_FAR = 24;
 
 // 밤 잔디밭 씬. 기존 돌 지형(Models.tsx의 GroundBase)은 그대로 두고,
 // 금속 빗물 바닥 대신 수면 평면을 깔아 지형의 낮은 곳을 물웅덩이로 만든다.
