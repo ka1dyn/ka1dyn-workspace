@@ -1,5 +1,4 @@
-import { useOverlay, useTweaks } from "@/shared/stores";
-import { OverlayTypes } from "@/shared/types/enums";
+import { OverlayTypes, useAudio, useDive, useOverlay } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
 import RightNav from "./RightNav";
@@ -53,11 +52,12 @@ function DefaultOverlay({ screenClick }: DefaultOverlayProps) {
 }
 
 function ScreenOverlay({ backClick }: ScreenOverlayProps) {
-  const { audioActive, setDive, setAudioActive, setAudioPrev } = useTweaks(
+  const { audioActive, setAudioActive, setAudioPrev } = useAudio(
     useShallow((state) => ({
       ...state,
     })),
   );
+  const setDive = useDive((state) => state.setDive);
   const setActive = useOverlay((state) => state.setActive);
 
   const diveClick = () => {

@@ -1,5 +1,5 @@
-import { useCameraInit, useOverlay, useTweaks } from "../stores";
-import { GsapEase, OverlayTypes } from "../types/enums";
+import { OverlayTypes, useCameraBlock, useCameraInit, useOverlay } from "../stores";
+import { GsapEase } from "../types/enums";
 import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 import gsap from "gsap";
@@ -28,7 +28,7 @@ export default function useCameraAnim() {
     })),
   );
 
-  const setCameraBlock = useTweaks((state) => state.setCameraBlock);
+  const setCameraBlock = useCameraBlock((state) => state.setCameraBlock);
 
   const { setLowDpr, setType, setActive } = useOverlay(
     useShallow((state) => ({

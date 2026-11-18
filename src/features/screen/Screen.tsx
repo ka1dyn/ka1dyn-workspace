@@ -1,7 +1,6 @@
 import Booting from "./components/Booting";
 import Home from "./components/Home";
-import { useCameraInit, useOverlay, useReady, useTweaks } from "@/shared/stores";
-import { OverlayTypes } from "@/shared/types/enums";
+import { useCameraInit, useOverlay, useReady, useDive, OverlayTypes } from "@/shared/stores";
 import { Html } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
@@ -35,7 +34,7 @@ export default function Screen({ ...props }: screenProps) {
     })),
   );
   const screenReady = useReady((state) => state.screenReady);
-  const dive = useTweaks((state) => state.dive);
+  const dive = useDive((state) => state.dive);
   const type = useOverlay((state) => state.type);
   const lab = useLab((state) => state.screen);
   // 해상도 배율을 낮추면 CSS 크기는 줄이고 distanceFactor는 키워, 월드에서 보이는 크기는 그대로 둔다.
@@ -185,7 +184,7 @@ export default function Screen({ ...props }: screenProps) {
     // 예전: brightness(dot) 다음 opacity(dot × fade)를 검은 배경 위에 → 내용 × dot² × fade
     const k = lab.frameStyle ? dot * dot * fade : 1;
 
-    const { dive } = useTweaks.getState();
+    const { dive } = useDive.getState();
     const overlayType = useOverlay.getState().type;
 
     // 화면이 차지하는 높이(CSS px)와 화면 안에 있는지

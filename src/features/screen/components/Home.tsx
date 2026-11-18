@@ -1,4 +1,4 @@
-import { useOverlay, useTweaks } from "@/shared/stores";
+import { useAudio, useDive, useOverlay } from "@/shared/stores";
 import { useBgImageStore } from "../stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "../icons/arrow_down.svg?react";
@@ -18,15 +18,16 @@ const BAR_HEIGHT = 64; // 상단 바 높이 (h-16)
 const BAR_TINT = "color-mix(in oklab, var(--color-gray-500) 60%, transparent)"; // bg-gray-500/60
 
 export default function Home() {
-  const { audioPrev, setDive, setAudioActive } = useTweaks(
+  const { audioPrev, setAudioActive } = useAudio(
     useShallow((state) => ({
       ...state,
     })),
   );
+  const setDive = useDive((state) => state.setDive);
   const path = useBgImageStore((state) => state.path);
   const [dockActive, setDockActive] = useState<boolean>(true);
   const setActive = useOverlay((state) => state.setActive);
-  const dive = useTweaks((state) => state.dive);
+  const dive = useDive((state) => state.dive);
   usePreloadImage([PUBLIC_IMAGES.BIKE, PUBLIC_IMAGES.CITY]);
   // 3D 화면에서는 실제 backdrop-blur 대신 미리 흐려 둔 배경 조각을 상단 바에 깐다 (index.css의 .screen-noblur 참고)
   const realBlur = useLab((state) => state.screen.backdrop) || dive;

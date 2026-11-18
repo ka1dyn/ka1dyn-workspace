@@ -2,7 +2,7 @@ import FullscreenIcon from "../icons/fullscreen.svg?react";
 import FullscreenExitIcon from "../icons/fullscreen_exit.svg?react";
 import GithubIcon from "../icons/github.svg?react";
 import AudioVisualizer from "./AudioVisualizer";
-import { useFullscreen, useTweaks } from "@/shared/stores";
+import { useAudio, useFullscreen } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
 
 interface LeftNavProps {
@@ -17,7 +17,7 @@ export default function RightNav({
   soundActive = true,
 }: LeftNavProps) {
   const fullscreen = useFullscreen((state) => state.fullscreen);
-  const { audioActive, setAudioActive } = useTweaks(
+  const { audioActive, setAudioActive } = useAudio(
     useShallow((state) => ({
       audioActive: state.audioActive,
       setAudioActive: state.setAudioActive,

@@ -1,5 +1,5 @@
-import { useCameraInit, useOverlay, useTweaks } from "@/shared/stores";
-import { GsapEase, OverlayTypes } from "@/shared/types/enums";
+import { OverlayTypes, useCameraBlock, useCameraInit, useOverlay } from "@/shared/stores";
+import { GsapEase } from "@/shared/types/enums";
 import gsap from "gsap";
 import { BASE_FOV } from "@/shared/constants/camera";
 import { overviewFov } from "@/shared/utils/cameraFit";
@@ -49,7 +49,7 @@ export default function CameraControl() {
 
   const setRefs = useCameraInit((state) => state.setRefs);
 
-  const cameraBlock = useTweaks((state) => state.cameraBlock);
+  const cameraBlock = useCameraBlock((state) => state.cameraBlock);
 
   // Set Camera init position
   const { target, pos } = useCameraInit(

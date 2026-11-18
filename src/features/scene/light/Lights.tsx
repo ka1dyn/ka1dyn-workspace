@@ -1,4 +1,4 @@
-import { useTweaks } from "@/shared/stores";
+import { useLight } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
 import { Environment, Lightformer, useHelper } from "@react-three/drei";
 import { memo, useRef } from "react";
@@ -15,8 +15,8 @@ import ReflectLayer from "../components/ReflectLayer";
 export default function Lights() {
   const lightRef = useRef<THREE.PointLight>(null!);
   const spotRef = useRef<THREE.SpotLight>(null!);
-  const intensity = useTweaks((state) => state.intensity);
-  const lightColor = useTweaks((state) => state.lightColor);
+  const intensity = useLight((state) => state.intensity);
+  const lightColor = useLight((state) => state.lightColor);
   // 필요한 값만 구독한다. 스토어 전체를 구독하면 패널의 어떤 토글에도 다시 렌더링된다.
   const environment = useLab((state) => state.environment);
   const rectArea = useLab((state) => state.rectArea);

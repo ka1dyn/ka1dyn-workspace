@@ -1,6 +1,5 @@
-import { useOverlay, useSoundVol, useStart, useTweaks } from "@/shared/stores";
+import { OverlayTypes, useOverlay, useSoundVol, useStart, useAudio } from "@/shared/stores";
 import { useThree } from "@react-three/fiber";
-import { OverlayTypes } from "@/shared/types/enums";
 import {
   createContext,
   useContext,
@@ -103,7 +102,7 @@ export function BackgroundBGM() {
 
   const type = useOverlay((state) => state.type);
 
-  const audioActive = useTweaks((state) => state.audioActive);
+  const audioActive = useAudio((state) => state.audioActive);
   const start = useStart((state) => state.start);
 
   // // Volume changes

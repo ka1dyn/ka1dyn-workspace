@@ -5,7 +5,7 @@ import CloseIcon from "../icons/close.svg?react";
 import RemoveIcon from "../icons/remove.svg?react";
 import ExpandIcon from "../icons/expand.svg?react";
 import CollapseIcon from "../icons/collapse.svg?react";
-import { useTweaks } from "@/shared/stores";
+import { useDive } from "@/shared/stores";
 import { useModalStore, useModalViewStore } from "../stores";
 import { useShallow } from "zustand/shallow";
 import NavContent from "./NavContent";
@@ -41,7 +41,7 @@ export default function InfoModal({
     })),
   );
   const modalRef = useRef<HTMLDivElement>(null!);
-  const dive = useTweaks((state) => state.dive);
+  const dive = useDive((state) => state.dive);
 
   // Not subscribe, just read (always same with DOM)
   const rect = useModalViewStore.getState().rects[name];

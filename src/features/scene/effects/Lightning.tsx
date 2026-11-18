@@ -3,7 +3,7 @@ import { random } from "maath";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useSound } from "@/features/sounds/components/Sound";
-import { useSoundVol, useStart, useTweaks } from "@/shared/stores";
+import { useSoundVol, useStart, useAudio } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
 import { fadeInAndPlay, fadeOutAndPause } from "@/features/sounds/utils/soundEffect";
 import { LIGHTNING, LIGHTNING_HEX } from "../lightningUniforms";
@@ -20,7 +20,7 @@ const MAX_LIGHT = 6.5; // 예전 번개 라이트 최대 세기 (2.5 ~ 6.5)
 
 export default function Lightning() {
   const lightRef = useRef<THREE.PointLight>(null!);
-  const audioActive = useTweaks((state) => state.audioActive);
+  const audioActive = useAudio((state) => state.audioActive);
   const [flash] = useState(
     () =>
       new random.FlashGen({

@@ -1,5 +1,5 @@
 import usePopup from "../hooks/usePopup";
-import { useSoundVol, useTweaks } from "@/shared/stores";
+import { useAudio, useLight, useSoundVol } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
 import { Slider } from "@/shared/components/ui/slider";
 import { SketchPicker } from "react-color";
@@ -16,7 +16,7 @@ export default function PopupMenu() {
     setActive: setPickerActive,
     containerRef: pickerRef,
   } = usePopup();
-  const { intensity, lightColor, setIntensity, setLightColor } = useTweaks(
+  const { intensity, lightColor, setIntensity, setLightColor } = useLight(
     useShallow((state) => ({
       intensity: state.intensity,
       lightColor: state.lightColor,
@@ -30,7 +30,7 @@ export default function PopupMenu() {
     })),
   );
 
-  const { audioActive, setAudioActive } = useTweaks(
+  const { audioActive, setAudioActive } = useAudio(
     useShallow((state) => ({
       ...state,
     })),

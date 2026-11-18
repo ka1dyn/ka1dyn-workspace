@@ -40,11 +40,6 @@ export const GsapEase = {
   ELASTIC_INOUT: "elastic.inOut",
 } as const;
 
-export const OverlayTypes = {
-  NONE: "none",
-  DEFAULT: "default",
-  SCREEN: "screen",
-} as const;
 
 export const RadioBtnTypes = {
   NONE: "none",
@@ -52,5 +47,4 @@ export const RadioBtnTypes = {
 } as const;
 
 export type GsapEase = (typeof GsapEase)[keyof typeof GsapEase];
-export type OverlayTypes = (typeof OverlayTypes)[keyof typeof OverlayTypes];
 export type RadioBtnTypes = (typeof RadioBtnTypes)[keyof typeof RadioBtnTypes];

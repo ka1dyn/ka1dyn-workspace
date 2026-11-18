@@ -7,7 +7,7 @@ import { AudioProvider, BackgroundBGM } from "@/features/sounds/components/Sound
 import CameraControl from "./CameraControl";
 import Helpers from "./components/Helpers";
 import FrameDetector from "./components/FrameDetector";
-import { useOverlay, useReady, useStart, useTweaks } from "@/shared/stores";
+import { useOverlay, useReady, useStart, useDive } from "@/shared/stores";
 import StartAnimaion from "@/features/intro/StartAnimaion";
 import { Post } from "./effects/Post";
 import { IS_LAB, IS_MSAA, useLab } from "@/features/lab/store";
@@ -24,7 +24,7 @@ export default function Scene() {
   const labTool = useLab((state) => state.tool);
   const labPause = useLab((state) => state.pause);
   const start = useStart((state) => state.start);
-  const dive = useTweaks((state) => state.dive);
+  const dive = useDive((state) => state.dive);
   // 캔버스가 완전히 가려져 있는 동안은 그리지 않는다:
   //   - 시작 화면: 첫 프레임(셰이더 컴파일·텍스처 올리기)이 끝난 뒤 start를 누르기 전까지
   //   - dive: 맥북 화면 DOM이 창 전체를 덮고 있는 동안

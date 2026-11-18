@@ -1,10 +1,10 @@
-import { useTweaks } from "@/shared/stores";
+import { useAudio } from "@/shared/stores";
 import { useEffect, useRef } from "react";
 
 export default function AudioVisualizer({ className }: { className?: string }) {
   const stickRefs = useRef<(HTMLDivElement | null)[]>([]);
   const animationRefs = useRef<Animation[]>([]);
-  const audioActive = useTweaks((state) => state.audioActive);
+  const audioActive = useAudio((state) => state.audioActive);
 
   const stickCnt = 4;
 
