@@ -6,7 +6,7 @@ import { useSound } from "@/features/sounds/components/Sound";
 import { useSoundVol, useStart, useTweaks } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
 import { fadeInAndPlay, fadeOutAndPause } from "@/features/sounds/utils/soundEffect";
-import { LIGHTNING, LIGHTNING_HEX } from "./lightningUniforms";
+import { LIGHTNING, LIGHTNING_HEX } from "../lightningUniforms";
 
 // 번개: 섬광 리듬(maath FlashGen) + 천둥 소리 + 섬광 세기.
 // 예전에는 구름(Cloud.tsx) 안에 있어서 밤 씬에서 구름을 끄면(8e397e7) 번개도 같이 사라졌다.

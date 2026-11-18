@@ -2,7 +2,7 @@ import { useLab } from "@/features/lab/store";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import { setMoonDir } from "../constants";
-import { LIGHTNING } from "../effects/lightningUniforms";
+import { LIGHTNING } from "../lightningUniforms";
 
 // 번개 섬광 1일 때 더하는 환경맵 세기 (기본 환경맵 세기 0.12)
 const FLASH_ENV = 0.9;

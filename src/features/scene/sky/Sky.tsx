@@ -1,10 +1,10 @@
 import { useLab } from "@/features/lab/store";
-import { lightningUniforms } from "../../effects/lightningUniforms";
+import { lightningUniforms } from "../lightningUniforms";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { MOON_DIR, setMoonDir } from "../../constants";
-import { bakeMilkyWay } from "../milkyway";
+import { MOON_DIR, setMoonDir } from "../constants";
+import { bakeMilkyWay } from "./milkyway";
 
 // 하늘 돔: 조명 계산 없이 방향만으로 색을 정한다.
 // 세로 그라데이션 + 은하수 + 별 + 달 + 지평선 숲 실루엣.

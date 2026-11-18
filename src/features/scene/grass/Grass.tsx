@@ -3,10 +3,10 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER } from "../constants";
-import { clumpNoise, getWindTexture } from "../water/noise";
+import { clumpNoise, getWindTexture } from "../noise";
 import { InteractionMap } from "./interaction";
-import { terrainLayout, useTerrainSampler } from "../ground/terrain";
-import { lightningUniforms } from "../effects/lightningUniforms";
+import { terrainLayout, useTerrainSampler } from "../terrain";
+import { lightningUniforms } from "../lightningUniforms";
 
 // 인스턴스 잔디: 위로 갈수록 좁아지는 띠 하나를 InstancedMesh로 수만 번 그린다 (드로우콜 1).
 // 조명 계산 없이 높이 그라데이션 + 바람 밝기 + 퍼걸러 등의 따뜻한 빛을 셰이더에서 흉내 낸다.

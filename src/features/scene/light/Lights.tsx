@@ -4,7 +4,7 @@ import { Environment, Lightformer, useHelper } from "@react-three/drei";
 import { memo, useRef } from "react";
 import * as THREE from "three";
 import NightLights from "./NightLights";
-import ReflectLayer from "../shared/ReflectLayer";
+import ReflectLayer from "../components/ReflectLayer";
 // import { useFrame } from "@react-three/fiber";
 // import { useLayoutEffect, useMemo, useRef } from "react";
 

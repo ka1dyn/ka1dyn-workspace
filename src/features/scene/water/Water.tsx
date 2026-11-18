@@ -3,10 +3,10 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { GRASS_LAYER, REFLECT_LAYER } from "../constants";
-import { getWindTexture } from "./noise";
+import { getWindTexture } from "../noise";
 import { PlanarReflection } from "./PlanarReflection";
-import { TERRAIN, terrainLayout, useTerrainTextures } from "../ground/terrain";
-import { LIGHTNING, lightningUniforms } from "../effects/lightningUniforms";
+import { TERRAIN, terrainLayout, useTerrainTextures } from "../terrain";
+import { LIGHTNING, lightningUniforms } from "../lightningUniforms";
 
 // 돌 지형 위에 까는 수면 평면. 지형보다 낮은 곳에서만 보여서 그 자리가 곧 물웅덩이가 된다
 // (높은 바위는 깊이 테스트로 수면을 가린다). 지형과 같은 그룹·크기·회전이라 UV가 같으므로

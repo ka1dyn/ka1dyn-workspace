@@ -1,13 +1,13 @@
 import { Splashes } from "./rain/Splashes";
-import Test from "./glb_components/Test";
+import Test from "./components/Test";
 import { GroundBase, RainGround } from "./ground/TestGround";
-import { Floor } from "./Floor";
+import { Floor } from "./ground/Floor";
 import { degToRad } from "three/src/math/MathUtils.js";
-import { RainClouds } from "./Cloud";
+import { RainClouds } from "./sky/Cloud";
 import Mac from "./mac/Mac";
 import { useLab } from "@/features/lab/store";
-import NightScene from ".";
-import ReflectLayer from "./shared/ReflectLayer";
+import NightScene from "./NightScene";
+import ReflectLayer from "./components/ReflectLayer";
 import Lightning from "./effects/Lightning";
 
 export default function Models() {

@@ -1,7 +1,7 @@
-import Test from "../glb_components/Test";
+import Test from "../components/Test";
 import { degToRad } from "three/src/math/MathUtils.js";
 import Screen from "@/features/screen/Screen";
-import ReflectLayer from "../shared/ReflectLayer";
+import ReflectLayer from "../components/ReflectLayer";
 
 export default function Mac() {
   return (

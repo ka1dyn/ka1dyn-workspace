@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Drops } from "../rain/Drops";
 import { Splashes } from "../rain/Splashes";
-import { terrainLayout } from "./terrain";
+import { terrainLayout } from "../terrain";
 
 // 지형 가장자리가 사라지며 드러나는 색: 하늘 돔의 지평선 아래쪽(Night/Sky.tsx의 uTree, #03050a).
 // 화면에 나가는 값 그대로 써야 하므로 색 공간 변환 없이 넣는다.
