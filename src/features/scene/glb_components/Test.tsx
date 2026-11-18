@@ -1,4 +1,4 @@
-import { warmupTextures } from "@/utils/warmupTextures";
+import { warmupTextures } from "../utils/warmupTextures";
 import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { useEffect } from "react";

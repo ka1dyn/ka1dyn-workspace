@@ -1,6 +1,6 @@
-import FullscreenIcon from "@/icons/fullscreen.svg?react";
-import FullscreenExitIcon from "@/icons/fullscreen_exit.svg?react";
-import GithubIcon from "@/icons/github.svg?react";
+import FullscreenIcon from "../icons/fullscreen.svg?react";
+import FullscreenExitIcon from "../icons/fullscreen_exit.svg?react";
+import GithubIcon from "../icons/github.svg?react";
 import AudioVisualizer from "./AudioVisualizer";
 import { useFullscreen, useTweaks } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";

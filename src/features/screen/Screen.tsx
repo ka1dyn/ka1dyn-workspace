@@ -15,7 +15,7 @@ import { fitDistance } from "@/shared/utils/cameraFit";
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
 import { useLab } from "@/features/lab/store";
-import { ScreenImpostor } from "./components/ScreenImpostor";
+import { ScreenImpostor } from "./utils/ScreenImpostor";
 
 // 화면 높이가 이 값(CSS px)보다 작게 보이면 대체 그림으로 바꾸고, 더 크게 보이면 DOM으로 돌아온다.
 // 전체 장면 시점에서는 약 30px이다. 두 값 사이에서는 지금 상태를 유지한다.

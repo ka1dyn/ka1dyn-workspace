@@ -5,7 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useSound } from "@/features/sounds/components/Sound";
 import { useSoundVol, useStart, useTweaks } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
-import { fadeInAndPlay, fadeOutAndPause } from "@/utils/soundEffect";
+import { fadeInAndPlay, fadeOutAndPause } from "@/features/sounds/utils/soundEffect";
 import { LIGHTNING, LIGHTNING_HEX } from "./lightningUniforms";
 
 // 번개: 섬광 리듬(maath FlashGen) + 천둥 소리 + 섬광 세기.

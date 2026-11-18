@@ -10,7 +10,7 @@ import {
   type RefObject,
 } from "react";
 import { Audio, AudioListener, AudioLoader } from "three";
-import { fadeInAndPlay, fadeOutAndPause } from "@/utils/soundEffect";
+import { fadeInAndPlay, fadeOutAndPause } from "../utils/soundEffect";
 import { useShallow } from "zustand/shallow";
 
 export const AudioContext = createContext<RefObject<AudioListener> | null>(

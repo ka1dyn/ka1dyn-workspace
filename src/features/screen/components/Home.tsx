@@ -1,6 +1,6 @@
 import { useBgImageStore, useOverlay, useTweaks } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
-import ArrowDown from "@/icons/arrow_down.svg?react";
+import ArrowDown from "../icons/arrow_down.svg?react";
 import Dock from "./Dock";
 import { useEffect, useState } from "react";
 import { cn } from "@/shared/utils";
@@ -9,7 +9,7 @@ import ModalContainer from "./ModalContainer";
 import { LogOut } from "lucide-react";
 import { PUBLIC_IMAGES } from "@/shared/constants/images";
 import usePreloadImage from "@/shared/hooks/usePreloadImage";
-import useBlurredStrip from "@/hooks/useBlurredStrip";
+import useBlurredStrip from "../hooks/useBlurredStrip";
 import { useLab } from "@/features/lab/store";
 import { SCREEN_PX } from "@/shared/constants/camera";
 

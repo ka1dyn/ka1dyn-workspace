@@ -1,11 +1,11 @@
-import usePopup from "@/hooks/usePopup";
+import usePopup from "../hooks/usePopup";
 import { useSoundVol, useTweaks } from "@/shared/stores";
 import { useShallow } from "zustand/shallow";
 import { Slider } from "@/shared/components/ui/slider";
 import { SketchPicker } from "react-color";
-import VolumeupIcon from "@/icons/volumeup.svg?react";
-import VolumeoffIcon from "@/icons/volumeoff.svg?react";
-import RefreshIcon from "@/icons/refresh.svg?react";
+import VolumeupIcon from "../icons/volumeup.svg?react";
+import VolumeoffIcon from "../icons/volumeoff.svg?react";
+import RefreshIcon from "../icons/refresh.svg?react";
 
 const tweak = "flex font-bold items-center text-[12px] text-[#a3a3a3] gap-5";
 const tweak_name = "w-20 text-left";
