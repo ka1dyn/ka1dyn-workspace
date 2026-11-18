@@ -6,7 +6,7 @@ import gsap from "gsap";
 import type * as THREE from "three";
 import { BASE_FOV } from "@/constants/camera";
 import { overviewFov } from "@/utils/cameraFit";
-import { useLab } from "@/lab/store";
+import { useLab } from "@/features/lab/store";
 
 // 전체 장면(overview) 카메라 위치. 밤 씬은 실험실 "카메라" 값(퍼걸러 중심 방위·높이·거리)으로 정한다.
 // 기본값: 기존 위치에서 퍼걸러를 중심으로 24° 돌리고, 1.7m 높이, 조작 범위 상한(10m)에 가까운 9.9m.
