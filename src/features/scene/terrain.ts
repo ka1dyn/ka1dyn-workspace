@@ -2,9 +2,9 @@ import { useTexture } from "@react-three/drei";
 import { useMemo } from "react";
 import { degToRad } from "three/src/math/MathUtils.js";
 
-// 기존 돌 지형(Ground/TestGround.tsx의 GroundBase와 Models.tsx의 배치)과 같은 값.
+// 돌 지형(ground/TestGround.tsx의 GroundBase와 Models.tsx의 배치)과 같은 값.
 // 수면과 잔디가 지형과 정확히 맞아야 하므로 한곳에 모아 둔다. GroundBase를 바꾸면 여기도 바꾼다.
-// 크기·분할·반복은 땅 크기에 따라 바뀌므로 terrainLayout(size)로 구한다 (기존 씬은 15m).
+// 크기·분할·반복은 땅 크기에 따라 바뀌므로 terrainLayout(size)로 구한다 (기준 15m).
 export const TERRAIN = {
   y: -0.03, // 그룹 위치
   rotY: degToRad(50), // 그룹 회전
@@ -16,7 +16,7 @@ const BASE_SIZE = 15;
 const BASE_SEGMENTS = 128;
 const BASE_REPEAT = 2; // 변위맵 등 반복 (알파맵은 반복하지 않는다)
 
-// 땅을 넓혀도 돌 질감과 격자 간격이 기존(15m)과 같도록 반복 횟수와 분할 수를 크기에 비례시킨다.
+// 땅을 넓혀도 돌 질감과 격자 간격이 기준(15m)과 같도록 반복 횟수와 분할 수를 크기에 비례시킨다.
 // 알파맵은 반복하지 않으므로 가장자리 원도 크기를 따라 넓어진다.
 export function terrainLayout(size: number) {
   return {

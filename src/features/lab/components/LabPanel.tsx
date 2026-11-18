@@ -6,8 +6,7 @@ import { overviewPosition } from "@/shared/hooks/useCameraAnim";
 
 // leva 패널 값을 실험실 스토어로 옮긴다. 장면 컴포넌트는 스토어만 읽는다.
 export default function LabPanel() {
-  // 밤 씬 기준으로 주제별로 묶었다. 기존 씬 전용 항목(씬 전환, 이전 하늘, 빗물 바닥,
-  // rectArea·ambient 조명)은 패널에서 뺐다. 스토어와 코드는 남아 있어 콘솔(__lab.setState)로는 바꿀 수 있다.
+  // 주제별로 묶었다.
   const v = useControls({
     모델: folder({
       "퍼걸러 (+물튀김)": true,
@@ -231,11 +230,7 @@ export default function LabPanel() {
       dpr: v.DPR as "default" | number,
       post: v["후처리 (Bloom + 대비)"],
       environment: v["환경맵 켜기"],
-      // 기존 씬 전용 조명. 밤 씬에서는 쓰이지 않는다
-      rectArea: true,
-      ambient: true,
       models: {
-        rainGround: true, // 기존 씬 전용. 밤 씬에서는 렌더되지 않는다
         pergola: v["퍼걸러 (+물튀김)"],
         groundBase: v["돌 지형 (128×128 변위)"],
         things: v["소품 (things)"],
@@ -254,7 +249,6 @@ export default function LabPanel() {
         res: v["화면 DOM 해상도"] as number,
       },
       night: {
-        scene: "night", // 기존 씬 전환은 패널에서 뺐다
         grass: v["잔디 켜기"],
         groundSize: v["땅 크기 (m)"],
         grassCount: v["잔디 개수"] as number,
@@ -278,7 +272,6 @@ export default function LabPanel() {
         camDistance: v["카메라 거리 (m)"],
         moonAz: v["달 방위 (°)"],
         moonEl: v["달 고도 (°)"],
-        skyQuality: "new", // 이전 하늘 비교는 패널에서 뺐다
         starDensity: v["별 밀도"],
         starBright: v["별 밝기"],
         starTwinkle: v["별 반짝임"],

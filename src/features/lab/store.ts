@@ -9,7 +9,6 @@ export const IS_MSAA =
   IS_LAB && new URLSearchParams(window.location.search).has("msaa");
 
 export type ModelKey =
-  | "rainGround"
   | "pergola"
   | "groundBase"
   | "things"
@@ -32,10 +31,9 @@ export interface ScreenLab {
 
 // 밤 씬 실험용 스위치. 이 브랜치의 기본값이 곧 새 기준 장면이다.
 export interface NightLab {
-  scene: "old" | "night"; // old: 기존 돌 지형·스튜디오 조명, night: 밤 잔디밭
   grass: boolean;
   grassCount: number;
-  groundSize: number; // 밤 씬 돌 지형 한 변(m). 기존 씬은 15
+  groundSize: number; // 돌 지형 한 변(m)
   grassSegments: number; // 잎 하나의 세로 분할 수 (삼각형 = 2 × 분할). 2면 꺾인 막대처럼 휜다
   wind: boolean;
   windStrength: number; // 바람 세기 배율
@@ -55,7 +53,6 @@ export interface NightLab {
   camDistance: number; // 타깃(0, 1, 0)까지 거리 (m, 조작 상한 10)
   moonAz: number; // 달 방위 (°)
   moonEl: number; // 달 고도 (°)
-  skyQuality: "new" | "old"; // 밤하늘 셰이더 (Night/Sky.tsx). old = 이전 하늘(비교·측정용)
   starDensity: number;
   starBright: number;
   starTwinkle: number; // 별 반짝임 세기 (밝기 ±)
@@ -99,7 +96,7 @@ export interface NightLab {
   terrainOpaque: boolean; // 돌 지형을 불투명으로 그리고 가장자리는 어두운 색으로 섞는다
   skyLast: boolean; // 하늘을 불투명 물체 중 마지막에 그려 가려진 픽셀을 건너뛴다
   grainSingle: boolean; // 그레인을 블렌딩 한 번으로 그리는 근사 방식 (Night/Grain.tsx)
-  // 조명 (밤 씬 전용)
+  // 조명
   moonIntensity: number;
   lampIntensity: number;
   lampColor: string;
@@ -114,8 +111,6 @@ export interface LabState {
   dpr: "default" | number;
   post: boolean;
   environment: boolean;
-  rectArea: boolean;
-  ambient: boolean;
   models: Record<ModelKey, boolean>;
   screen: ScreenLab;
   night: NightLab;
@@ -128,10 +123,7 @@ export const useLab = create<LabState>(() => ({
   dpr: "default",
   post: false,
   environment: true,
-  rectArea: true,
-  ambient: true,
   models: {
-    rainGround: true,
     pergola: true,
     groundBase: true,
     things: true,
@@ -149,7 +141,6 @@ export const useLab = create<LabState>(() => ({
     res: 1,
   },
   night: {
-    scene: "night",
     grass: true,
     grassCount: 100000,
     groundSize: 17,
@@ -173,7 +164,6 @@ export const useLab = create<LabState>(() => ({
     camDistance: 9.9,
     moonAz: -143,
     moonEl: 18.5,
-    skyQuality: "new",
     starDensity: 1,
     starBright: 0.3,
     starTwinkle: 0.6,

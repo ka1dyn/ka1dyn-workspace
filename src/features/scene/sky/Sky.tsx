@@ -10,7 +10,6 @@ import { bakeMilkyWay } from "./milkyway";
 // 세로 그라데이션 + 은하수 + 별 + 달 + 지평선 숲 실루엣.
 // 하늘은 화면의 큰 부분을 덮고 물웅덩이 반사에서도 한 번 더 그려지므로,
 // 무거운 노이즈(은하수)는 시작할 때 한 번 굽고(milkyway.ts) 여기서는 텍스처 1번만 읽는다.
-// SKY_OLD를 정의하면 이전 하늘(칸 전체를 칠하는 별, 값 노이즈 숲)로 그린다 (비교·측정용).
 
 // 은하수 띠(대원)의 평면 법선. 띠의 가장 높은 곳이 방위 16°(atan2(z, x) 기준), 고도 65°에 오도록 기울였다.
 // 전체 장면 첫 화면(카메라 방위 65.7°)에서는 오른쪽 끝에 걸치고, 달(방위 -143°, 고도 18°)과는
@@ -139,19 +138,6 @@ const fragmentShader = /* glsl */ `
     // 밝아진 하늘 앞에 실루엣으로 또렷하게 드러난다
     color += uFlashColor * uFlash * (0.08 + 0.22 * (1.0 - smoothstep(0.0, 0.8, h)));
 
-  #ifdef SKY_OLD
-    // 이전 하늘: 칸 전체를 칠하는 별 + 값 노이즈 숲
-    vec3 cell = floor(d * 180.0);
-    float star = step(0.9975, fract(sin(dot(cell, vec3(12.9898, 78.233, 37.719))) * 43758.5453));
-    color += star * smoothstep(0.1, 0.5, h) * 0.6;
-    float c = dot(d, uMoonDir);
-    float disk = smoothstep(0.99955, 0.99975, c);
-    float halo = pow(max(c, 0.0), 600.0) * 0.5 + pow(max(c, 0.0), 40.0) * 0.08;
-    color += uMoon * (disk * 2.0 + halo);
-    float az0 = atan(d.z, d.x);
-    float tree0 = 0.035 + 0.05 * noise1(az0 * 18.0) + 0.03 * noise1(az0 * 55.0) + 0.02 * noise1(az0 * 140.0);
-    color = mix(color, uTree, step(h, tree0));
-  #else
     float c = dot(d, uMoonDir);
     // 달빛과 대기에 씻기는 정도: 달 가까이, 지평선 가까이에서 별·은하수를 약하게
     float moonWash = smoothstep(0.75, 0.97, c);
@@ -245,7 +231,6 @@ const fragmentShader = /* glsl */ `
     float t2 = treeLine(az, 32.0, 0.03, 0.07, 303.0);
     color = mix(color, uTree, smoothstep(aa, -aa, h - t2));
     }
-  #endif
 
     gl_FragColor = vec4(color, 1.0);
     #include <colorspace_fragment>
@@ -312,7 +297,6 @@ function spawnMeteor(
 }
 
 export default function Sky() {
-  const old = useLab((s) => s.night.skyQuality === "old");
   // 하늘은 화면에서 가장 넓고 픽셀당 계산도 많다. 불투명 물체 중 맨 마지막에 그리면
   // 잔디·퍼걸러·지형이 먼저 깊이를 채워서, 그 뒤에 가려진 하늘 픽셀은 깊이 테스트에서 걸러진다.
   // (하늘은 항상 가장 먼 깊이에 그려지고 깊이를 쓰지 않으므로 순서만 바꾸면 된다)
@@ -328,7 +312,6 @@ export default function Sky() {
         side: THREE.BackSide,
         depthWrite: false,
         fog: false,
-        defines: old ? { SKY_OLD: "" } : {},
         uniforms: {
           uMoonDir: { value: MOON_DIR },
           uZenith: { value: new THREE.Color("#02040b") },
@@ -355,7 +338,7 @@ export default function Sky() {
           ...lightningUniforms(),
         },
       }),
-    [old],
+    [],
   );
   useEffect(() => () => material.dispose(), [material]);
 

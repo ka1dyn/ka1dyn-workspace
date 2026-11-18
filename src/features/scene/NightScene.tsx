@@ -13,9 +13,9 @@ const FOG_COLOR = "#0a1020";
 const FOG_NEAR = 6;
 const FOG_FAR = 24;
 
-// 밤 잔디밭 씬. 기존 돌 지형(Models.tsx의 GroundBase)은 그대로 두고,
-// 금속 빗물 바닥 대신 수면 평면을 깔아 지형의 낮은 곳을 물웅덩이로 만든다.
-// 퍼걸러, 타일 바닥, 맥북, 소품도 Models.tsx에서 그대로 쓴다.
+// 밤 잔디밭: 하늘, 잔디, 반딧불이, 비, 그레인과 수면.
+// 수면 평면이 돌 지형(Models.tsx의 GroundBase)의 낮은 곳을 물웅덩이로 만든다.
+// 퍼걸러, 타일 바닥, 맥북, 소품은 Models.tsx에 있다.
 export default function NightScene() {
   const n = useLab((state) => state.night);
   return (
@@ -48,9 +48,7 @@ export default function NightScene() {
   );
 }
 
-// 기존 RainGround에서 빗방울과 물튀김만 떼어 온다.
-// 변환 순서(바닥면 -90° → 자식 +90°)를 그대로 둬서 비가 떨어지는 범위가 같다.
-// (RainGround는 `{ props }`로 구조 분해해서 Models가 넘긴 50° 회전이 실제로는 적용되지 않았다.)
+// 빗방울과 물튀김. 변환 순서(바닥면 -90° → 자식 +90°)로 비가 떨어지는 범위를 정한다.
 function NightRain() {
   const on = useLab((s) => s.night.rainSparkleOn);
   const sparkle = useLab((s) => s.night.rainSparkle);

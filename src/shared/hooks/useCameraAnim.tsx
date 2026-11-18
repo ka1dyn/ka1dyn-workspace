@@ -8,12 +8,11 @@ import { BASE_FOV } from "../constants/camera";
 import { overviewFov } from "../utils/cameraFit";
 import { useLab } from "@/features/lab/store";
 
-// 전체 장면(overview) 카메라 위치. 밤 씬은 실험실 "카메라" 값(퍼걸러 중심 방위·높이·거리)으로 정한다.
+// 전체 장면(overview) 카메라 위치. 실험실 "카메라" 값(퍼걸러 중심 방위·높이·거리)으로 정한다.
 // 기본값: 기존 위치에서 퍼걸러를 중심으로 24° 돌리고, 1.7m 높이, 조작 범위 상한(10m)에 가까운 9.9m.
 // 달이 화면 왼쪽 위에, 은하수가 오른쪽 끝에 절반쯤 걸린다.
 export const overviewPosition = () => {
   const n = useLab.getState().night;
-  if (n.scene !== "night") return { x: 7.5, y: 2, z: 6 };
   const target = { x: 0, y: 1, z: 0 }; // 아래 애니메이션의 컨트롤 타깃과 같다
   const dy = n.camHeight - target.y;
   const r = Math.sqrt(Math.max(n.camDistance ** 2 - dy * dy, 0.01));
