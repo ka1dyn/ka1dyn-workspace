@@ -20,6 +20,8 @@ const MAX_LIGHT = 6.5; // 예전 번개 라이트 최대 세기 (2.5 ~ 6.5)
 
 export default function Lightning() {
   const lightRef = useRef<THREE.PointLight>(null!);
+  // 꺼도 섬광 계산(LIGHTNING)은 계속한다. visible=false인 조명은 셰이더의 조명 수에서 빠진다
+  const lightOn = useLab((s) => s.night.lightningLight);
   const audioActive = useAudio((state) => state.audioActive);
   const [flash] = useState(
     () =>
@@ -98,6 +100,7 @@ export default function Lightning() {
   return (
     <pointLight
       ref={lightRef}
+      visible={lightOn}
       color={LIGHTNING_HEX}
       intensity={0}
       decay={0.3}

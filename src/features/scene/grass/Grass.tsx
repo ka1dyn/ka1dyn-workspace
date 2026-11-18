@@ -431,7 +431,7 @@ export default function Grass({
     u.uWindSpeed.value = n.windSpeed;
     u.uLampPos.value.fromArray(n.lampPos);
     u.uLampColor.value.set(n.lampColor);
-    u.uLampIntensity.value = n.lampIntensity;
+    u.uLampIntensity.value = n.lampOn ? n.lampIntensity : 0;
   });
 
   return (

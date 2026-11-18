@@ -97,6 +97,13 @@ export interface NightLab {
   skyLast: boolean; // 하늘을 불투명 물체 중 마지막에 그려 가려진 픽셀을 건너뛴다
   grainSingle: boolean; // 그레인을 블렌딩 한 번으로 그리는 근사 방식 (Night/Grain.tsx)
   // 조명
+  moonOn: boolean; // 달(방향광)
+  lampOn: boolean; // 퍼걸러 아래 등. 끄면 잔디·수면에 흉내 낸 등 빛도 같이 끈다
+  lampType: "point" | "rect"; // point: 점광원, rect: RectAreaLight (기존 씬 방식, 아래를 향한 사각 면광원)
+  rectIntensity: number; // RectAreaLight 세기 (점광원과 단위가 달라 따로 둔다. 기존 씬 3)
+  rectSize: number; // RectAreaLight 한 변 (m, 기존 씬 2.8)
+  hemiOn: boolean; // 하늘빛(hemisphere)
+  lightningLight: boolean; // 번개 점광원. 끄면 PBR 재질만 번쩍이지 않고, 잔디·수면·하늘의 섬광과 천둥은 그대로다
   moonIntensity: number;
   lampIntensity: number;
   lampColor: string;
@@ -206,6 +213,13 @@ export const useLab = create<LabState>(() => ({
     terrainOpaque: true,
     skyLast: true,
     grainSingle: false,
+    moonOn: true,
+    lampOn: true,
+    lampType: "point",
+    rectIntensity: 3,
+    rectSize: 2.8,
+    hemiOn: true,
+    lightningLight: true,
     moonIntensity: 1.6,
     lampIntensity: 4,
     lampColor: "#ffb36b",

@@ -238,7 +238,7 @@ export default function Water({
     u.uLevel.value = n.waterLevel;
     u.uLampPos.value.fromArray(n.lampPos);
     u.uLampColor.value.set(n.lampColor);
-    u.uLampIntensity.value = n.lampIntensity;
+    u.uLampIntensity.value = n.lampOn ? n.lampIntensity : 0;
     mesh.current.position.y = n.waterLevel;
 
     if (!target) return;

@@ -1,8 +1,12 @@
 import { useLab } from "@/features/lab/store";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
+import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { setMoonDir } from "../constants";
 import { LIGHTNING } from "../lightningUniforms";
+
+// RectAreaLight는 LTC 조회 텍스처가 있어야 PBR 재질에 빛이 닿는다. 한 번만 만든다
+RectAreaLightUniformsLib.init();
 
 // 번개 섬광 1일 때 더하는 환경맵 세기 (기본 환경맵 세기 0.12)
 const FLASH_ENV = 0.9;
@@ -16,6 +20,12 @@ export default function NightLights() {
   const lampColor = useLab((s) => s.night.lampColor);
   const lampPos = useLab((s) => s.night.lampPos);
   const hemiIntensity = useLab((s) => s.night.hemiIntensity);
+  const moonOn = useLab((s) => s.night.moonOn);
+  const lampOn = useLab((s) => s.night.lampOn);
+  const lampType = useLab((s) => s.night.lampType);
+  const rectIntensity = useLab((s) => s.night.rectIntensity);
+  const rectSize = useLab((s) => s.night.rectSize);
+  const hemiOn = useLab((s) => s.night.hemiOn);
   const moonAz = useLab((s) => s.night.moonAz);
   const moonEl = useLab((s) => s.night.moonEl);
   const scene = useThree((s) => s.scene);
@@ -40,18 +50,34 @@ export default function NightLights() {
   return (
     <>
       <directionalLight
+        visible={moonOn}
         position={[moon.x, moon.y, moon.z]}
         color="#9fb4ff"
         intensity={moonIntensity}
       />
       <pointLight
+        visible={lampOn && lampType === "point"}
         position={lampPos}
         color={lampColor}
         intensity={lampIntensity}
         distance={7}
         decay={2}
       />
-      <hemisphereLight args={["#1d2a4d", "#05070a", hemiIntensity]} />
+      {/* 기존 씬 방식: 퍼걸러 천장에서 아래를 향하는 사각 면광원 */}
+      {lampOn && lampType === "rect" && (
+        <rectAreaLight
+          position={lampPos}
+          rotation={[-Math.PI / 2, 0, 0]}
+          width={rectSize}
+          height={rectSize}
+          color={lampColor}
+          intensity={rectIntensity}
+        />
+      )}
+      <hemisphereLight
+        visible={hemiOn}
+        args={["#1d2a4d", "#05070a", hemiIntensity]}
+      />
     </>
   );
 }

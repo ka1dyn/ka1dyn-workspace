@@ -42,10 +42,16 @@ export default function LabPanel() {
       },
     }),
     조명: folder({
+      "달 켜기": true,
       달빛: { value: 1.6, min: 0, max: 3, step: 0.05 },
+      "등 켜기": true,
+      "등 종류": { value: "point", options: { 점광원: "point", "사각 (RectArea)": "rect" } },
       "등 세기": { value: 4, min: 0, max: 20, step: 0.1 },
+      "사각 조명 세기": { value: 3, min: 0, max: 20, step: 0.1 },
+      "사각 조명 크기 (m)": { value: 2.8, min: 0.2, max: 5, step: 0.1 },
       "등 색": "#ffb36b",
       "등 위치": { value: [0, 2.3, 0], step: 0.05 },
+      "하늘빛 켜기": true,
       하늘빛: { value: 0.35, min: 0, max: 2, step: 0.05 },
       "환경맵 켜기": true,
       "환경맵 세기": { value: 0.12, min: 0, max: 1, step: 0.01 },
@@ -160,6 +166,7 @@ export default function LabPanel() {
     번개: folder({
       "번개 켜기": true,
       "번개 세기": { value: 1, min: 0, max: 3, step: 0.05 },
+      "번개 조명 (점광원)": true,
       "번개 바로 보기": button(() =>
         useLab.setState((s) => ({
           night: { ...s.night, lightningNow: s.night.lightningNow + 1 },
@@ -315,6 +322,13 @@ export default function LabPanel() {
         terrainOpaque: v["돌 지형 불투명 처리"],
         skyLast: v["하늘을 마지막에 그리기"],
         grainSingle: v["그레인 한 번에 그리기 (근사)"],
+        moonOn: v["달 켜기"],
+        lampOn: v["등 켜기"],
+        lampType: v["등 종류"] as "point" | "rect",
+        rectIntensity: v["사각 조명 세기"],
+        rectSize: v["사각 조명 크기 (m)"],
+        hemiOn: v["하늘빛 켜기"],
+        lightningLight: v["번개 조명 (점광원)"],
         moonIntensity: v["달빛"],
         lampIntensity: v["등 세기"],
         lampColor: v["등 색"],
