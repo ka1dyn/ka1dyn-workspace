@@ -1,5 +1,5 @@
 import { OverlayTypes, useCameraBlock, useCameraInit, useOverlay } from "../stores";
-import { GsapEase } from "../types/enums";
+import { GsapEase } from "../constants/gsap";
 import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 import gsap from "gsap";

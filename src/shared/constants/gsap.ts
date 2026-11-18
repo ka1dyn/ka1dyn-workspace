@@ -40,11 +40,4 @@ export const GsapEase = {
   ELASTIC_INOUT: "elastic.inOut",
 } as const;
 
-
-export const RadioBtnTypes = {
-  NONE: "none",
-  SETTING: "setting",
-} as const;
-
 export type GsapEase = (typeof GsapEase)[keyof typeof GsapEase];
-export type RadioBtnTypes = (typeof RadioBtnTypes)[keyof typeof RadioBtnTypes];

@@ -1,5 +1,5 @@
 import { OverlayTypes, useCameraBlock, useCameraInit, useOverlay } from "@/shared/stores";
-import { GsapEase } from "@/shared/types/enums";
+import { GsapEase } from "@/shared/constants/gsap";
 import gsap from "gsap";
 import { BASE_FOV } from "@/shared/constants/camera";
 import { overviewFov } from "@/shared/utils/cameraFit";

@@ -1,8 +1,14 @@
 import AnimButton from "./AnimButton";
-import { RadioBtnTypes } from "@/shared/types/enums";
 import { useState } from "react";
 import PaletteIcon from "../icons/palette.svg?react";
 import PopupMenu from "./PopupMenu";
+
+const RadioBtnTypes = {
+  NONE: "none",
+  SETTING: "setting",
+} as const;
+
+type RadioBtnTypes = (typeof RadioBtnTypes)[keyof typeof RadioBtnTypes];
 
 export default function RadioNav() {
   const [navClicked, setNavClicked] = useState<RadioBtnTypes>(
