@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { random } from "maath";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useSound } from "@/features/sounds/components/Sound";
+import { useSound } from "@/features/sounds/hooks/useSound";
 import { useSoundVol, useStart, useAudio } from "@/shared/stores";
 import { useLab } from "@/features/lab/store";
 import { fadeInAndPlay, fadeOutAndPause } from "@/features/sounds/utils/soundEffect";

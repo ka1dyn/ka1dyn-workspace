@@ -3,7 +3,8 @@ import { lazy, Suspense, useEffect } from "react";
 // import { Post } from "./components/Post"
 import Lights from "./light/Lights";
 import Models from "./Models";
-import { AudioProvider, BackgroundBGM } from "@/features/sounds/components/Sound";
+import { AudioProvider } from "@/features/sounds/components/AudioProvider";
+import { BackgroundBGM } from "@/features/sounds/components/BackgroundBGM";
 import CameraControl from "./CameraControl";
 import Helpers from "./components/Helpers";
 import FrameDetector from "./components/FrameDetector";
