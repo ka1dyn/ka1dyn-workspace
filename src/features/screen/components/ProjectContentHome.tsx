@@ -1,4 +1,4 @@
-import { useModalStore } from "@/shared/stores";
+import { useModalStore } from "../stores";
 import Card from "./Card";
 import { PUBLIC_IMAGES } from "@/shared/constants/images";
 import { useEffect, type RefObject } from "react";

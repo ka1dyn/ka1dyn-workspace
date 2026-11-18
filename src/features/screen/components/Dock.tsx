@@ -1,5 +1,5 @@
 import { cn } from "@/shared/utils";
-import { useBgImageStore, useModalStore } from "@/shared/stores";
+import { useBgImageStore, useModalStore } from "../stores";
 import { useLayoutEffect, useRef, useState } from "react";
 import ModalDockItem from "./ModalDockItem";
 import React from "react";

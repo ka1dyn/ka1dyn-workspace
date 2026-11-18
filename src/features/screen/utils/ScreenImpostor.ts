@@ -1,11 +1,7 @@
 import { PUBLIC_IMAGES } from "@/shared/constants/images";
 import { SCREEN_PX } from "@/shared/constants/camera";
-import {
-  useBgImageStore,
-  useModalStore,
-  useModalViewStore,
-  useReady,
-} from "@/shared/stores";
+import { useReady } from "@/shared/stores";
+import { useBgImageStore, useModalStore, useModalViewStore } from "../stores";
 import * as THREE from "three";
 
 // 멀리서 보는 맥북 화면의 대체 그림.

@@ -5,11 +5,12 @@ import CloseIcon from "../icons/close.svg?react";
 import RemoveIcon from "../icons/remove.svg?react";
 import ExpandIcon from "../icons/expand.svg?react";
 import CollapseIcon from "../icons/collapse.svg?react";
-import { useModalStore, useModalViewStore, useTweaks } from "@/shared/stores";
+import { useTweaks } from "@/shared/stores";
+import { useModalStore, useModalViewStore } from "../stores";
 import { useShallow } from "zustand/shallow";
 import NavContent from "./NavContent";
 import MDContent from "./MDContent";
-import type { ModalPos } from "@/shared/types/types";
+import type { ModalPos } from "../types";
 
 interface InfoModalProps {
   className?: string;

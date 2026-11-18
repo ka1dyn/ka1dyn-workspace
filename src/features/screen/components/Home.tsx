@@ -1,4 +1,5 @@
-import { useBgImageStore, useOverlay, useTweaks } from "@/shared/stores";
+import { useOverlay, useTweaks } from "@/shared/stores";
+import { useBgImageStore } from "../stores";
 import { useShallow } from "zustand/shallow";
 import ArrowDown from "../icons/arrow_down.svg?react";
 import Dock from "./Dock";

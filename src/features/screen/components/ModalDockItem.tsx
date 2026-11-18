@@ -1,5 +1,5 @@
 import { cn } from "@/shared/utils";
-import { useModalStore } from "@/shared/stores";
+import { useModalStore } from "../stores";
 import React from "react";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
