@@ -22,6 +22,14 @@ const LOD_FAR_PX = 110;
 const LOD_NEAR_PX = 140;
 const LOD_FADE_SECONDS = 0.25;
 
+// 화면 평면 두 장(drei Html의 구멍 평면 → 필름 평면 순)을 다른 불투명 물체보다 먼저 그린다.
+// three는 불투명 물체를 물체 중심 거리로 정렬해서, 중심이 더 가까운 맥북 상판이 먼저 그려졌다.
+// 그러면 화면 뒤에 가려질 상판 픽셀까지 PBR로 전부 계산한 뒤 평면이 덮어쓴다
+// (맥북 정면에서 프레임의 90%, 측정 약 840mW). 평면이 먼저 깊이를 채우면 뒤쪽 픽셀은 깊이 테스트에서 걸러진다.
+// 필름 평면은 구멍 평면의 알파를 그대로 덮어써야 하므로 구멍 평면보다 뒤에 그린다.
+const HOLE_RENDER_ORDER = -2;
+const FILM_RENDER_ORDER = -1;
+
 type screenProps = React.JSX.IntrinsicElements["group"];
 
 export default function Screen({ ...props }: screenProps) {
@@ -171,6 +179,15 @@ export default function Screen({ ...props }: screenProps) {
     const s = lod.current;
     const camera = state.camera as THREE.PerspectiveCamera;
 
+    // drei Html은 구멍 평면의 renderOrder를 받지 않고, dive를 오가면 평면을 새로 만든다.
+    // 그래서 매 프레임 Html 그룹(필름 평면 외의 자식) 안의 평면에 값을 넣는다 (자식은 몇 개뿐이다).
+    // 그룹은 필름 평면의 부모로 찾는다 (groupRef는 effect 의존성이라 거기서 꺼내 고치면 React 컴파일러 규칙에 걸린다)
+    for (const child of film.parent?.children ?? []) {
+      if (child === film) continue;
+      for (const m of child.children)
+        if ((m as THREE.Mesh).isMesh) m.renderOrder = HOLE_RENDER_ORDER;
+    }
+
     group.updateWorldMatrix(true, false);
     group.getWorldPosition(s.world);
     group.getWorldDirection(s.normal);
@@ -229,7 +246,11 @@ export default function Screen({ ...props }: screenProps) {
   return (
     <group ref={groupRef} {...props}>
       {lab.html && (
-        <mesh ref={filmRef} material={filmMaterial} renderOrder={1}>
+        <mesh
+          ref={filmRef}
+          material={filmMaterial}
+          renderOrder={FILM_RENDER_ORDER}
+        >
           <planeGeometry args={[SCREEN_WORLD.w, SCREEN_WORLD.h]} />
         </mesh>
       )}
